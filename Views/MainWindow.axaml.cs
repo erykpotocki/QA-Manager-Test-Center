@@ -174,6 +174,7 @@ public partial class MainWindow : Window
             Application.Current?.RequestedThemeVariant ==
             ThemeVariant.Dark;
 
+        UpdateLanguagePicker();
         UpdateThemeButton();
 
         StartTestButton.Click +=
@@ -1067,8 +1068,8 @@ public partial class MainWindow : Window
     {
         if (_isDarkMode)
         {
-            ThemeIconTextBlock.Text =
-                "☀";
+            ThemeSunIcon.IsVisible = true;
+            ThemeMoonIcon.IsVisible = false;
 
             ToolTip.SetTip(
                 ThemeToggleButton,
@@ -1076,8 +1077,8 @@ public partial class MainWindow : Window
         }
         else
         {
-            ThemeIconTextBlock.Text =
-                "☾";
+            ThemeSunIcon.IsVisible = false;
+            ThemeMoonIcon.IsVisible = true;
 
             ToolTip.SetTip(
                 ThemeToggleButton,

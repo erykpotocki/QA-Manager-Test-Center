@@ -6,6 +6,26 @@
 
 > Project status: active development, version line `v0.2.x`.
 
+## Interface preview
+
+### Test explorer and ad-hoc execution
+
+![QA Manager test explorer](docs/screenshots/02-test-explorer.png)
+
+| Sign-in | Assigned-test tutorial |
+| --- | --- |
+| ![QA Manager sign-in](docs/screenshots/01-sign-in.png) | ![Assigned-test tutorial](docs/screenshots/03-assigned-test-tutorial.png) |
+
+| Assigned test execution | Notification center |
+| --- | --- |
+| ![Assigned test execution](docs/screenshots/04-assigned-test-execution.png) | ![Notification center](docs/screenshots/05-notification-center.png) |
+
+### Appearance settings
+
+![Application appearance settings](docs/screenshots/06-application-settings.png)
+
+The screenshots show the English interface in the Light theme. The same workflow is available in Polish and in the Dark theme.
+
 ## Features
 
 - ad hoc and assigned test execution,
@@ -24,12 +44,14 @@ A fresh installation creates only synthetic demonstration accounts:
 
 | Login | Initial PIN | System role | Default project access |
 | --- | --- | --- | --- |
-| `admin` | `000000` | Admin | `TEST PROJECT`, `TEST SANDBOX` |
+| `admin` | `000000` | Admin, Leader, Tester | `TEST PROJECT — ENGLISH`, `TEST PROJECT — POLISH` |
 | `leader` | `000000` | Leader | None until assigned by Admin |
 | `tester1` | `000000` | Tester | None until assigned by Admin |
 | `tester2` | `000000` | Tester | None until assigned by Admin |
 
 The application requires each account to replace the initial PIN during its first sign-in. These accounts and all included test cases are fictional and are not associated with any company or real person.
+
+The Admin profile also demonstrates several colored custom QA roles: `QA Analyst`, `Automation Engineer`, `Test Architect` and `Quality Observer`. They have no project access by default and can be freely edited or removed in role management.
 
 ## Clean local state
 
@@ -49,8 +71,8 @@ The default appearance for a fresh profile is Light, Blue, Arial, standard text 
 
 Admin has access to two neutral projects:
 
-- `TEST PROJECT`
-- `TEST SANDBOX`
+- `TEST PROJECT — ENGLISH` — folders, collections, cases, descriptions and steps in English
+- `TEST PROJECT — POLISH` — foldery, zbiory, przypadki, opisy i kroki po polsku
 
 Their folders, collections and test cases are generated locally from deterministic seed definitions. Imported or user-created project names and test cases are never translated or uploaded by the application.
 
@@ -93,6 +115,7 @@ Host/client synchronization uses HTTPS, certificate fingerprint verification and
 - `ViewModels` — presentation logic
 - `Views` — Avalonia views
 - `Assets` — application icon and visual resources
+- `docs/screenshots` — screenshots used in this README
 - `installer` — installer configuration
 - `scripts` — release scripts
 

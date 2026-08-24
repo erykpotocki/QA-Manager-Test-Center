@@ -2,7 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Class="QARegressionManager.Views.ContinueSessionWindow"
-    Title="Niedokończona regresja"
+    Title="{DynamicResource ContinueSession.WindowTitle}"
     Width="620"
     Height="610"
     MinWidth="560"
@@ -111,7 +111,7 @@
                 </Border>
 
                 <TextBlock
-                    Text="Wykryto niedokończoną regresję"
+                    Text="{DynamicResource ContinueSession.Title}"
                     Margin="0,8,0,0"
                     HorizontalAlignment="Center"
                     TextAlignment="Center"
@@ -120,7 +120,7 @@
                     Foreground="{DynamicResource PrimaryTextBrush}" />
 
                 <TextBlock
-                    Text="Masz przypisaną sesję testową, która nie została zakończona. Możesz wrócić dokładnie do ostatniego miejsca."
+                    Text="{DynamicResource ContinueSession.Description}"
                     MaxWidth="500"
                     HorizontalAlignment="Center"
                     TextAlignment="Center"
@@ -152,22 +152,22 @@
                             ColumnDefinitions="150,*"
                             RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="Projekt" />
+                            <TextBlock Grid.Row="0" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="{DynamicResource ContinueSession.Project}" />
                             <TextBlock Name="ProjectNameTextBlock" Grid.Row="0" Grid.Column="1" Classes="MetadataValue" Margin="0,0,0,12" />
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="Wersja" />
+                            <TextBlock Grid.Row="1" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="{DynamicResource ContinueSession.Version}" />
                             <TextBlock Name="ApplicationVersionTextBlock" Grid.Row="1" Grid.Column="1" Classes="MetadataValue" Margin="0,0,0,12" />
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="Tester" />
+                            <TextBlock Grid.Row="2" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="{DynamicResource ContinueSession.Tester}" />
                             <TextBlock Name="TesterNameTextBlock" Grid.Row="2" Grid.Column="1" Classes="MetadataValue" Margin="0,0,0,12" />
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="Rodzaj sesji" />
+                            <TextBlock Grid.Row="3" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="{DynamicResource ContinueSession.SessionType}" />
                             <TextBlock Name="SessionModeTextBlock" Grid.Row="3" Grid.Column="1" Classes="MetadataValue" Margin="0,0,0,12" />
 
-                            <TextBlock Grid.Row="4" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="Ostatni test" />
+                            <TextBlock Grid.Row="4" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,12" Text="{DynamicResource ContinueSession.LastTest}" />
                             <TextBlock Name="LastTestTextBlock" Grid.Row="4" Grid.Column="1" Classes="MetadataValue" Margin="0,0,0,12" />
 
-                            <TextBlock Grid.Row="5" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,0" Text="Ostatni zapis" />
+                            <TextBlock Grid.Row="5" Grid.Column="0" Classes="MetadataLabel" Margin="0,0,18,0" Text="{DynamicResource ContinueSession.LastSave}" />
                             <TextBlock Name="LastSaveTextBlock" Grid.Row="5" Grid.Column="1" Classes="MetadataValue" />
 
                         </Grid>
@@ -180,7 +180,7 @@
                         CornerRadius="12">
 
                         <TextBlock
-                            Text="Wybranie „Nie teraz” nie usunie wyników. Sesja pozostanie zapisana i będzie można wrócić do niej później."
+                            Text="{DynamicResource ContinueSession.DismissInfo}"
                             TextWrapping="Wrap"
                             FontSize="{DynamicResource AppFontSize12}"
                             LineHeight="18"
@@ -200,13 +200,13 @@
                     Grid.Column="1"
                     Classes="DialogButton Secondary"
                     Margin="0,0,10,0"
-                    Content="NIE TERAZ"
+                    Content="{DynamicResource ContinueSession.NotNow}"
                     Click="DismissButton_OnClick" />
 
                 <Button
                     Grid.Column="2"
                     Classes="DialogButton Primary"
-                    Content="KONTYNUUJ"
+                    Content="{DynamicResource ContinueSession.Continue}"
                     Click="ContinueButton_OnClick" />
 
             </Grid>

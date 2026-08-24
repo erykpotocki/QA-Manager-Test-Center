@@ -73,7 +73,8 @@ public partial class LoginWindow : Window
     private void UpdateThemeButton()
     {
         var isDark = Application.Current?.RequestedThemeVariant == ThemeVariant.Dark;
-        ThemeIconTextBlock.Text = isDark ? "☀" : "☾";
+        ThemeSunIcon.IsVisible = isDark;
+        ThemeMoonIcon.IsVisible = !isDark;
         ToolTip.SetTip(
             ThemeToggleButton,
             LocalizationService.T(isDark ? "Theme.SwitchToLight" : "Theme.SwitchToDark"));

@@ -15,8 +15,20 @@ public sealed class UserProfileService
 {
     private const string RoleAndProjectDefinitionsMigration =
         "role-and-project-definitions-v1";
-    private const string RemoveNovaProjectRoleMigration =
-        "remove-nova-project-role-v1";
+    private const string DemoQaRolesMigration =
+        "demo-qa-roles-v1";
+    private const string EnglishDemoProjectKey =
+        "test-project-english";
+    private const string PolishDemoProjectKey =
+        "test-project-polish";
+
+    private static readonly ProjectRoleDefinitionModel[] DemoQaRoles =
+    {
+        new() { Name = "QA Analyst", BorderColor = "#2E86D1" },
+        new() { Name = "Automation Engineer", BorderColor = "#28A06A" },
+        new() { Name = "Test Architect", BorderColor = "#9A6BE8" },
+        new() { Name = "Quality Observer", BorderColor = "#F0A34A" }
+    };
 
     public const string InitialPin =
         "000000";
@@ -182,6 +194,10 @@ public sealed class UserProfileService
 
         data.AppliedDataMigrations ??=
             new();
+        var assignDemoQaRoles =
+            !data.AppliedDataMigrations.Contains(
+                DemoQaRolesMigration,
+                StringComparer.OrdinalIgnoreCase);
         EnsureRoleAndProjectDefinitions(data);
 
         foreach (var demoProfile in demoProfiles)
@@ -208,28 +224,26 @@ public sealed class UserProfileService
             profile.DisplayName =
                 demoProfile.DisplayName;
 
-            profile.SystemRoles = new() { demoProfile.Role };
+            profile.SystemRoles = string.Equals(
+                    profile.Login,
+                    "admin",
+                    StringComparison.OrdinalIgnoreCase)
+                ? SystemRoleService.AvailableSystemRoles.ToList()
+                : new() { demoProfile.Role };
 
             profile.ProjectRoles ??=
                 new();
 
             EnsureDedicatedAdminRole(
                 profile);
-        }
 
-        if (!data.AppliedDataMigrations.Contains(
-                RemoveNovaProjectRoleMigration,
-                StringComparer.OrdinalIgnoreCase))
-        {
-            foreach (var profile in data.Profiles)
+            if (assignDemoQaRoles &&
+                string.Equals(profile.Login, "admin", StringComparison.OrdinalIgnoreCase))
             {
-                profile.ProjectRoles.RemoveAll(role =>
-                    string.Equals(role, "NOVA", StringComparison.OrdinalIgnoreCase));
+                profile.ProjectRoles = DemoQaRoles
+                    .Select(role => role.Name)
+                    .ToList();
             }
-
-            data.ProjectRoleDefinitions.RemoveAll(role =>
-                string.Equals(role.Name, "NOVA", StringComparison.OrdinalIgnoreCase));
-            data.AppliedDataMigrations.Add(RemoveNovaProjectRoleMigration);
         }
 
         await SaveAsync(
@@ -295,29 +309,84 @@ public sealed class UserProfileService
         data.ProjectRoleDefinitions ??= new();
         data.AppliedDataMigrations ??= new();
 
-        data.Projects.AddRange(new[]
-        {
-            new ProjectDefinitionModel { Key = "nova-pay-demo", Name = DemoCatalog.PrimaryProjectName },
-            new ProjectDefinitionModel { Key = "nova-pay-sandbox", Name = DemoCatalog.SecondaryProjectName }
-        }.Where(project => data.Projects.All(existing =>
-            !string.Equals(existing.Key, project.Key, StringComparison.OrdinalIgnoreCase))));
+        EnsureDemoProjectDefinition(
+            data,
+            EnglishDemoProjectKey,
+            DemoCatalog.PrimaryProjectName);
+        EnsureDemoProjectDefinition(
+            data,
+            PolishDemoProjectKey,
+            DemoCatalog.SecondaryProjectName);
 
-        foreach (var project in data.Projects)
+        if (!data.AppliedDataMigrations.Contains(
+                DemoQaRolesMigration,
+                StringComparer.OrdinalIgnoreCase))
         {
-            if (string.Equals(project.Key, "nova-pay-demo", StringComparison.OrdinalIgnoreCase))
+            foreach (var demoRole in DemoQaRoles)
             {
-                project.Name = DemoCatalog.PrimaryProjectName;
+                if (data.ProjectRoleDefinitions.Any(role =>
+                        string.Equals(role.Name, demoRole.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                data.ProjectRoleDefinitions.Add(
+                    new ProjectRoleDefinitionModel
+                    {
+                        Name = demoRole.Name,
+                        BorderColor = demoRole.BorderColor,
+                        ProjectKeys = new()
+                    });
             }
-            else if (string.Equals(project.Key, "nova-pay-sandbox", StringComparison.OrdinalIgnoreCase))
-            {
-                project.Name = DemoCatalog.SecondaryProjectName;
-            }
+
+            data.AppliedDataMigrations.Add(DemoQaRolesMigration);
         }
 
-        data.ProjectRoleDefinitions.RemoveAll(role =>
-            string.Equals(role.Name, "NOVA", StringComparison.OrdinalIgnoreCase));
-
         data.AppliedDataMigrations.Add(RoleAndProjectDefinitionsMigration);
+    }
+
+    private static void EnsureDemoProjectDefinition(
+        UserProfilesDataModel data,
+        string projectKey,
+        string projectName)
+    {
+        var project = data.Projects.FirstOrDefault(item =>
+            string.Equals(item.Name, projectName, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(item.Key, projectKey, StringComparison.OrdinalIgnoreCase));
+
+        if (project is null)
+        {
+            data.Projects.Add(
+                new ProjectDefinitionModel
+                {
+                    Key = projectKey,
+                    Name = projectName
+                });
+            return;
+        }
+
+        var previousKey = project.Key;
+        project.Key = projectKey;
+        project.Name = projectName;
+
+        if (string.Equals(previousKey, projectKey, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        foreach (var role in data.ProjectRoleDefinitions)
+        {
+            for (var index = 0; index < role.ProjectKeys.Count; index++)
+            {
+                if (string.Equals(
+                        role.ProjectKeys[index],
+                        previousKey,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    role.ProjectKeys[index] = projectKey;
+                }
+            }
+        }
     }
 
     public async Task ChangePinAsync(
@@ -603,11 +672,11 @@ public sealed class UserProfileService
 
         foreach (var project in data.Projects)
         {
-            if (string.Equals(project.Key, "nova-pay-demo", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(project.Key, EnglishDemoProjectKey, StringComparison.OrdinalIgnoreCase))
             {
                 project.Name = DemoCatalog.PrimaryProjectName;
             }
-            else if (string.Equals(project.Key, "nova-pay-sandbox", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(project.Key, PolishDemoProjectKey, StringComparison.OrdinalIgnoreCase))
             {
                 project.Name = DemoCatalog.SecondaryProjectName;
             }

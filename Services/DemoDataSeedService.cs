@@ -9,7 +9,7 @@ namespace QARegressionManager.Services;
 
 public static class DemoDataSeedService
 {
-    private const string MigrationPrefix = "nova-pay-public-demo-v1";
+    private const string MigrationPrefix = "public-bilingual-demo-v2";
 
     public static bool EnsureSeeded(
         UserTestDataModel data,
@@ -30,34 +30,56 @@ public static class DemoDataSeedService
             return false;
         }
 
-        var seed = Build(projectKey);
-        var existingFolderKeys = data.Folders
-            .Where(item => string.Equals(item.ProjectKey, projectKey, StringComparison.OrdinalIgnoreCase))
-            .Select(item => item.SectionKey)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var existingCollectionKeys = data.Collections
-            .Where(item => string.Equals(item.ProjectKey, projectKey, StringComparison.OrdinalIgnoreCase))
-            .Select(item => item.CollectionKey)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var existingCaseIds = data.TestCases
-            .Where(item => string.Equals(item.ProjectKey, projectKey, StringComparison.OrdinalIgnoreCase))
-            .Select(item => item.Id)
-            .ToHashSet();
+        var seed =
+            Build(
+                projectKey,
+                DemoCatalog.IsEnglishProject(projectName));
 
-        // Migracja katalogu demonstracyjnego nie może usuwać elementów
-        // utworzonych wcześniej przez użytkownika. Dodajemy wyłącznie brakujące
-        // elementy o stabilnych kluczach i identyfikatorach.
-        data.Folders.AddRange(seed.Folders.Where(item => existingFolderKeys.Add(item.SectionKey)));
-        data.Collections.AddRange(seed.Collections.Where(item => existingCollectionKeys.Add(item.CollectionKey)));
-        data.TestCases.AddRange(seed.TestCases.Where(item => existingCaseIds.Add(item.Id)));
+        ApplySeed(
+            data,
+            seed);
         data.AppliedDataMigrations.Add(migrationId);
         return true;
     }
 
-    private static SeedData Build(string projectKey)
+    private static SeedData Build(
+        string projectKey,
+        bool english)
     {
         var seed = new SeedData();
-        var functionalAreas = new[]
+        var functionalAreas = english
+            ? BuildEnglishAreas()
+            : BuildPolishAreas();
+
+        AddTestType(seed, projectKey, "functional", "functional-root", functionalAreas, false, english);
+
+        var regressionAreas = functionalAreas.Select(area =>
+            new Area(
+                area.Name,
+                english
+                    ? $"A compact regression check for the {area.Name} area."
+                    : $"Skrócona kontrola regresji obszaru {area.Name}.",
+                new[]
+                {
+                    new Collection(
+                        english
+                            ? $"{area.Name} regression"
+                            : $"Regresja {area.Name}",
+                        new[]
+                        {
+                            english
+                                ? $"Critical {area.Name} flow"
+                                : $"Kluczowy przebieg obszaru {area.Name}"
+                        })
+                }))
+            .ToArray();
+
+        AddTestType(seed, projectKey, "regression", "regression-root", regressionAreas, true, english);
+        return seed;
+    }
+
+    private static Area[] BuildPolishAreas() =>
+        new[]
         {
             new Area("Interfejs użytkownika", "Czytelność i obsługa podstawowych ekranów płatności.", new[]
             {
@@ -90,23 +112,39 @@ public static class DemoDataSeedService
             })
         };
 
-        AddTestType(seed, projectKey, "functional", "functional-root", functionalAreas, false);
-
-        var regressionAreas = functionalAreas.Select(area =>
-            new Area(
-                area.Name,
-                $"Skrócona kontrola regresji obszaru {area.Name}.",
-                new[]
-                {
-                    new Collection(
-                        $"Regresja {area.Name}",
-                        new[] { $"Kluczowy przebieg obszaru {area.Name}" })
-                }))
-            .ToArray();
-
-        AddTestType(seed, projectKey, "regression", "regression-root", regressionAreas, true);
-        return seed;
-    }
+    private static Area[] BuildEnglishAreas() =>
+        new[]
+        {
+            new Area("User interface", "Readability and operation of the primary payment screens.", new[]
+            {
+                new Collection("Payment screen", new[] { "Start a payment", "Cancel an operation", "Result message" })
+            }),
+            new Area("Card payments", "Primary card payment methods.", new[]
+            {
+                new Collection("Contactless card", new[] { "Contactless payment", "Contactless payment with PIN confirmation" }),
+                new Collection("Chip card", new[] { "Chip card payment", "Reject an invalid PIN" }),
+                new Collection("Magnetic stripe", new[] { "Magnetic stripe payment" })
+            }),
+            new Area("Digital wallets", "Payments made with devices and digital wallets.", new[]
+            {
+                new Collection("Mobile payments", new[] { "Phone payment", "Smartwatch payment" }),
+                new Collection("Online wallets", new[] { "Digital wallet payment", "Cancel a wallet payment" })
+            }),
+            new Area("Transaction handling", "Operations performed after payment authorization.", new[]
+            {
+                new Collection("Refunds", new[] { "Full refund", "Partial refund" }),
+                new Collection("Reports", new[] { "Daily report", "Transaction history" })
+            }),
+            new Area("Connectivity and resilience", "Application behavior when work is interrupted.", new[]
+            {
+                new Collection("Connection", new[] { "Connection unavailable during payment", "Retry the connection" }),
+                new Collection("Restart", new[] { "Preserve data after restart" })
+            }),
+            new Area("Security", "Primary user authorization controls.", new[]
+            {
+                new Collection("Authorization", new[] { "Require a PIN", "Reject an invalid PIN" })
+            })
+        };
 
     private static void AddTestType(
         SeedData seed,
@@ -114,7 +152,8 @@ public static class DemoDataSeedService
         string testTypeKey,
         string rootKey,
         IReadOnlyList<Area> areas,
-        bool regression)
+        bool regression,
+        bool english)
     {
         for (var areaIndex = 0; areaIndex < areas.Count; areaIndex++)
         {
@@ -166,20 +205,32 @@ public static class DemoDataSeedService
                         CreatedByLogin = "admin",
                         SortOrder = (caseIndex + 1) * 1000,
                         Summary = regression
-                            ? $"Potwierdź najważniejszy przebieg. {caseName}."
-                            : $"Zweryfikuj scenariusz. {caseName}.",
-                        Preconditions = "Aplikacja demonstracyjna jest uruchomiona i gotowa do testu.",
-                        Importance = regression ? "Wysoki" : "Średni",
-                        ExecutionType = "Manualny",
+                            ? english
+                                ? $"Confirm the critical flow: {caseName}."
+                                : $"Potwierdź najważniejszy przebieg. {caseName}."
+                            : english
+                                ? $"Verify the scenario: {caseName}."
+                                : $"Zweryfikuj scenariusz. {caseName}.",
+                        Preconditions = english
+                            ? "The demonstration application is running and ready for testing."
+                            : "Aplikacja demonstracyjna jest uruchomiona i gotowa do testu.",
+                        Importance = regression
+                            ? english ? "High" : "Wysoki"
+                            : english ? "Medium" : "Średni",
+                        ExecutionType = english ? "Manual" : "Manualny",
                         Platforms = new List<string> { "Demo Terminal" },
                         Steps = new List<TestStepModel>
                         {
                             new()
                             {
                                 Number = 1,
-                                Actions = $"Wykonaj scenariusz. {caseName}.",
-                                ExpectedResults = "Operacja kończy się przewidywalnym wynikiem i czytelnym komunikatem.",
-                                ExecutionType = "Manualny"
+                                Actions = english
+                                    ? $"Execute the scenario: {caseName}."
+                                    : $"Wykonaj scenariusz. {caseName}.",
+                                ExpectedResults = english
+                                    ? "The operation finishes with the expected result and a clear message."
+                                    : "Operacja kończy się przewidywalnym wynikiem i czytelnym komunikatem.",
+                                ExecutionType = english ? "Manual" : "Manualny"
                             }
                         }
                     });
@@ -192,6 +243,93 @@ public static class DemoDataSeedService
     {
         var hash = SHA256.HashData(Encoding.UTF8.GetBytes(value));
         return new Guid(hash.AsSpan(0, 16));
+    }
+
+    private static void ApplySeed(
+        UserTestDataModel data,
+        SeedData seed)
+    {
+        foreach (var desired in seed.Folders)
+        {
+            var existing =
+                data.Folders.FirstOrDefault(
+                    item => item.Id == desired.Id);
+
+            if (existing is null)
+            {
+                data.Folders.Add(desired);
+                continue;
+            }
+
+            existing.ProjectKey = desired.ProjectKey;
+            existing.TestTypeKey = desired.TestTypeKey;
+            existing.SectionKey = desired.SectionKey;
+            existing.ParentSectionKey = desired.ParentSectionKey;
+            existing.Name = desired.Name;
+            existing.CreatedByLogin = desired.CreatedByLogin;
+            existing.IsSystem = desired.IsSystem;
+            existing.RequiresManagerRole = desired.RequiresManagerRole;
+            existing.SortOrder = desired.SortOrder;
+        }
+
+        foreach (var desired in seed.Collections)
+        {
+            var existing =
+                data.Collections.FirstOrDefault(
+                    item => item.Id == desired.Id);
+
+            if (existing is null)
+            {
+                data.Collections.Add(desired);
+                continue;
+            }
+
+            existing.ProjectKey = desired.ProjectKey;
+            existing.TestTypeKey = desired.TestTypeKey;
+            existing.ParentFolderKey = desired.ParentFolderKey;
+            existing.CollectionKey = desired.CollectionKey;
+            existing.Name = desired.Name;
+            existing.Description = desired.Description;
+            existing.CreatedByLogin = desired.CreatedByLogin;
+            existing.IsSystem = desired.IsSystem;
+            existing.RequiresManagerRole = desired.RequiresManagerRole;
+            existing.SortOrder = desired.SortOrder;
+        }
+
+        foreach (var desired in seed.TestCases)
+        {
+            var existing =
+                data.TestCases.FirstOrDefault(
+                    item => item.Id == desired.Id);
+
+            if (existing is null)
+            {
+                data.TestCases.Add(desired);
+                continue;
+            }
+
+            existing.ProjectKey = desired.ProjectKey;
+            existing.TestTypeKey = desired.TestTypeKey;
+            existing.SectionKey = desired.SectionKey;
+            existing.Name = desired.Name;
+            existing.CreatedByLogin = desired.CreatedByLogin;
+            existing.SortOrder = desired.SortOrder;
+            existing.Summary = desired.Summary;
+            existing.Preconditions = desired.Preconditions;
+            existing.Importance = desired.Importance;
+            existing.ExecutionType = desired.ExecutionType;
+            existing.Platforms = desired.Platforms.ToList();
+            existing.Steps = desired.Steps
+                .Select(
+                    step => new TestStepModel
+                    {
+                        Number = step.Number,
+                        Actions = step.Actions,
+                        ExpectedResults = step.ExpectedResults,
+                        ExecutionType = step.ExecutionType
+                    })
+                .ToList();
+        }
     }
 
     private sealed record Area(string Name, string Description, IReadOnlyList<Collection> Collections);

@@ -8,7 +8,7 @@ Instalacja środowiska .NET nie jest wymagana.
 Pierwsze logowanie
 Użyj loginu profilu i otrzymanego kodu PIN. Przy pierwszym logowaniu aplikacja poprosi o ustawienie własnego PIN-u.
 
-Struktura testów TEST PROJECT
+Struktura testów TEST PROJECT — ENGLISH oraz TEST PROJECT — POLISH
 Przy pierwszym otwarciu projektu aplikacja przygotowuje neutralny katalog demonstracyjny testów płatności.
 Ponowne uruchomienie aplikacji nie tworzy duplikatów.
 

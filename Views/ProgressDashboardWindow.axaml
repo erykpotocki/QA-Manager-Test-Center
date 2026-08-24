@@ -2,7 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Class="QARegressionManager.Views.ProgressDashboardWindow"
-    Title="Dashboard postępu testów"
+    Title="{DynamicResource Dashboard.WindowTitle}"
     Width="980"
     Height="780"
     MinWidth="760"
@@ -20,7 +20,7 @@
                     <TextBlock Text="Dashboard"
                                FontSize="{DynamicResource AppFontSize25}" FontWeight="Bold"
                                Foreground="{DynamicResource PrimaryTextBrush}" />
-                    <TextBlock Text="Postęp przypisanych testów"
+                    <TextBlock Text="{DynamicResource Common.AssignedProgress}"
                                FontSize="{DynamicResource AppFontSize13}" FontWeight="SemiBold"
                                Foreground="{DynamicResource SecondaryTextBrush}" />
                     <TextBlock Name="DashboardDescriptionTextBlock"
@@ -52,19 +52,19 @@
             <Grid Grid.Row="1" Margin="0,14,0,6" ColumnDefinitions="*,12,*,12,*">
                 <Border Grid.Column="0" Padding="14,8" Background="#142878D0" CornerRadius="12">
                     <StackPanel>
-                        <TextBlock Text="SESJE" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" Foreground="#2878D0" />
+                        <TextBlock Text="{DynamicResource Dashboard.Sessions}" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" Foreground="#2878D0" />
                         <TextBlock Name="SessionsCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize22}" FontWeight="Bold" />
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="2" Padding="14,8" Background="#1428C76F" CornerRadius="12">
                     <StackPanel>
-                        <TextBlock Text="WYKONANE" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" Foreground="#159454" />
+                        <TextBlock Text="{DynamicResource Dashboard.Completed}" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" Foreground="#159454" />
                         <TextBlock Name="CompletedCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize22}" FontWeight="Bold" />
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="4" Padding="14,8" Background="#14F0A34A" CornerRadius="12">
                     <StackPanel>
-                        <TextBlock Text="POZOSTAŁO" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" Foreground="#C26A10" />
+                        <TextBlock Text="{DynamicResource Dashboard.Remaining}" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" Foreground="#C26A10" />
                         <TextBlock Name="RemainingCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize22}" FontWeight="Bold" />
                     </StackPanel>
                 </Border>
@@ -79,8 +79,8 @@
                     <Canvas Name="TeamPieChartCanvas" Width="150" Height="150"
                             HorizontalAlignment="Center" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Spacing="6">
-                        <TextBlock Text="Postęp zespołu" FontSize="{DynamicResource AppFontSize17}" FontWeight="Bold" />
-                        <TextBlock Text="Kolor pokazuje udział testera w przypisanym zakresie, a legenda jego wykonanie."
+                        <TextBlock Text="{DynamicResource Dashboard.TeamProgress}" FontSize="{DynamicResource AppFontSize17}" FontWeight="Bold" />
+                        <TextBlock Text="{DynamicResource Dashboard.TeamProgressDescription}"
                                    TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize12}"
                                    Foreground="{DynamicResource SecondaryTextBrush}" />
                         <WrapPanel Name="TeamLegendPanel" Margin="0,6,0,0"
@@ -90,7 +90,7 @@
                     <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="4,7,4,0"
                           RowDefinitions="Auto,Auto">
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Text="Wykonanie całego zespołu"
+                            <TextBlock Text="{DynamicResource Dashboard.TeamCompletion}"
                                        FontSize="{DynamicResource AppFontSize11}" FontWeight="SemiBold" />
                             <TextBlock Name="TeamCompletionPercentTextBlock"
                                        Grid.Column="1" Text="0%"
@@ -108,22 +108,22 @@
             <Grid Name="ManagerNavigationPanel" Grid.Row="3" Margin="0,8,0,0"
                   ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto,8,Auto,8,Auto" IsVisible="False">
                 <Button Name="ActiveSessionsButton" Grid.Column="0" Height="38" Padding="16,0"
-                        Content="AKTYWNE" Click="ActiveSessionsButton_OnClick"
+                        Content="{DynamicResource Dashboard.Active}" Click="ActiveSessionsButton_OnClick"
                         Background="#2E86D1" Foreground="White" BorderBrush="#2E86D1" />
                 <Button Name="HistorySessionsButton" Grid.Column="2" Height="38" Padding="16,0"
-                        Content="HISTORIA" Click="HistorySessionsButton_OnClick" />
+                        Content="{DynamicResource Dashboard.History}" Click="HistorySessionsButton_OnClick" />
                 <Button Name="ArchiveSessionsButton" Grid.Column="4" Height="38" Padding="16,0"
-                        Content="ARCHIWUM" Click="ArchiveSessionsButton_OnClick" />
+                        Content="{DynamicResource Dashboard.Archive}" Click="ArchiveSessionsButton_OnClick" />
                 <Button Name="StopSelectedSessionsButton" Grid.Column="6" Height="38" Padding="16,0"
-                        Content="ZATRZYMAJ ZAZNACZONE" Click="StopSelectedSessionsButton_OnClick"
+                        Content="{DynamicResource Dashboard.StopSelected}" Click="StopSelectedSessionsButton_OnClick"
                         Background="#DC4C56" Foreground="White" BorderBrush="#DC4C56"
                         IsEnabled="False" />
                 <Button Name="RestoreArchivedSessionsButton" Grid.Column="8" Height="38" Padding="16,0"
-                        Content="PRZYWRÓĆ ZAZNACZONE" Click="RestoreArchivedSessionsButton_OnClick"
+                        Content="{DynamicResource Dashboard.RestoreSelected}" Click="RestoreArchivedSessionsButton_OnClick"
                         Background="#2E86D1" Foreground="White" BorderBrush="#2E86D1"
                         IsVisible="False" IsEnabled="False" />
                 <Button Name="DeleteAllArchivedSessionsButton" Grid.Column="10" Height="38" Padding="16,0"
-                        Content="USUŃ WSZYSTKO" Click="DeleteAllArchivedSessionsButton_OnClick"
+                        Content="{DynamicResource Dashboard.DeleteAll}" Click="DeleteAllArchivedSessionsButton_OnClick"
                         Background="#B93643" Foreground="White" BorderBrush="#B93643"
                         IsVisible="False" />
             </Grid>
@@ -137,11 +137,11 @@
                         Height="44" Padding="22,0"
                         Background="#4D91D1" BorderBrush="#75A9D8"
                         Foreground="White" FontWeight="Bold"
-                        Content="GENERUJ RAPORT" IsVisible="False"
+                        Content="{DynamicResource Dashboard.GenerateReport}" IsVisible="False"
                         Click="GenerateTeamReportButton_OnClick" />
                 <Button Grid.Column="3" HorizontalAlignment="Right" Height="44" Padding="24,0"
                         Background="{DynamicResource AccentPrimaryBrush}" Foreground="White" FontWeight="Bold"
-                        Content="ZAMKNIJ" Click="CloseButton_OnClick" />
+                        Content="{DynamicResource Common.Close}" Click="CloseButton_OnClick" />
             </Grid>
         </Grid>
     </Border>

@@ -57,7 +57,7 @@ public partial class ProgressDashboardWindow : Window
 
     public ProgressDashboardWindow()
         : this(
-            "nieznany",
+            "unknown",
             new[]
             {
                 SystemRoleService.TesterRole
@@ -146,10 +146,10 @@ public partial class ProgressDashboardWindow : Window
 
         DashboardDescriptionTextBlock.Text =
             _dashboardSection == DashboardSection.Archive
-                ? "Zarchiwizowane sesje są automatycznie usuwane po 60 dniach. Można je wcześniej przywrócić do historii."
+                ? LocalizationService.T("Dashboard.ArchiveDescription")
                 : CanSeeTeamProgress
-                ? "Bieżący postęp całego zespołu oraz ostatnio ukończone przypisania."
-                : "Widzisz wyłącznie postęp testów przypisanych do Twojego profilu.";
+                ? LocalizationService.T("Dashboard.ManagerDescription")
+                : LocalizationService.T("Dashboard.UserDescription");
 
         ManagerNavigationPanel.IsVisible =
             CanSeeTeamProgress;
@@ -191,8 +191,8 @@ public partial class ProgressDashboardWindow : Window
 
         GenerateTeamReportButton.Content =
             CanSeeTeamProgress
-                ? "GENERUJ RAPORT"
-                : "RAPORT ZBIORCZY";
+                ? LocalizationService.T("Dashboard.GenerateReport")
+                : LocalizationService.T("Dashboard.CombinedReport");
 
         BuildTeamOverview(currentRows);
 
@@ -216,10 +216,10 @@ public partial class ProgressDashboardWindow : Window
                 new TextBlock
                 {
                     Text = _dashboardSection == DashboardSection.Archive
-                        ? "Archiwum jest puste."
+                        ? LocalizationService.T("Dashboard.EmptyArchive")
                         : _dashboardSection == DashboardSection.Active
-                        ? "Brak aktywnych przypisań do pokazania."
-                        : "Historia ukończonych przypisań jest pusta.",
+                        ? LocalizationService.T("Dashboard.EmptyActive")
+                        : LocalizationService.T("Dashboard.EmptyHistory"),
                     Margin = new Thickness(0, 28),
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Foreground = Brushes.Gray
@@ -290,7 +290,7 @@ public partial class ProgressDashboardWindow : Window
                                 },
                                 new TextBlock
                                 {
-                                    Text = $"Wysłane {first.Assignment.CreatedAt.LocalDateTime:g}  •  {rows.Length} {(rows.Length == 1 ? "osoba" : "osoby")}  •  {completed}/{total}",
+                                    Text = LocalizationService.Format("Dashboard.BatchSummary", first.Assignment.CreatedAt.LocalDateTime.ToString("g"), rows.Length, completed, total),
                                     FontSize = 11,
                                     Foreground = Brushes.Gray
                                 }
@@ -298,7 +298,7 @@ public partial class ProgressDashboardWindow : Window
                         },
                         new TextBlock
                         {
-                            Text = batchCompleted ? "UKOŃCZONO" : "W TRAKCIE",
+                            Text = LocalizationService.T(batchCompleted ? "Dashboard.StateCompleted" : "Dashboard.StateInProgress"),
                             FontSize = 10,
                             FontWeight = FontWeight.Bold,
                             Foreground = new SolidColorBrush(Color.Parse(batchCompleted ? "#159454" : "#2E86D1")),
@@ -426,12 +426,12 @@ public partial class ProgressDashboardWindow : Window
                 Child = new TextBlock
                 {
                     Text = _dashboardSection == DashboardSection.Archive
-                        ? "ARCHIWUM"
+                        ? LocalizationService.T("Dashboard.StateArchived")
                         : row.IsCompleted
-                        ? "UKOŃCZONO"
+                        ? LocalizationService.T("Dashboard.StateCompleted")
                         : row.Assignment.IsPaused
-                        ? "WSTRZYMANO"
-                        : "IN PROGRESS",
+                        ? LocalizationService.T("Dashboard.StatePaused")
+                        : LocalizationService.T("Dashboard.StateInProgress"),
                     FontSize = _dashboardSection == DashboardSection.Archive ? 8 : 9,
                     LineHeight = _dashboardSection == DashboardSection.Archive ? 10 : double.NaN,
                     FontWeight = FontWeight.Bold,
@@ -474,7 +474,7 @@ public partial class ProgressDashboardWindow : Window
 
             ToolTip.SetTip(
                 archiveButton,
-                "Przenieś ukończoną sesję do archiwum");
+                LocalizationService.T("Dashboard.ArchiveSessionTip"));
 
             archiveButton.Click +=
                 async (_, _) =>
@@ -501,7 +501,7 @@ public partial class ProgressDashboardWindow : Window
                     CornerRadius = new CornerRadius(9)
                 };
 
-            ToolTip.SetTip(stopButton, "Zatrzymaj tę przypisaną sesję");
+            ToolTip.SetTip(stopButton, LocalizationService.T("Dashboard.StopSessionTip"));
             stopButton.Click += async (_, _) =>
                 await StopAssignmentsAsync(new[] { row.Assignment.Id });
             Grid.SetColumn(stopButton, 3);
@@ -538,7 +538,7 @@ public partial class ProgressDashboardWindow : Window
                         progressBar,
                         new TextBlock
                         {
-                            Text = $"Wykonane {row.Completed} z {row.Total}  •  pozostało {row.Remaining}  •  {row.Percent:0.#}%",
+                            Text = LocalizationService.Format("Dashboard.RowProgress", row.Completed, row.Total, row.Remaining, row.Percent),
                             FontSize = 11,
                             Foreground = Brushes.Gray
                         }
@@ -553,7 +553,7 @@ public partial class ProgressDashboardWindow : Window
             var archiveMenuItem =
                 new MenuItem
                 {
-                    Header = "Przenieś do archiwum"
+                    Header = LocalizationService.T("Dashboard.MoveToArchive")
                 };
 
             archiveMenuItem.Click +=
@@ -582,9 +582,9 @@ public partial class ProgressDashboardWindow : Window
 
         var confirmation =
             new ConfirmDeleteWindow(
-                "Przenieść sesję do archiwum?",
-                $"Sesja {row.RecipientLogin}, {row.ProjectName}, wersja {row.Version}, zostanie przeniesiona z historii do archiwum. Po 60 dniach zostanie trwale usunięta, chyba że wcześniej ją przywrócisz.",
-                "ARCHIWIZUJ");
+                LocalizationService.T("Dashboard.ArchiveQuestion"),
+                LocalizationService.Format("Dashboard.ArchiveRowDescription", row.RecipientLogin, row.ProjectName, row.Version),
+                LocalizationService.T("Dashboard.ArchiveAction"));
 
         if (!await confirmation.ShowDialog<bool>(this))
         {
@@ -657,9 +657,9 @@ public partial class ProgressDashboardWindow : Window
 
         var confirmation =
             new ConfirmDeleteWindow(
-                "Przywrócić zaznaczone sesje?",
-                "Sesje wrócą z archiwum do historii i zachowają pierwotną kolejność oraz daty.",
-                "PRZYWRÓĆ");
+                LocalizationService.T("Dashboard.RestoreQuestion"),
+                LocalizationService.T("Dashboard.RestoreDescription"),
+                LocalizationService.T("Dashboard.RestoreAction"));
 
         if (!await confirmation.ShowDialog<bool>(this))
         {
@@ -680,9 +680,9 @@ public partial class ProgressDashboardWindow : Window
 
         var confirmation =
             new ConfirmDeleteWindow(
-                "Przenieść zaznaczone sesje do archiwum?",
-                "Sesje znikną z historii i pozostaną w archiwum przez 60 dni. W tym czasie można je przywrócić. Trwałe usunięcie jest dostępne wyłącznie w archiwum.",
-                "PRZENIEŚ");
+                LocalizationService.T("Dashboard.ArchiveSelectedQuestion"),
+                LocalizationService.T("Dashboard.ArchiveSelectedDescription"),
+                LocalizationService.T("Dashboard.MoveAction"));
 
         if (!await confirmation.ShowDialog<bool>(this))
         {
@@ -716,9 +716,9 @@ public partial class ProgressDashboardWindow : Window
     {
         var confirmation =
             new ConfirmDeleteWindow(
-                "Usunąć całe archiwum?",
-                "Ta operacja trwale usunie wszystkie zarchiwizowane sesje oraz powiązane z nimi powiadomienia.",
-                "USUŃ WSZYSTKO");
+                LocalizationService.T("Dashboard.DeleteArchiveQuestion"),
+                LocalizationService.T("Dashboard.DeleteArchiveDescription"),
+                LocalizationService.T("Dashboard.DeleteAll"));
 
         if (!await confirmation.ShowDialog<bool>(this))
         {
@@ -739,9 +739,9 @@ public partial class ProgressDashboardWindow : Window
 
         var confirmation =
             new ConfirmDeleteWindow(
-                "Usunąć zaznaczone sesje z archiwum?",
-                $"Ta operacja trwale usunie {assignmentIds.Count} sesji oraz powiązane z nimi powiadomienia.",
-                "USUŃ TRWALE");
+                LocalizationService.T("Dashboard.DeleteSelectedQuestion"),
+                LocalizationService.Format("Dashboard.DeleteSelectedDescription", assignmentIds.Count),
+                LocalizationService.T("Dashboard.DeletePermanently"));
 
         if (!await confirmation.ShowDialog<bool>(this))
         {
@@ -772,14 +772,14 @@ public partial class ProgressDashboardWindow : Window
 
         var details =
             startedCount > 0
-                ? $"Wybrano {assignmentIds.Count} sesji, w tym {startedCount} już rozpoczętych. Testerzy zostaną przeniesieni do trybu ad-hoc i otrzymają powiadomienie."
-                : $"Wybrano {assignmentIds.Count} nierozpoczętych sesji. Zostaną usunięte, a ich przypadki ponownie będą dostępne.";
+                ? LocalizationService.Format("Dashboard.StopStartedDescription", assignmentIds.Count, startedCount)
+                : LocalizationService.Format("Dashboard.StopNotStartedDescription", assignmentIds.Count);
 
         var confirmation =
             new ConfirmDeleteWindow(
-                "Zatrzymać wybrane sesje?",
+                LocalizationService.T("Dashboard.StopQuestion"),
                 details,
-                "ZATRZYMAJ SESJE");
+                LocalizationService.T("Dashboard.StopAction"));
 
         if (!await confirmation.ShowDialog<bool>(this))
         {
@@ -821,10 +821,10 @@ public partial class ProgressDashboardWindow : Window
         ArchiveSessionsButton.Foreground = archive ? Brushes.White : Brushes.Gray;
         StopSelectedSessionsButton.IsVisible = true;
         StopSelectedSessionsButton.Content = archive
-            ? "USUŃ ZAZNACZONE"
+            ? LocalizationService.T("Dashboard.DeleteSelected")
             : history
-            ? "PRZENIEŚ DO ARCHIWUM"
-            : "ZATRZYMAJ ZAZNACZONE";
+            ? LocalizationService.T("Dashboard.MoveSelectedToArchive")
+            : LocalizationService.T("Dashboard.StopSelected");
         RestoreArchivedSessionsButton.IsVisible = archive;
         RestoreArchivedSessionsButton.IsEnabled = false;
         DeleteAllArchivedSessionsButton.IsVisible = archive;
@@ -1003,7 +1003,7 @@ public partial class ProgressDashboardWindow : Window
         var centerText =
             new TextBlock
             {
-                Text = $"{rows.Sum(row => row.Completed)}\nwykonano",
+                Text = LocalizationService.Format("Dashboard.ChartCompleted", rows.Sum(row => row.Completed)),
                 Width = 68,
                 TextAlignment = TextAlignment.Center,
                 FontSize = 11,
@@ -1126,7 +1126,7 @@ public partial class ProgressDashboardWindow : Window
         var reportVersion =
             versions.Length == 1
                 ? versions[0]
-                : "Wiele wersji";
+                : LocalizationService.T("Dashboard.MultipleVersions");
 
         var dialog =
             new ReportVersionWindow(
@@ -1160,8 +1160,8 @@ public partial class ProgressDashboardWindow : Window
             {
                 await new OperationResultWindow(
                         false,
-                        "Nie udało się utworzyć raportu",
-                        "Sprawdź miejsce zapisu i spróbuj ponownie.")
+                        LocalizationService.T("Dashboard.ReportFailedTitle"),
+                        LocalizationService.T("Dashboard.ReportFailedDescription"))
                     .ShowDialog(this);
                 return;
             }
@@ -1172,8 +1172,8 @@ public partial class ProgressDashboardWindow : Window
 
             await new OperationResultWindow(
                     true,
-                    "Raport został zapisany",
-                    $"{path}\n\nCały ukończony pakiet przypisań został przeniesiony do historii.")
+                    LocalizationService.T("Dashboard.ReportSavedTitle"),
+                    LocalizationService.Format("Dashboard.ReportSavedDescription", path))
                 .ShowDialog(this);
 
             await LoadDashboardAsync();
@@ -1222,14 +1222,14 @@ public partial class ProgressDashboardWindow : Window
                     testCase is not null &&
                     collectionsByKey.TryGetValue(testCase.SectionKey, out var collection)
                         ? collection.Name
-                        : "Przypisany zakres";
+                        : LocalizationService.T("Dashboard.AssignedScope");
 
                 reportCases.Add(
                     new TestReportCase
                     {
                         TestType = row.RecipientLogin,
                         Collection = collectionName,
-                        Path = $"{row.ProjectName} / wersja {row.Version}",
+                        Path = LocalizationService.Format("Dashboard.ReportPath", row.ProjectName, row.Version),
                         Name = testCase?.Name ?? testCaseId.ToString(),
                         Status = progressById.TryGetValue(testCaseId, out var status)
                             ? status
@@ -1258,9 +1258,9 @@ public partial class ProgressDashboardWindow : Window
             {
                 SessionId = Guid.Empty,
                 SessionMode = "Assigned",
-                ProjectName = projects.Length == 1 ? projects[0] : "Wiele projektów",
+                ProjectName = projects.Length == 1 ? projects[0] : LocalizationService.T("Dashboard.MultipleProjects"),
                 ApplicationVersion = reportVersion,
-                TesterLogin = "Zespół QA",
+                TesterLogin = LocalizationService.T("Dashboard.QaTeam"),
                 GeneratedAt = DateTimeOffset.Now
             },
             Summary = new TestReportSummary

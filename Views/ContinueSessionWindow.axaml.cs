@@ -1,8 +1,10 @@
 using System;
+using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using QARegressionManager.Services;
 
 namespace QARegressionManager.Views;
 
@@ -48,14 +50,14 @@ public partial class ContinueSessionWindow : Window
                 sessionMode,
                 "Assigned",
                 StringComparison.OrdinalIgnoreCase)
-                ? "Regresja przypisana"
-                : "Testy ad-hoc");
+                ? LocalizationService.T("ContinueSession.AssignedMode")
+                : LocalizationService.T("ContinueSession.AdHocMode"));
 
         SetText(
             _lastTestTextBlock,
             string.IsNullOrWhiteSpace(
                 lastTestName)
-                ? "Nie określono"
+                ? LocalizationService.T("ContinueSession.NotSpecified")
                 : lastTestName);
 
         SetText(
@@ -63,7 +65,9 @@ public partial class ContinueSessionWindow : Window
             lastSaveTime
                 .ToLocalTime()
                 .ToString(
-                    "dd.MM.yyyy HH:mm"));
+                    "g",
+                    CultureInfo.GetCultureInfo(
+                        LocalizationService.IsPolish ? "pl-PL" : "en-US")));
     }
 
     private void InitializeComponent()

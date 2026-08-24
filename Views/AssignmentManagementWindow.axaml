@@ -64,7 +64,7 @@
                             <TextBlock Text="{DynamicResource Assignment.Version}" FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" />
                             <TextBox Name="VersionTextBox" Height="38" MinWidth="220"
                                      HorizontalAlignment="Stretch" Padding="12,7"
-                                     PlaceholderText="np. 1.2.1.1" />
+                                     PlaceholderText="{DynamicResource Assignment.VersionPlaceholder}" />
                         </StackPanel>
                     </Grid>
 
@@ -79,12 +79,12 @@
                             <TextBlock Text="{DynamicResource Assignment.Search}"
                                        FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" />
                             <TextBox Name="SearchTextBox" Height="38" Padding="12,6"
-                                     PlaceholderText="np. Kasjerzy" />
+                                     PlaceholderText="{DynamicResource Assignment.SearchPlaceholder}" />
                         </StackPanel>
                         <Border Grid.Column="1" MinWidth="280" Height="38" Padding="14,0"
                                  VerticalAlignment="Bottom" CornerRadius="10"
                                  Background="{DynamicResource IconBackgroundBrush}"
-                                 ToolTip.Tip="Liczba przypadków zajętych przez wszystkie aktywne sesje i bieżące pozycje podsumowania w tym projekcie.">
+                                 ToolTip.Tip="{DynamicResource Assignment.CountsTip}">
                             <TextBlock Name="AssignmentCountsTextBlock"
                                        VerticalAlignment="Center" TextAlignment="Center"
                                        TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize12}"
@@ -120,7 +120,7 @@
                                     HorizontalAlignment="Right" Spacing="10">
                             <Button Name="WithdrawButton" Classes="assignmentAction"
                                     Content="{DynamicResource Assignment.CancelAssignment}" Background="#DC4C56" Foreground="White"
-                                    ToolTip.Tip="Wybierz istniejącą sesję, aby anulować przypisanie"
+                                    ToolTip.Tip="{DynamicResource Assignment.WithdrawTip}"
                                     Click="WithdrawButton_OnClick" />
                             <Button Classes="assignmentAction SecondaryAction" Content="{DynamicResource Common.Close}"
                                     Click="CloseButton_OnClick" />

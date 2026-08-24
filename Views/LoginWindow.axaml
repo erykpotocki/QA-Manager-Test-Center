@@ -96,9 +96,24 @@
         <Button Name="ThemeToggleButton" Classes="QuickTheme"
                 HorizontalAlignment="Right" VerticalAlignment="Top"
                 Margin="0,12,68,0" Click="ThemeToggleButton_OnClick">
-            <TextBlock Name="ThemeIconTextBlock" Text="☾" FontSize="20"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Foreground="{DynamicResource PrimaryTextBrush}" />
+            <Grid Width="22" Height="22"
+                  HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid Name="ThemeSunIcon" IsVisible="False">
+                    <Ellipse Width="8" Height="8"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"
+                             Stroke="{DynamicResource PrimaryTextBrush}"
+                             StrokeThickness="1.8" />
+                    <Path Width="22" Height="22" Stretch="None"
+                          Stroke="{DynamicResource PrimaryTextBrush}"
+                          StrokeThickness="1.8" StrokeLineCap="Round"
+                          Data="M 11,1.5 L 11,4 M 11,18 L 11,20.5 M 1.5,11 L 4,11 M 18,11 L 20.5,11 M 4.3,4.3 L 6.1,6.1 M 15.9,15.9 L 17.7,17.7 M 17.7,4.3 L 15.9,6.1 M 6.1,15.9 L 4.3,17.7" />
+                </Grid>
+                <Path Name="ThemeMoonIcon" Width="22" Height="22"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Stretch="Uniform"
+                      Fill="{DynamicResource PrimaryTextBrush}"
+                      Data="M 19,15.5 A 8,8 0 1 1 10.5,3 A 6.5,6.5 0 0 0 19,15.5 Z" />
+            </Grid>
         </Button>
 
         <Button Name="LanguagePickerButton"

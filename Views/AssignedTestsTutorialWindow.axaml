@@ -2,7 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Class="QARegressionManager.Views.AssignedTestsTutorialWindow"
-    Title="Jak wykonywać przypisane testy"
+    Title="{DynamicResource Tutorial.WindowTitle}"
     Width="570" Height="430" MinWidth="540" MinHeight="410"
     CanResize="False"
     WindowStartupLocation="CenterOwner"
@@ -64,17 +64,17 @@
             </StackPanel>
             <Grid Grid.Row="4" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
                 <CheckBox Name="DontShowAgainCheckBox"
-                          Content="Nie pokazuj ponownie"
+                          Content="{DynamicResource Tutorial.DoNotShowAgain}"
                           MinHeight="44"
                           VerticalAlignment="Center"
                           VerticalContentAlignment="Center"
                           FontSize="14"
                           FontWeight="SemiBold"
                           Foreground="{DynamicResource SecondaryTextBrush}" />
-                <Button Grid.Column="1" Classes="TutorialSecondary" Content="POMIŃ"
+                <Button Grid.Column="1" Classes="TutorialSecondary" Content="{DynamicResource Tutorial.Skip}"
                         Click="SkipButton_OnClick" />
                 <Button Name="NextButton" Grid.Column="2"
-                        Classes="TutorialPrimary" Content="DALEJ"
+                        Classes="TutorialPrimary" Content="{DynamicResource Tutorial.Next}"
                         Click="NextButton_OnClick" />
             </Grid>
         </Grid>

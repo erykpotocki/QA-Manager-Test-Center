@@ -4,23 +4,13 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using QARegressionManager.Services;
 
 namespace QARegressionManager.Views;
 
 public partial class AssignedTestsTutorialWindow : Window
 {
-    private readonly IReadOnlyList<(string Title, string Message)> _pages =
-        new[]
-        {
-            ("Szybkie oznaczanie wyniku",
-             "Kliknij przypadek dwukrotnie, aby oznaczyć go jako Sukces. Wynik możesz również wybrać z listy statusów."),
-            ("Płynne przechodzenie przez przypadki",
-             "Inteligentne przewijanie pozostawia ostatnio wykonany przypadek w zasięgu wzroku i pokazuje kolejne pozycje."),
-            ("Komentarz dla zablokowanego testu",
-             "Status Zablokowany wymaga krótkiego komentarza. Po wpisaniu przyczyna zostanie zapisana razem z wynikiem."),
-            ("Zakończenie przypisanych testów",
-             "Po uzupełnieniu wszystkich przypadków zakończ testy. Możesz wysłać wyniki bez raportu albo dodatkowo wygenerować raport.")
-        };
+    private readonly IReadOnlyList<(string Title, string Message)> _pages;
 
     private readonly Border[] _dots;
     private readonly TextBlock _title;
@@ -33,6 +23,13 @@ public partial class AssignedTestsTutorialWindow : Window
 
     public AssignedTestsTutorialWindow()
     {
+        _pages = new[]
+        {
+            (LocalizationService.T("Tutorial.QuickTitle"), LocalizationService.T("Tutorial.QuickMessage")),
+            (LocalizationService.T("Tutorial.NavigationTitle"), LocalizationService.T("Tutorial.NavigationMessage")),
+            (LocalizationService.T("Tutorial.BlockedTitle"), LocalizationService.T("Tutorial.BlockedMessage")),
+            (LocalizationService.T("Tutorial.FinishTitle"), LocalizationService.T("Tutorial.FinishMessage"))
+        };
         AvaloniaXamlLoader.Load(this);
         _title = this.FindControl<TextBlock>("TutorialTitleTextBlock")!;
         _message = this.FindControl<TextBlock>("TutorialMessageTextBlock")!;
@@ -53,7 +50,8 @@ public partial class AssignedTestsTutorialWindow : Window
         var page = _pages[_pageIndex];
         _title.Text = page.Title;
         _message.Text = page.Message;
-        _next.Content = _pageIndex == _pages.Count - 1 ? "ROZUMIEM" : "DALEJ";
+        _next.Content = LocalizationService.T(
+            _pageIndex == _pages.Count - 1 ? "Tutorial.Done" : "Tutorial.Next");
 
         for (var index = 0; index < _dots.Length; index++)
         {

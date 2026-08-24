@@ -455,7 +455,7 @@
 
                     <TextBlock
                         Name="ProjectInfoTextBlock"
-                        Text="TEST PROJECT"
+                        Text="TEST PROJECT — ENGLISH"
                         FontSize="{DynamicResource AppFontSize13}"
                         Foreground="{DynamicResource SecondaryTextBrush}" />
 
@@ -479,6 +479,7 @@
                             Click="ExecuteAssignedTestsButton_OnClick">
                         <Grid ClipToBounds="False">
                             <TextBlock Name="ExecuteAssignedTestsLabel" Text="{DynamicResource Assignment.ExecuteTests}"
+                                       FontWeight="SemiBold"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />
                             <Border Name="ExecuteAssignmentPendingDot"
@@ -583,7 +584,7 @@
 
                     <ScrollViewer
                         Name="RoleBadgesScrollViewer"
-                        MaxWidth="380"
+                        MaxWidth="900"
                         HorizontalScrollBarVisibility="Hidden"
                         VerticalScrollBarVisibility="Disabled">
 
@@ -1047,8 +1048,8 @@
         <Grid Name="ExplorerBodyGrid" Grid.Row="1">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="330" MinWidth="300" MaxWidth="560" />
-                <ColumnDefinition Width="24" />
+                <ColumnDefinition Width="285" MinWidth="260" MaxWidth="460" />
+                <ColumnDefinition Width="18" />
                 <ColumnDefinition Width="*" MinWidth="560" />
             </Grid.ColumnDefinitions>
 
@@ -1057,8 +1058,8 @@
             <Border
                 Name="TestTreePanelBorder"
                 Grid.Column="0"
-                Margin="18,18,9,18"
-                Padding="14,16,5,16"
+                Margin="14,14,6,14"
+                Padding="10,12,2,12"
                 Background="{DynamicResource CardBackgroundBrush}"
                 BorderBrush="{DynamicResource CardBorderBrush}"
                 BorderThickness="1"
@@ -1078,7 +1079,7 @@
                     <TextBox
                         Name="TestTreeSearchTextBox"
                         Grid.Row="1"
-                        Margin="0,0,10,10"
+                        Margin="0,0,6,8"
                         PlaceholderText="{DynamicResource Explorer.SearchCase}"
                         TextChanged="TestTreeSearchTextBox_OnTextChanged" />
 
@@ -1086,7 +1087,7 @@
                         Name="TestTreeScrollViewer"
                         Grid.Row="2"
                         Margin="0"
-                        Padding="0,0,10,14"
+                        Padding="0,0,4,10"
                         HorizontalScrollBarVisibility="Hidden"
                         VerticalScrollBarVisibility="Auto">
 
@@ -1094,7 +1095,7 @@
                             Name="TestTreeView"
                             MinWidth="190"
                             HorizontalAlignment="Stretch"
-                            Margin="0,0,8,8" />
+                            Margin="0,0,2,6" />
 
                     </ScrollViewer>
 
@@ -1138,7 +1139,7 @@
 
             <Border
                 Grid.Column="2"
-                Margin="9,18,18,18"
+                Margin="6,14,14,14"
                 Padding="26"
                 Background="{DynamicResource CardBackgroundBrush}"
                 BorderBrush="{DynamicResource CardBorderBrush}"

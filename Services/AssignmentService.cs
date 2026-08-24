@@ -550,8 +550,8 @@ public sealed class AssignmentService
             AddNotification(
                 data,
                 previousRecipient,
-                "Przypisanie zostało przeniesione",
-                $"Sesja projektu {request.ProjectName} została przepisana na innego użytkownika.",
+                LocalizationService.T("Notifications.AssignmentMovedTitle"),
+                LocalizationService.Format("Notifications.AssignmentMovedMessage", request.ProjectName),
                 assignment.Id);
         }
 
@@ -559,9 +559,9 @@ public sealed class AssignmentService
             data,
             assignment.RecipientLogin,
             request.AssignmentId.HasValue
-                ? "Zmieniono przypisane testy"
-                : "Nowe testy do wykonania",
-            $"{request.AssignedByLogin} przypisał sesję projektu {request.ProjectName}, wersja {request.ApplicationVersion} ({assignment.TestCaseIds.Count} przypadków).",
+                ? LocalizationService.T("Notifications.AssignmentChangedTitle")
+                : LocalizationService.T("Notifications.NewTestsTitle"),
+            LocalizationService.Format("Notifications.NewTestsMessage", request.AssignedByLogin, request.ProjectName, request.ApplicationVersion, assignment.TestCaseIds.Count),
             assignment.Id);
 
         return assignment;
@@ -871,8 +871,8 @@ public sealed class AssignmentService
         AddNotification(
             data,
             assignment.RecipientLogin,
-            "Wycofano przypisane testy",
-            $"{changedByLogin} wycofał sesję projektu {assignment.ProjectName}.",
+            LocalizationService.T("Notifications.AssignmentWithdrawnTitle"),
+            LocalizationService.Format("Notifications.AssignmentWithdrawnMessage", changedByLogin, assignment.ProjectName),
             assignment.Id);
 
         await SaveAsync(
@@ -914,8 +914,8 @@ public sealed class AssignmentService
             AddNotification(
                 data,
                 assignment.RecipientLogin,
-                "Wycofano przypisane testy",
-                $"{changedByLogin} wyzerował aktywne przypisanie projektu {assignment.ProjectName}, wersja {assignment.ApplicationVersion}.",
+                LocalizationService.T("Notifications.AssignmentWithdrawnTitle"),
+                LocalizationService.Format("Notifications.AssignmentResetMessage", changedByLogin, assignment.ProjectName, assignment.ApplicationVersion),
                 assignment.Id);
         }
 
@@ -1117,8 +1117,8 @@ public sealed class AssignmentService
             data.Notifications.Add(new UserNotificationModel
             {
                 RecipientLogin = manager,
-                Title = "Prośba o usunięcie dużej gałęzi",
-                Message = $"{requestedByLogin} prosi o usunięcie elementu „{entityName}”. Operacja obejmie całą jego zawartość.",
+                Title = LocalizationService.T("Notifications.DeletionRequestTitle"),
+                Message = LocalizationService.Format("Notifications.DeletionRequestMessage", requestedByLogin, entityName),
                 StructureChangeRequestId = request.Id,
                 CreatedAt = DateTimeOffset.Now
             });
@@ -1216,10 +1216,12 @@ public sealed class AssignmentService
         assignmentData.Notifications.Add(new UserNotificationModel
         {
             RecipientLogin = request.RequestedByLogin,
-            Title = approve ? "Usunięcie zatwierdzone" : "Usunięcie odrzucone",
+            Title = LocalizationService.T(approve
+                ? "Notifications.DeletionApprovedTitle"
+                : "Notifications.DeletionRejectedTitle"),
             Message = approve
-                ? $"{managerLogin} zatwierdził usunięcie elementu „{request.EntityName}”."
-                : $"{managerLogin} odrzucił usunięcie elementu „{request.EntityName}”.",
+                ? LocalizationService.Format("Notifications.DeletionApprovedMessage", managerLogin, request.EntityName)
+                : LocalizationService.Format("Notifications.DeletionRejectedMessage", managerLogin, request.EntityName),
             CreatedAt = DateTimeOffset.Now
         });
         await SaveAsync(assignmentData);
@@ -1369,15 +1371,15 @@ public sealed class AssignmentService
 
         var completionDetails =
             unfinishedCount > 0
-                ? $"{assignment.RecipientLogin} zakończył sesję po wykonaniu {completedCount} z {assignment.TestCaseIds.Count} przypadków projektu {assignment.ProjectName}, wersja {assignment.ApplicationVersion}. {unfinishedCount} niewykonanych przypadków wróciło do puli przypisań."
-                : $"{assignment.RecipientLogin} ukończył {assignment.TestCaseIds.Count} przypadków projektu {assignment.ProjectName}, wersja {assignment.ApplicationVersion}.";
+                ? LocalizationService.Format("Notifications.CompletedWithRemainingMessage", assignment.RecipientLogin, completedCount, assignment.TestCaseIds.Count, assignment.ProjectName, assignment.ApplicationVersion, unfinishedCount)
+                : LocalizationService.Format("Notifications.CompletedMessage", assignment.RecipientLogin, assignment.TestCaseIds.Count, assignment.ProjectName, assignment.ApplicationVersion);
 
         foreach (var managerLogin in managerLogins)
         {
             AddNotification(
                 data,
                 managerLogin,
-                "Przypisanie ukończone",
+                LocalizationService.T("Notifications.CompletedTitle"),
                 completionDetails,
                 assignment.Id);
         }

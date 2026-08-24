@@ -100,6 +100,7 @@ public partial class ExplorerView : UserControl
     private TreeView? _testTreeView;
     private TextBox? _testTreeSearchTextBox;
     private string _testTreeSearchText = string.Empty;
+    private bool _testTreeInitialized;
     private TextBlock? _testTreeTitleTextBlock;
     private ScrollViewer? _testTreeScrollViewer;
     private Grid? _explorerBodyGrid;
@@ -108,7 +109,7 @@ public partial class ExplorerView : UserControl
     private Button? _toggleCompactTestTreePanelButton;
     private Button? _collapseTestTreePanelButton;
     private double _lastTestTreePanelWidth =
-        330;
+        285;
     private TreePanelState _treePanelState =
         TreePanelState.Full;
     private bool _isCompactTreeTypography;
@@ -362,13 +363,6 @@ public partial class ExplorerView : UserControl
                     _assignmentGlowBright
                         ? 1
                         : 0.9;
-
-                _executeAssignedTestsButton.BorderBrush =
-                    new SolidColorBrush(
-                        Color.Parse(
-                            _assignmentGlowBright
-                                ? "#A8CCF1"
-                                : "#397FCA"));
             };
 
         _assignmentValidityTimer.Tick +=
@@ -491,10 +485,25 @@ public partial class ExplorerView : UserControl
                     .FirstOrDefault();
         }
 
+        collection ??=
+            GetCollectionsForTestType(
+                    FunctionalTestTypeKey)
+                .FirstOrDefault(
+                    item => item.Cases.Any(
+                        IsCaseVisibleForActiveAssignment));
+
+        collection ??=
+            GetCollectionsForTestType(
+                    RegressionTestTypeKey)
+                .FirstOrDefault(
+                    item => item.Cases.Any(
+                        IsCaseVisibleForActiveAssignment));
+
         if (collection is not null)
         {
             SelectCollection(
-                collection);
+                collection,
+                revealInTree: true);
         }
     }
 
@@ -716,8 +725,8 @@ public partial class ExplorerView : UserControl
                     _lastTestTreePanelWidth =
                         Math.Clamp(
                             width,
-                            300,
-                            560);
+                            260,
+                            460);
 
                     _treePanelState =
                         TreePanelState.Full;
@@ -727,10 +736,10 @@ public partial class ExplorerView : UserControl
                             .ColumnDefinitions[0];
 
                     if (leftColumn is not null &&
-                        width < 300)
+                        width < 260)
                     {
                         leftColumn.Width =
-                            new GridLength(300);
+                            new GridLength(260);
                     }
 
                     UpdateTreePanelButtons();
@@ -1660,6 +1669,8 @@ public partial class ExplorerView : UserControl
                 collection);
         }
 
+        _testTreeInitialized =
+            false;
         BuildTestTree();
         UpdateSessionSummary();
 
@@ -1689,6 +1700,9 @@ public partial class ExplorerView : UserControl
                         folder.Key)
                 .ToHashSet(
                     StringComparer.OrdinalIgnoreCase);
+
+        var expandAllByDefault =
+            !_testTreeInitialized;
 
         var activeCollectionKey =
             _currentCollectionIndex >= 0 &&
@@ -1725,11 +1739,15 @@ public partial class ExplorerView : UserControl
 
             folder.TreeItem.IsExpanded =
                 folder.Key == ProjectRootKey ||
+                expandAllByDefault ||
                 !string.IsNullOrWhiteSpace(
                     _testTreeSearchText) ||
                 expandedFolderKeys.Contains(
                     folder.Key);
         }
+
+        _testTreeInitialized =
+            true;
 
         if (!string.IsNullOrWhiteSpace(
                 activeCollectionKey))
@@ -2296,13 +2314,13 @@ public partial class ExplorerView : UserControl
 
                 Margin =
                     new Thickness(
-                        12,
+                        6,
                         0,
-                        24,
+                        6,
                         0),
 
                 MinWidth =
-                    42,
+                    34,
 
                 TextAlignment =
                     TextAlignment.Right,
@@ -2357,12 +2375,12 @@ public partial class ExplorerView : UserControl
                     headerGrid,
 
                 MinWidth =
-                    245,
+                    180,
 
                 Padding =
                     new Thickness(
-                        6,
-                        5),
+                        4,
+                        4),
 
                 CornerRadius =
                     new CornerRadius(7),
@@ -7278,7 +7296,7 @@ public partial class ExplorerView : UserControl
             new Button
             {
                 Content =
-                    "+  Dodaj przypadek",
+                    "+  " + LocalizationService.T("Structure.AddCase"),
 
                 HorizontalAlignment =
                     HorizontalAlignment.Left,
@@ -7338,7 +7356,7 @@ public partial class ExplorerView : UserControl
             new MenuItem
             {
                 Header =
-                    "Dodaj przypadek testowy"
+                    LocalizationService.T("Structure.AddCase")
             };
 
         addCaseItem.Click +=
@@ -7672,15 +7690,13 @@ public partial class ExplorerView : UserControl
         var currentCollection =
             GetCurrentCollection();
 
-        var activeTestTypeKey =
-            currentCollection?.TestTypeKey;
-
-        var visibleCollections =
-            string.IsNullOrWhiteSpace(
-                activeTestTypeKey)
+        IEnumerable<TestCollectionData> visibleCollections =
+            currentCollection is null
                 ? _collections
-                : GetCollectionsForTestType(
-                    activeTestTypeKey);
+                : new[]
+                {
+                    currentCollection
+                };
 
         var visibleCases =
             visibleCollections
@@ -7908,8 +7924,8 @@ public partial class ExplorerView : UserControl
             _lastTestTreePanelWidth =
                 Math.Clamp(
                     leftColumn.ActualWidth,
-                    290,
-                    560);
+                    260,
+                    460);
         }
 
         _treePanelState =
@@ -7942,20 +7958,20 @@ public partial class ExplorerView : UserControl
         else
         {
             leftColumn.MinWidth =
-                300;
+                260;
 
             leftColumn.MaxWidth =
-                560;
+                460;
 
             leftColumn.Width =
                 new GridLength(
                     state ==
                         TreePanelState.Compact
-                        ? 300
+                        ? 260
                         : Math.Clamp(
                             _lastTestTreePanelWidth,
-                            300,
-                            560));
+                            260,
+                            460));
 
             if (_testTreePanelBorder is not null)
             {
@@ -8662,7 +8678,10 @@ public partial class ExplorerView : UserControl
 
         SetText(
             _summaryCompletedTitleTextBlock,
-            $"{GetTestTypeDisplayName(completedTestTypeKey)} zakończone");
+            LocalizationService.Format(
+                "Explorer.TestTypeCompleted",
+                GetTestTypeDisplayName(
+                    completedTestTypeKey)));
 
         SetText(
             _summarySuccessCountTextBlock,
@@ -8744,6 +8763,8 @@ public partial class ExplorerView : UserControl
                     .SelectMany(
                         collection =>
                             collection.Cases)
+                    .Where(
+                        IsCaseVisibleForActiveAssignment)
                     .Count();
 
             SetText(
@@ -10220,17 +10241,26 @@ public partial class ExplorerView : UserControl
     private static string GetTestTypeDisplayName(
         string testTypeKey)
     {
-        return testTypeKey switch
+        if (string.Equals(
+                testTypeKey,
+                RegressionTestTypeKey,
+                StringComparison.OrdinalIgnoreCase))
         {
-            RegressionTestTypeKey =>
-                LocalizationService.T("Explorer.RegressionTests"),
+            return LocalizationService.T(
+                "Explorer.RegressionTests");
+        }
 
-            FunctionalTestTypeKey =>
-                LocalizationService.T("Explorer.FunctionalTests"),
+        if (string.Equals(
+                testTypeKey,
+                FunctionalTestTypeKey,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return LocalizationService.T(
+                "Explorer.FunctionalTests");
+        }
 
-            _ =>
-                "Test"
-        };
+        return LocalizationService.T(
+            "Explorer.Test");
     }
 
     private string? GetNextTestTypeKey(
@@ -10244,9 +10274,20 @@ public partial class ExplorerView : UserControl
             };
 
         var currentIndex =
-            Array.IndexOf(
+            Array.FindIndex(
                 orderedKeys,
-                currentTestTypeKey);
+                key =>
+                    string.Equals(
+                        key,
+                        currentTestTypeKey,
+                        StringComparison.OrdinalIgnoreCase));
+
+        // Nieznany klucz nie może powodować powrotu do pierwszego typu
+        // i zapętlenia ekranu podsumowania z ostatnim zbiorem.
+        if (currentIndex < 0)
+        {
+            return null;
+        }
 
         for (var index = currentIndex + 1;
              index < orderedKeys.Length;
@@ -10430,7 +10471,8 @@ public partial class ExplorerView : UserControl
             if (folder.Key != ProjectRootKey)
             {
                 names.Add(
-                    folder.Name);
+                    GetFolderDisplayName(
+                        folder));
             }
 
             currentKey =
@@ -10767,10 +10809,11 @@ public partial class ExplorerView : UserControl
                     LocalizationService.T("Assignment.ExecuteTests");
             }
 
-            _executeAssignedTestsButton.Background =
-                new SolidColorBrush(
-                    Color.Parse(
-                        "#397FCA"));
+            _executeAssignedTestsButton.ClearValue(
+                TemplatedControl.BackgroundProperty);
+
+            _executeAssignedTestsButton.ClearValue(
+                TemplatedControl.BorderBrushProperty);
 
             if (_executeAssignedTestsButton.IsVisible)
             {
@@ -10780,10 +10823,8 @@ public partial class ExplorerView : UserControl
             {
                 _assignmentGlowTimer.Stop();
                 _executeAssignedTestsButton.Opacity = 1;
-                _executeAssignedTestsButton.BorderBrush =
-                    new SolidColorBrush(
-                        Color.Parse(
-                            "#70A8DD"));
+                _executeAssignedTestsButton.ClearValue(
+                    TemplatedControl.BorderBrushProperty);
             }
         }
 
@@ -11273,7 +11314,10 @@ public partial class ExplorerView : UserControl
         if (_projectInfoTextBlock is not null)
         {
             _projectInfoTextBlock.Text =
-                $"{_projectName} • wykonywanie testów • v{_applicationVersion}";
+                LocalizationService.Format(
+                    "Assignment.ExecutionModeSubtitle",
+                    _projectName,
+                    _applicationVersion);
         }
 
         BuildTestTree();
@@ -11390,6 +11434,11 @@ public partial class ExplorerView : UserControl
 
         await dialog.ShowDialog(
             ownerWindow);
+
+        if (dialog.GlobalResetCompleted)
+        {
+            _logoutAction?.Invoke();
+        }
     }
 
     private async void AssignmentArchiveButton_OnClick(
@@ -12625,12 +12674,23 @@ public partial class ExplorerView : UserControl
                 _assignTestsButton,
                 _executeAssignedTestsButton,
                 _restartAssignedTestsButton
-            }.Count(button => button?.IsVisible == true);
+            }.Where(button => button?.IsVisible == true).ToArray();
 
-        const double fixedHeaderWidth = 710;
-        const double estimatedActionWidth = 148;
+        const double fixedHeaderWidth = 620;
         const double overflowButtonWidth = 48;
-        const double maximumRolePanelWidth = 380;
+        const double maximumRolePanelWidth = 900;
+
+        var headerActionsWidth =
+            visibleHeaderActions.Sum(
+                button =>
+                    Math.Max(
+                        button!.Bounds.Width,
+                        Math.Max(
+                            button.DesiredSize.Width,
+                            120))) +
+            Math.Max(
+                0,
+                visibleHeaderActions.Length - 1) * 6;
 
         var roleSpace =
             Math.Min(
@@ -12639,7 +12699,7 @@ public partial class ExplorerView : UserControl
                     0,
                     Bounds.Width -
                     fixedHeaderWidth -
-                    visibleHeaderActions * estimatedActionWidth));
+                    headerActionsWidth));
 
         static double EstimateBadgeWidth(string role) =>
             Math.Max(58, 34 + role.Length * 7.4);
@@ -12931,7 +12991,18 @@ public partial class ExplorerView : UserControl
                 LocalizationService.T("Assignment.ExecuteTests");
         }
 
+        RefreshCollectionPaths();
         BuildTestTree();
+
+        var currentCollection =
+            GetCurrentCollection();
+
+        if (currentCollection is not null)
+        {
+            ShowCurrentCollectionHeader(
+                currentCollection);
+        }
+
         UpdateSessionSummary();
         UpdateNavigationButtons();
         UpdateThemeButton();

@@ -7,6 +7,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using QARegressionManager.Services;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace QARegressionManager.Views;
 
@@ -20,7 +21,7 @@ public partial class NotificationCenterWindow : Window
 
     public NotificationCenterWindow()
         : this(
-            "nieznany")
+            "unknown")
     {
     }
 
@@ -53,10 +54,7 @@ public partial class NotificationCenterWindow : Window
                             notification =>
                                 notification.AssignmentId.HasValue &&
                                 activeAssignmentIds.Contains(
-                                    notification.AssignmentId.Value) &&
-                                notification.Title.StartsWith(
-                                    "Nowe testy do wykonania",
-                                    StringComparison.OrdinalIgnoreCase))
+                                    notification.AssignmentId.Value))
                         .OrderByDescending(
                             notification =>
                                 notification.CreatedAt)
@@ -74,7 +72,7 @@ public partial class NotificationCenterWindow : Window
                     NotificationsPanel.Children.Add(
                         new TextBlock
                         {
-                            Text = "Nie masz jeszcze żadnych powiadomień.",
+                            Text = LocalizationService.T("Notifications.Empty"),
                             Margin = new Thickness(0, 18),
                             HorizontalAlignment = HorizontalAlignment.Center,
                             Foreground = Brushes.Gray
@@ -100,13 +98,13 @@ public partial class NotificationCenterWindow : Window
                                 {
                                     new TextBlock
                                     {
-                                        Text = notification.Title,
+                                        Text = GetDisplayTitle(notification.Title),
                                         FontSize = 14,
                                         FontWeight = FontWeight.Bold
                                     },
                                     new TextBlock
                                     {
-                                        Text = notification.Message,
+                                        Text = GetDisplayMessage(notification.Message),
                                         TextWrapping = TextWrapping.Wrap,
                                         FontSize = 13
                                     },
@@ -130,12 +128,12 @@ public partial class NotificationCenterWindow : Window
                         {
                             var approveButton = new Button
                             {
-                                Content = "ZATWIERDŹ USUNIĘCIE",
+                                Content = LocalizationService.T("Notifications.ApproveDeletion"),
                                 Classes = { "PrimaryAction" }
                             };
                             var rejectButton = new Button
                             {
-                                Content = "ODRZUĆ",
+                                Content = LocalizationService.T("Notifications.Reject"),
                                 Classes = { "SecondaryAction" }
                             };
                             var actions = new StackPanel
@@ -157,7 +155,9 @@ public partial class NotificationCenterWindow : Window
 
                                 approveButton.IsEnabled = false;
                                 rejectButton.IsEnabled = false;
-                                approveButton.Content = approve ? "ZATWIERDZONO" : "ODRZUCONO";
+                                approveButton.Content = approve
+                                    ? LocalizationService.T("Notifications.Approved")
+                                    : LocalizationService.T("Notifications.Rejected");
                             }
 
                             approveButton.Click += (_, _) => Resolve(true);
@@ -175,7 +175,7 @@ public partial class NotificationCenterWindow : Window
 
                         ToolTip.SetTip(
                             notificationBorder,
-                            "Pokaż przycisk Wykonaj testy");
+                            LocalizationService.T("Notifications.ShowExecuteTip"));
 
                         notificationBorder.PointerPressed +=
                             (_, eventArgs) =>
@@ -215,9 +215,9 @@ public partial class NotificationCenterWindow : Window
     {
         var confirmation =
             new ConfirmDeleteWindow(
-                "Wyczyścić powiadomienia?",
-                "Wszystkie powiadomienia przypisane do Twojego profilu zostaną trwale usunięte.",
-                "WYCZYŚĆ");
+                LocalizationService.T("Notifications.ClearQuestion"),
+                LocalizationService.T("Notifications.ClearDescription"),
+                LocalizationService.T("Notifications.ClearAction"));
 
         if (!await confirmation.ShowDialog<bool>(
                 this))
@@ -233,7 +233,7 @@ public partial class NotificationCenterWindow : Window
             new TextBlock
             {
                 Text =
-                    "Nie masz jeszcze żadnych powiadomień.",
+                    LocalizationService.T("Notifications.Empty"),
                 Margin =
                     new Thickness(0, 18),
                 HorizontalAlignment =
@@ -256,5 +256,47 @@ public partial class NotificationCenterWindow : Window
             Close();
             e.Handled = true;
         }
+    }
+
+    private static string GetDisplayTitle(string title)
+    {
+        if (LocalizationService.IsPolish)
+        {
+            return title;
+        }
+
+        return title switch
+        {
+            "Nowe testy do wykonania" => LocalizationService.T("Notifications.NewTestsTitle"),
+            "Zmieniono przypisane testy" => LocalizationService.T("Notifications.AssignmentChangedTitle"),
+            "Wycofano przypisane testy" => LocalizationService.T("Notifications.AssignmentWithdrawnTitle"),
+            "Przypisanie ukończone" => LocalizationService.T("Notifications.CompletedTitle"),
+            "Przypisanie zostało przeniesione" => LocalizationService.T("Notifications.AssignmentMovedTitle"),
+            "Prośba o usunięcie dużej gałęzi" => LocalizationService.T("Notifications.DeletionRequestTitle"),
+            "Usunięcie zatwierdzone" => LocalizationService.T("Notifications.DeletionApprovedTitle"),
+            "Usunięcie odrzucone" => LocalizationService.T("Notifications.DeletionRejectedTitle"),
+            _ => title
+        };
+    }
+
+    private static string GetDisplayMessage(string message)
+    {
+        if (LocalizationService.IsPolish)
+        {
+            return message;
+        }
+
+        var assignment = Regex.Match(
+            message,
+            @"^(?<by>.+) przypisał sesję projektu (?<project>.+), wersja (?<version>.+) \((?<count>\d+) przypadków\)\.$");
+
+        return assignment.Success
+            ? LocalizationService.Format(
+                "Notifications.NewTestsMessage",
+                assignment.Groups["by"].Value,
+                assignment.Groups["project"].Value,
+                assignment.Groups["version"].Value,
+                assignment.Groups["count"].Value)
+            : message;
     }
 }

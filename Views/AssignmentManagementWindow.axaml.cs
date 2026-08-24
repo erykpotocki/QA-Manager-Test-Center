@@ -16,11 +16,8 @@ namespace QARegressionManager.Views;
 
 public partial class AssignmentManagementWindow : Window
 {
-    private static readonly string[] StandardTestTypes =
-    {
-        "Testy regresji",
-        "Testy funkcjonalne"
-    };
+    private const string RegressionTestType = "regression";
+    private const string FunctionalTestType = "functional";
     private readonly string _projectKey;
     private readonly string _projectName;
     private readonly string _assignedByLogin;
@@ -159,10 +156,8 @@ public partial class AssignmentManagementWindow : Window
             TestTypeComboBox.Items.Clear();
 
             foreach (var testType in
-                     StandardTestTypes
-                         .Concat(
-                             _caseOptions
-                                 .Select(GetTestTypeName))
+                     _caseOptions
+                         .Select(GetTestTypeName)
                          .Where(testType =>
                              !string.IsNullOrWhiteSpace(testType))
                          .Distinct(StringComparer.OrdinalIgnoreCase))
@@ -170,7 +165,7 @@ public partial class AssignmentManagementWindow : Window
                 TestTypeComboBox.Items.Add(
                     new ComboBoxItem
                     {
-                        Content = testType,
+                        Content = GetTestTypeDisplayName(testType),
                         Tag = testType
                     });
             }
@@ -182,7 +177,7 @@ public partial class AssignmentManagementWindow : Window
             AssignmentComboBox.Items.Add(
                 new ComboBoxItem
                 {
-                    Content = "Nowe przypisanie"
+                    Content = LocalizationService.T("Assignment.NewSession")
                 });
 
             foreach (var assignment in _activeAssignments)
@@ -190,7 +185,11 @@ public partial class AssignmentManagementWindow : Window
                 AssignmentComboBox.Items.Add(
                     new ComboBoxItem
                     {
-                        Content = $"{assignment.RecipientLogin} — v{assignment.ApplicationVersion} — {assignment.TestCaseIds.Count} przypadków",
+                        Content = LocalizationService.Format(
+                            "Assignment.SessionListItem",
+                            assignment.RecipientLogin,
+                            assignment.ApplicationVersion,
+                            assignment.TestCaseIds.Count),
                         Tag = assignment
                     });
             }
@@ -451,27 +450,54 @@ public partial class AssignmentManagementWindow : Window
 
         return rawName.Trim().ToLowerInvariant() switch
         {
-            "regresja" or "testy regresyjne" or "testy regresji" =>
-                "Testy regresji",
-            "testy funkcjonalne" or "testy funkcyjne" =>
-                "Testy funkcjonalne",
+            "regression" or "regression tests" or "regresja" or
+                "testy regresyjne" or "testy regresji" =>
+                RegressionTestType,
+            "functional" or "functional tests" or "testy funkcjonalne" or
+                "testy funkcyjne" =>
+                FunctionalTestType,
             _ => rawName
         };
     }
+
+    private static string GetTestTypeDisplayName(string testType) =>
+        testType switch
+        {
+            RegressionTestType => LocalizationService.T("Explorer.RegressionTests"),
+            FunctionalTestType => LocalizationService.T("Explorer.FunctionalTests"),
+            _ => testType
+        };
 
     private static string GetCollectionDisplayName(
         string collectionName,
         string selectedTestType)
     {
-        var prefix =
-            selectedTestType + " / ";
+        var parts = collectionName.Split(
+            " / ",
+            StringSplitOptions.RemoveEmptyEntries |
+            StringSplitOptions.TrimEntries);
 
-        return collectionName.StartsWith(
-            prefix,
-            StringComparison.OrdinalIgnoreCase)
-            ? collectionName[prefix.Length..]
-            : collectionName;
+        if (parts.Length > 1 &&
+            string.Equals(
+                NormalizeTestTypeName(parts[0]),
+                selectedTestType,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return string.Join(" / ", parts.Skip(1));
+        }
+
+        return collectionName;
     }
+
+    private static string NormalizeTestTypeName(string rawName) =>
+        rawName.Trim().ToLowerInvariant() switch
+        {
+            "regression" or "regression tests" or "regresja" or
+                "testy regresyjne" or "testy regresji" => RegressionTestType,
+            "functional" or "functional tests" or "testy funkcjonalne" or
+                "testy funkcyjne" => FunctionalTestType,
+            _ => rawName
+        };
 
     private IEnumerable<AssignmentCaseOption> GetAvailableCaseOptions()
     {
@@ -793,7 +819,7 @@ public partial class AssignmentManagementWindow : Window
                 version))
         {
             ShowResult(
-                "Wpisz numer wersji aplikacji, np. 1.2.1.1.",
+                LocalizationService.T("Assignment.VersionRequired"),
                 false);
 
             VersionTextBox.Focus();

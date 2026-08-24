@@ -12,6 +12,7 @@ namespace QARegressionManager.Views;
 
 public partial class AdminTestMenuWindow : Window
 {
+    public bool GlobalResetCompleted { get; private set; }
     private readonly UserProfileService _profileService =
         new();
     private readonly AssignmentService _assignmentService =
@@ -315,9 +316,7 @@ public partial class AdminTestMenuWindow : Window
             _additionalProjectRolesTextBox.Text =
                 string.Join(
                     ", ",
-                    profile.ProjectRoles.Where(
-                        role =>
-                            !string.Equals(role, "NOVA", StringComparison.OrdinalIgnoreCase)));
+                    profile.ProjectRoles);
         }
     }
 
@@ -848,37 +847,40 @@ public partial class AdminTestMenuWindow : Window
             return;
         }
 
-        try
-        {
-            var removedAssignments = await _assignmentService.ResetAllAssignmentDataAsync();
-            var testData = await _storageService.LoadAsync();
-            foreach (var testCase in testData.TestCases)
+        var busyWindow = new BusyOperationWindow(
+            "Resetowanie danych testowych",
+            "Przywracanie kont, wyglądu, przypisań, sesji i statusów. Po zakończeniu nastąpi wylogowanie.",
+            async () =>
             {
-                testCase.Status = "None";
-                testCase.Comment = string.Empty;
-            }
+                await _assignmentService.ResetAllAssignmentDataAsync();
+                var testData = await _storageService.LoadAsync();
+                foreach (var testCase in testData.TestCases)
+                {
+                    testCase.Status = "None";
+                    testCase.Comment = string.Empty;
+                }
 
-            await _storageService.SaveAsync(testData);
-            var resetProfiles = await _profileService.ResetAllProfilesForTestAsync();
-            var removedSessions = SessionManager.DeleteAllLocalSessions();
-            ApplicationAppearanceService.ResetAllProfilesToTestDefaults();
-            _globalResetPinTextBox.Text = string.Empty;
+                await _storageService.SaveAsync(testData);
+                await _profileService.ResetAllProfilesForTestAsync();
+                SessionManager.DeleteAllLocalSessions();
+                ApplicationAppearanceService.ResetAllProfilesToTestDefaults();
+            });
 
-            var message =
-                $"Reset zakończony: {resetProfiles} kont, {testData.TestCases.Count} przypadków, " +
-                $"{removedAssignments} przypisań i {removedSessions} sesji. Przy następnym logowaniu użyj PIN-u 000000.";
+        await busyWindow.ShowDialog(this);
 
-            ShowResult(message, true);
-            await ShowOperationResultAsync(true, "Globalny reset zakończony", message);
-        }
-        catch (Exception exception)
+        if (busyWindow.OperationException is Exception exception)
         {
             ShowResult($"Globalny reset nie powiódł się: {exception.Message}", false);
             await ShowOperationResultAsync(
                 false,
                 "Globalny reset nie powiódł się",
                 "Nie udało się przywrócić środowiska testowego. Żadne dalsze operacje nie zostały wykonane.");
+            return;
         }
+
+        _globalResetPinTextBox.Text = string.Empty;
+        GlobalResetCompleted = true;
+        Close();
     }
 
     private async Task ShowOperationResultAsync(
