@@ -1,0 +1,59 @@
+# Build output
+bin/
+obj/
+artifacts/
+Releases/
+
+# IDE and local tooling
+.vs/
+.vscode/
+.idea/
+.codex_tmp/
+.build-*.txt
+.build-status.png
+.codex-*
+inspect-*.png
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local runtime data and logs
+*.log
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+assignments.json
+profiles.json
+project-data.json
+TestCases.json
+TestCases.backup.json
+session*.json
+application-settings*.json
+language-settings.json
+user-settings*.json
+report-settings*.json
+network-sync*.json
+
+# Certificates, pairing data and private keys
+*.pfx
+*.p12
+*.cer
+*.crt
+*.key
+*.pem
+
+# Generated installer output
+installer/Output/
+
+# Internal working context
+PROJECT_CONTEXT.md
+
+# Private source imports retained only in the local workspace
+Assets/*Seeds/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini

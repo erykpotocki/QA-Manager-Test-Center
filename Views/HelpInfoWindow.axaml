@@ -1,0 +1,161 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.HelpInfoWindow"
+    Title="{DynamicResource Help.Title}"
+    Width="760"
+    Height="720"
+    MinWidth="680"
+    MinHeight="600"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Styles>
+        <Style Selector="Border.SectionCard">
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+        </Style>
+
+        <Style Selector="TextBlock.SectionTitle">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+        </Style>
+
+        <Style Selector="TextBlock.BodyText">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="LineHeight" Value="20" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+        </Style>
+
+        <Style Selector="Button.CloseButton">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="MinWidth" Value="125" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+        </Style>
+    </Window.Styles>
+
+    <Border
+        Margin="20"
+        Padding="26"
+        Background="{DynamicResource CardBackgroundBrush}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="22">
+
+        <Grid RowDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Row="0" Spacing="5">
+                <TextBlock
+                    Text="{DynamicResource Help.Title}"
+                    FontSize="{DynamicResource AppFontSize28}"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource PrimaryTextBrush}" />
+                <TextBlock
+                    Text="{DynamicResource Help.Subtitle}"
+                    FontSize="{DynamicResource AppFontSize13}"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+            </StackPanel>
+
+            <ScrollViewer
+                Grid.Row="1"
+                Margin="0,22,0,18"
+                Padding="0,0,12,0"
+                VerticalScrollBarVisibility="Auto">
+
+                <StackPanel Spacing="14">
+                    <Border Classes="SectionCard">
+                        <StackPanel Spacing="10">
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.CoreTitle}" />
+                            <TextBlock
+                                Classes="BodyText"
+                                Text="{DynamicResource Help.CoreBody}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="SectionCard">
+                        <StackPanel Spacing="10">
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.TeamTitle}" />
+                            <TextBlock
+                                Classes="BodyText"
+                                Text="{DynamicResource Help.TeamBody}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="SectionCard">
+                        <StackPanel Spacing="10">
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.ReportsTitle}" />
+                            <TextBlock
+                                Classes="BodyText"
+                                Text="{DynamicResource Help.ReportsBody}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="SectionCard">
+                        <StackPanel Spacing="10">
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.EditingTitle}" />
+                            <TextBlock
+                                Classes="BodyText"
+                                Text="{DynamicResource Help.EditingBody}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="SectionCard">
+                        <StackPanel Spacing="10">
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.ShortcutsTitle}" />
+                            <TextBlock
+                                Classes="BodyText"
+                                Text="{DynamicResource Help.ShortcutsBody}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="SectionCard">
+                        <StackPanel Spacing="10">
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.NetworkTitle}" />
+                            <TextBlock
+                                Classes="BodyText"
+                                Text="{DynamicResource Help.NetworkBody}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="SectionCard">
+                        <StackPanel Spacing="10">
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.Update02Title}" />
+                            <TextBlock
+                                Classes="BodyText"
+                                Text="{DynamicResource Help.Update02Body}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="SectionCard">
+                        <StackPanel Spacing="10">
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.Update01Title}" />
+                            <TextBlock
+                                Classes="BodyText"
+                                Text="{DynamicResource Help.Update01Body}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Button
+                Grid.Row="2"
+                Classes="CloseButton"
+                HorizontalAlignment="Right"
+                Content="{DynamicResource Common.Close}"
+                Click="CloseButton_OnClick" />
+        </Grid>
+    </Border>
+</Window>

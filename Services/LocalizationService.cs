@@ -1,0 +1,405 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using Avalonia;
+
+namespace QARegressionManager.Services;
+
+public static class LocalizationService
+{
+    private sealed class DeviceLanguageSettings
+    {
+        public string Language { get; set; } = English;
+    }
+
+    public const string English = "en";
+    public const string Polish = "pl";
+
+    private static readonly string SettingsPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "QARegressionManager",
+        "language-settings.json");
+
+    private static readonly Dictionary<string, (string En, string Pl)> Texts = new(StringComparer.Ordinal)
+    {
+        ["AppSettings.Title"] = ("Application settings", "Ustawienia aplikacji"),
+        ["AppSettings.Description"] = ("Customize the application appearance. Changes are shown immediately in the preview.", "Dostosuj wygląd aplikacji. Zmiany widać od razu w podglądzie."),
+        ["AppSettings.Language"] = ("LANGUAGE", "JĘZYK"),
+        ["Language.English"] = ("English", "Angielski"),
+        ["Language.Polish"] = ("Polish", "Polski"),
+        ["Language.Select"] = ("SELECT LANGUAGE", "WYBIERZ JĘZYK"),
+        ["AppSettings.Theme"] = ("THEME", "MOTYW"),
+        ["AppSettings.TextSize"] = ("TEXT SIZE", "ROZMIAR TEKSTU"),
+        ["AppSettings.Font"] = ("FONT", "CZCIONKA"),
+        ["AppSettings.FontWeight"] = ("TEXT WEIGHT", "GRUBOŚĆ TEKSTU"),
+        ["AppSettings.Accent"] = ("ACCENT COLOR", "KOLOR DOMINUJĄCY"),
+        ["Accent.Blue"] = ("Blue, default", "Niebieski, domyślny"),
+        ["Accent.Green"] = ("Green", "Zielony"),
+        ["Accent.Yellow"] = ("Gold", "Złoty"),
+        ["Accent.Purple"] = ("Purple", "Fioletowy"),
+        ["Accent.Pink"] = ("Pink", "Różowy"),
+        ["AppSettings.Preview"] = ("Text preview", "Podgląd tekstu"),
+        ["AppSettings.PreviewBody"] = ("Test cases, reports and settings remain readable in the selected theme.", "Przypadki testowe, raporty i ustawienia pozostają czytelne w wybranym motywie."),
+        ["Common.Cancel"] = ("CANCEL", "ANULUJ"),
+        ["Common.Save"] = ("SAVE", "ZAPISZ"),
+        ["Common.Close"] = ("CLOSE", "ZAMKNIJ"),
+        ["Login.Title"] = ("QA Manager", "QA Manager"),
+        ["Login.WindowTitle"] = ("QA Manager - Sign in", "QA Manager - Logowanie"),
+        ["Login.Description"] = ("Sign in with your user login", "Zaloguj się loginem użytkownika"),
+        ["Login.Login"] = ("LOGIN", "LOGIN"),
+        ["Login.Pin"] = ("PIN", "PIN"),
+        ["Login.LoginPlaceholder"] = ("e.g. tester1", "np. tester1"),
+        ["Login.PinPlaceholder"] = ("6 digits", "6 cyfr"),
+        ["Login.SignIn"] = ("SIGN IN", "ZALOGUJ SIĘ"),
+        ["Login.FirstLoginInfo"] = ("This is your first sign-in. Set your own PIN to secure the profile.", "To pierwsze logowanie. Ustaw własny PIN, aby zabezpieczyć profil."),
+        ["Login.NewPin"] = ("NEW PIN", "NOWY PIN"),
+        ["Login.RepeatPin"] = ("REPEAT NEW PIN", "POWTÓRZ NOWY PIN"),
+        ["Login.SavePin"] = ("SAVE PIN AND CONTINUE", "ZAPISZ PIN I WEJDŹ"),
+        ["Login.Welcome"] = ("Welcome, {0}", "Witaj, {0}"),
+        ["Login.Error.Cleanup"] = ("Local profiles could not be prepared.", "Nie udało się uporządkować lokalnych profili."),
+        ["Login.Error.LoginRequired"] = ("Enter your user login.", "Wpisz login użytkownika."),
+        ["Login.Error.PinFormat"] = ("The PIN must contain exactly 6 digits.", "PIN musi składać się z dokładnie 6 cyfr."),
+        ["Login.Error.PinReset"] = ("Your PIN was reset. Use PIN 000000.", "Twój PIN został zresetowany. Użyj PIN-u 000000."),
+        ["Login.Error.InvalidCredentials"] = ("Invalid login or PIN.", "Nieprawidłowy login lub PIN."),
+        ["Login.Error.ProfileRead"] = ("The profile could not be loaded. Try again.", "Nie udało się odczytać profilu. Spróbuj ponownie."),
+        ["Login.Error.NewPinFormat"] = ("The new PIN must contain exactly 6 digits.", "Nowy PIN musi składać się z dokładnie 6 cyfr."),
+        ["Login.Error.PinMismatch"] = ("The entered PINs do not match.", "Wpisane PIN-y nie są identyczne."),
+        ["Login.Error.PinSave"] = ("The new PIN could not be saved.", "Nie udało się zapisać nowego PIN-u."),
+        ["Status.Pending"] = ("Pending", "Niewykonany"),
+        ["Status.InProgress"] = ("In Progress", "W trakcie"),
+        ["Status.Success"] = ("Success", "Sukces"),
+        ["Status.Failed"] = ("Failed", "Niepowodzenie"),
+        ["Status.NotApplicable"] = ("N/A", "Nie dotyczy"),
+        ["Status.Blocked"] = ("Blocked", "Zablokowany"),
+        ["Status.Remaining"] = ("Remaining", "Pozostało"),
+        ["Theme.Light"] = ("Light", "Jasny"),
+        ["Theme.Dark"] = ("Dark", "Ciemny"),
+        ["Theme.SwitchToLight"] = ("Switch to light theme", "Przełącz na jasny motyw"),
+        ["Theme.SwitchToDark"] = ("Switch to dark theme", "Przełącz na ciemny motyw"),
+        ["TextSize.Small"] = ("Small", "Mały"),
+        ["TextSize.Medium"] = ("Medium", "Średni"),
+        ["TextSize.Large"] = ("Large", "Duży"),
+        ["TextWeight.Regular"] = ("Regular", "Standardowa"),
+        ["TextWeight.SemiBold"] = ("Semi-bold", "Pogrubiona"),
+        ["Common.Refresh"] = ("Refresh", "Odśwież"),
+        ["Common.Settings"] = ("Settings", "Ustawienia"),
+        ["Common.Logout"] = ("Sign out", "Wyloguj"),
+        ["Common.Ready"] = ("Ready", "Gotowy"),
+        ["Common.LocalMode"] = ("local mode", "tryb lokalny"),
+        ["Common.LocalModeDescription"] = ("Local mode: changes are saved on this computer and are not yet synchronized with the shared database.", "Tryb lokalny: zmiany są zapisywane na tym komputerze i nie są jeszcze synchronizowane ze wspólną bazą."),
+        ["Common.LoggedIn"] = ("Signed in: {0}", "Zalogowany: {0}"),
+        ["Common.RefreshingData"] = ("Refreshing data", "Odświeżanie danych"),
+        ["Common.SettingsArea"] = ("SETTINGS", "USTAWIENIA"),
+        ["Common.SettingsDescription"] = ("Choose the area you want to configure.", "Wybierz obszar, który chcesz skonfigurować."),
+        ["Common.ApplicationSettings"] = ("Application settings", "Ustawienia aplikacji"),
+        ["Common.AppearanceDescription"] = ("Theme, text and font", "Motyw, tekst i czcionka"),
+        ["Common.NetworkSync"] = ("Network and synchronization", "Sieć i synchronizacja"),
+        ["Common.NetworkSyncDescription"] = ("Host or connection to a host", "Host lub połączenie z hostem"),
+        ["Network.Title"] = ("Computer synchronization", "Synchronizacja komputerów"),
+        ["Network.Description"] = ("Connect applications in the room to one encrypted data host.", "Połącz aplikacje w pokoju z jednym, szyfrowanym hostem danych."),
+        ["Network.ThisComputerHost"] = ("THIS COMPUTER AS HOST", "TEN KOMPUTER JAKO HOST"),
+        ["Network.HostDescription"] = ("Creates an HTTPS certificate and a connection file for other computers. It does not automatically open a Windows Firewall port.", "Tworzy certyfikat HTTPS i plik połączenia dla pozostałych komputerów. Nie otwiera automatycznie portu w Zaporze Windows."),
+        ["Network.CreateHost"] = ("CREATE HOST AND CONNECTION FILE", "UTWÓRZ HOST I PLIK POŁĄCZENIA"),
+        ["Network.ConnectComputer"] = ("CONNECT THIS COMPUTER", "PODŁĄCZ TEN KOMPUTER"),
+        ["Network.ClientDescription"] = ("Select the QA Manager connection JSON file received from the host computer.", "Wybierz plik połączenia JSON QA Manager otrzymany z komputera hosta."),
+        ["Network.SelectConnectionFile"] = ("SELECT CONNECTION FILE", "WYBIERZ PLIK POŁĄCZENIA"),
+        ["Network.LocalMode"] = ("LOCAL MODE", "TRYB LOKALNY"),
+        ["Network.HostReady"] = ("The host is ready. The connection file was saved here: {0}\nThe application will restart.", "Host został przygotowany. Plik połączenia zapisano tutaj: {0}\nAplikacja zostanie ponownie uruchomiona."),
+        ["Network.FilePickerTitle"] = ("Select a QA Manager connection file", "Wybierz plik połączenia QA Manager"),
+        ["Network.FileType"] = ("QA Manager configuration", "Konfiguracja QA Manager"),
+        ["Network.ClientSaved"] = ("The connection was saved. The application will restart.", "Połączenie zostało zapisane. Aplikacja zostanie ponownie uruchomiona."),
+        ["Network.LocalSaved"] = ("Local mode was enabled. The application will restart.", "Ustawiono tryb lokalny. Aplikacja zostanie ponownie uruchomiona."),
+        ["Network.SaveFailed"] = ("The configuration could not be saved: {0}", "Nie udało się zapisać konfiguracji: {0}"),
+        ["Network.ModeHost"] = ("Mode: data host", "Tryb: host danych"),
+        ["Network.ModeClient"] = ("Mode: connected computer", "Tryb: komputer podłączony"),
+        ["Network.ModeLocal"] = ("Mode: local", "Tryb: lokalny"),
+        ["Network.LocalDescription"] = ("Changes are visible only on this computer.", "Zmiany są widoczne tylko na tym komputerze."),
+        ["Common.ProjectStructure"] = ("Project structure", "Struktura projektu"),
+        ["Common.ProjectStructureDescription"] = ("Import or export a project", "Importuj lub eksportuj projekt"),
+        ["Common.ResetStatuses"] = ("Reset statuses", "Reset statusów"),
+        ["Common.ResetStatusesDescription"] = ("Change statuses of multiple test cases", "Zmień statusy wielu przypadków"),
+        ["ResetStatuses.Title"] = ("Reset statuses", "Reset statusów"),
+        ["ResetStatuses.Description"] = ("Select the scope, new status and test cases to be changed.", "Wybierz zakres, nowy status i przypadki, które mają zostać zmienione."),
+        ["ResetStatuses.Scope"] = ("SCOPE", "ZAKRES"),
+        ["ResetStatuses.EntireProject"] = ("Entire project", "Cały projekt"),
+        ["ResetStatuses.NewStatus"] = ("NEW STATUS", "NOWY STATUS"),
+        ["ResetStatuses.Pending"] = ("Pending", "Niewykonany (Pending)"),
+        ["ResetStatuses.InProgress"] = ("In Progress", "W trakcie (In Progress)"),
+        ["ResetStatuses.WhichCases"] = ("WHICH CASES TO CHANGE", "KTÓRE PRZYPADKI ZMIENIĆ"),
+        ["ResetStatuses.AllCases"] = ("All test cases", "Wszystkie przypadki"),
+        ["ResetStatuses.PendingAndNa"] = ("Pending and N/A only", "Tylko niewykonane i N/A"),
+        ["ResetStatuses.Apply"] = ("APPLY", "ZASTOSUJ"),
+        ["ResetStatuses.BusyTitle"] = ("Updating statuses", "Ustawianie statusów"),
+        ["ResetStatuses.BusyDescription"] = ("Please wait while test case statuses are updated.", "Proszę czekać. Trwa ustawianie statusów przypadków testowych."),
+        ["ResetStatuses.FailedTitle"] = ("Statuses could not be reset", "Nie udało się zresetować statusów"),
+        ["ResetStatuses.FailedDescription"] = ("Not all changes were saved. Try again.", "Nie wszystkie zmiany zostały zapisane. Spróbuj ponownie."),
+        ["ResetStatuses.SuccessTitle"] = ("Statuses reset", "Statusy zostały zresetowane"),
+        ["ResetStatuses.SuccessDescription"] = ("All selected test cases were saved and are ready for further work.", "Wszystkie wybrane przypadki zostały zapisane i są już gotowe do dalszej pracy."),
+        ["ProjectTools.Title"] = ("Project settings", "Ustawienia projektu"),
+        ["ProjectTools.Description"] = ("Import or export the project structure.", "Importuj lub eksportuj strukturę projektu."),
+        ["ProjectTools.Import"] = ("Import project", "Importuj projekt"),
+        ["ProjectTools.ImportDescription"] = ("Load the structure from a JSON file", "Wczytaj strukturę z pliku JSON"),
+        ["ProjectTools.Export"] = ("Export project", "Eksportuj projekt"),
+        ["ProjectTools.ExportDescription"] = ("Save the structure to a JSON file", "Zapisz strukturę do pliku JSON"),
+        ["ProjectTools.ProjectLabel"] = ("Project:", "Projekt:"),
+        ["ProjectTools.VersionLabel"] = ("Application version:", "Wersja aplikacji:"),
+        ["ProjectTools.ExportDateLabel"] = ("Export date:", "Data eksportu:"),
+        ["ProjectTools.Statuses"] = ("STATUSES", "STATUSY"),
+        ["ProjectTools.PreserveStatuses"] = ("Keep my statuses", "Zachowaj moje statusy"),
+        ["ProjectTools.OverwriteStatuses"] = ("Overwrite statuses with data from the file", "Nadpisz statusy danymi z pliku"),
+        ["ProjectTools.ImportAction"] = ("IMPORT", "IMPORTUJ"),
+        ["ProjectTools.JsonFile"] = ("JSON project file", "Plik projektu JSON"),
+        ["Common.HelpInfo"] = ("Help and information", "Pomoc i informacje"),
+        ["Common.HelpInfoDescription"] = ("Features, shortcuts and change history", "Funkcje, skróty i historia zmian"),
+        ["Help.Title"] = ("Help and information", "Pomoc i informacje"),
+        ["Help.Subtitle"] = ("QA Manager • v0.2 • features available for your current role", "QA Manager • v0.2 • funkcje dostępne dla bieżącej roli"),
+        ["Help.CoreTitle"] = ("Key features", "Najważniejsze funkcje"),
+        ["Help.CoreBody"] = ("• Organize projects, folders, collections and test cases.\n• Automatically save results, names, descriptions and test layout.\n• Use ad hoc mode or the separate assigned-test mode.\n• Restart an assigned session without assigning its scope again.\n• Finish an assigned session by submitting results alone or creating a report.\n• Blocked status requires an automatically saved comment.\n• Available statuses: Success, Failed, Blocked, N/A and In Progress.\n• Roles: Admin, Leader, Tester and custom project roles.\n• Theme, text size, font and accent color are saved on this computer.", "• Organizacja projektów, folderów, zbiorów i przypadków testowych.\n• Automatyczny zapis wyników, nazw, opisów i układu testów.\n• Tryb ad hoc oraz odrębny tryb wykonywania testów przypisanych.\n• Przypisaną sesję można zacząć od nowa bez ponownego przypisywania zakresu.\n• Zakończenie przypisanej sesji może wysłać same wyniki albo dodatkowo utworzyć raport.\n• Status Blocked wymaga komentarza zapisywanego automatycznie.\n• Statusy Success, Failed, Blocked, N/A i In Progress.\n• Role Admin, Lider, Tester oraz role projektowe.\n• Motyw, rozmiar i styl tekstu, czcionka oraz kolor dominujący są zapamiętywane na tym komputerze."),
+        ["Help.TeamTitle"] = ("Team collaboration", "Współpraca zespołu"),
+        ["Help.TeamBody"] = ("• Admins and Leaders can prepare one assignment package for multiple testers and approve it in the summary.\n• A package remains active until all scopes are completed and a team report is generated.\n• Suspended packages go directly to history.\n• Removing an item from history moves the entire package to the archive, where it can be restored.\n• Archived items are removed automatically after 60 days; manual deletion is permanent.\n• Active cases are protected against duplicate assignment.\n• Private notifications report new, completed and withdrawn sessions.\n• Interrupting tests preserves progress and restores the previous ad hoc state.\n• An unexpectedly closed active session can be resumed after signing in again.", "• Admin i Lider przygotowują jeden pakiet przypisań dla wielu testerów oraz zatwierdzają go w podsumowaniu.\n• Pakiet pozostaje aktywny do ukończenia wszystkich jego zakresów i wygenerowania raportu zespołu.\n• Wstrzymane pakiety trafiają bezpośrednio do historii.\n• Usunięcie z historii przenosi cały pakiet do archiwum, z którego można go przywrócić.\n• Archiwum automatycznie usuwa pozycje po 60 dniach. Ręczne usunięcie z archiwum jest trwałe.\n• Aktywne przypadki są chronione przed ponownym przypisaniem.\n• Prywatne powiadomienia informują o nowych, ukończonych i wycofanych sesjach.\n• Przerwanie testów zachowuje postęp i przywraca wcześniejszy stan ad hoc.\n• Nieoczekiwanie zamkniętą, nadal aktywną sesję można kontynuować po ponownym logowaniu."),
+        ["Help.ReportsTitle"] = ("Reports", "Raporty"),
+        ["Help.ReportsBody"] = ("• PDF and Excel reports contain a summary and detailed results.\n• An assigned-session report includes only the assigned scope.\n• The generator lets you change the name, format and save location.\n• A report can include every case or only cases with changed statuses.\n• File names are protected against accidental overwriting.", "• Raporty PDF i Excel zawierają podsumowanie oraz szczegółowe wyniki.\n• Raport sesji przypisanej obejmuje wyłącznie przydzielony zakres.\n• Generator pozwala zmienić nazwę, format i miejsce zapisu.\n• Zakres raportu może zawierać wszystkie przypadki albo tylko przypadki ze zmienionym statusem.\n• Nazwy plików są zabezpieczone przed przypadkowym nadpisaniem."),
+        ["Help.EditingTitle"] = ("Editing and navigation", "Edycja i nawigacja"),
+        ["Help.EditingBody"] = ("• Tree items can be copied, renamed and reordered.\n• Copies receive new identifiers and an independent status.\n• Smart scrolling follows the executed case and active tree item.\n• Structure dragging is disabled while assigned tests are running.\n• Cases created during a session are saved in the main project structure.", "• Elementy drzewa można kopiować, zmieniać ich nazwy i porządkować.\n• Kopie otrzymują nowe identyfikatory i niezależny status.\n• Inteligentne przewijanie śledzi wykonywany przypadek oraz aktywny element drzewa.\n• Przeciąganie struktury jest wyłączone podczas wykonywania przypisanej sesji.\n• Nowe przypadki utworzone podczas sesji są zapisywane w głównej strukturze projektu."),
+        ["Help.ShortcutsTitle"] = ("Keyboard shortcuts", "Skróty klawiszowe"),
+        ["Help.ShortcutsBody"] = ("Ctrl+C — copy selected item\nCtrl+V — paste at the current location\nF2 — rename\nDelete or Backspace — delete after confirmation\nEnter — confirm the primary action\nEscape — cancel or open sign-out confirmation\nCtrl+Enter — save collection description\nDouble-click a case — Success\nShift + double-click — Failed", "Ctrl+C — kopiowanie zaznaczonego elementu\nCtrl+V — wklejanie w bieżącym miejscu\nF2 — zmiana nazwy\nDelete lub Backspace — usuwanie po potwierdzeniu\nEnter — zatwierdzenie głównej akcji\nEscape — anulowanie lub otwarcie potwierdzenia wylogowania\nCtrl+Enter — zapis opisu zbioru\nDwuklik przypadku — Success\nShift i dwuklik — Failed"),
+        ["Help.NetworkTitle"] = ("Network and synchronization", "Sieć i synchronizacja"),
+        ["Help.NetworkBody"] = ("• Local mode stores data only on the current computer.\n• Host mode shares structure, profiles and assignments over encrypted HTTPS.\n• A client connects to one host using a connection file.\n• The host certificate is verified using its saved fingerprint.\n• Concurrent write conflicts are detected before a newer version is overwritten.\n• The API does not execute system commands or expose arbitrary host files.\n• The connection file contains a confidential token that grants access to shared QA data.\n• Running a host on an organization network requires compliance with its security policies.", "• Tryb lokalny przechowuje dane wyłącznie na bieżącym komputerze.\n• Tryb hosta udostępnia strukturę, profile i przypisania przez szyfrowane połączenie HTTPS.\n• Klient łączy się z jednym hostem przy użyciu pliku połączenia.\n• Certyfikat hosta jest sprawdzany na podstawie zapisanego odcisku.\n• Konflikt równoczesnego zapisu jest wykrywany przed nadpisaniem nowszej wersji.\n• API nie uruchamia poleceń systemowych i nie udostępnia dowolnych plików hosta.\n• Plik połączenia zawiera poufny token. Jego posiadacz może odczytać lub zmienić współdzielone dane QA.\n• Uruchomienie hosta w sieci organizacji wymaga akceptacji obowiązujących zasad bezpieczeństwa."),
+        ["Help.Update02Title"] = ("Version 0.2 update", "Aktualizacja v0.2"),
+        ["Help.Update02Body"] = ("• Admins and Leaders can create a host and generate a connection file.\n• TEST PROJECT contains a neutral demonstration catalog.\n• Functional tests are organized into clear product areas.\n• Regression tests provide a compact skeleton of key user paths.\n• Descriptions, preconditions and expected results can be expanded freely.\n• Test cases can be searched in the ad hoc tree.\n• Main branches are protected by the Admin or Leader role.\n• The interface remains consistent in light and dark themes.", "• Admin i Lider mogą utworzyć host oraz wygenerować plik połączenia.\n• Projekt TEST PROJECT zawiera neutralny katalog demonstracyjny.\n• Testy funkcjonalne są uporządkowane w czytelnych obszarach produktu.\n• Testy regresji stanowią skrócony szkielet najważniejszych ścieżek użytkownika.\n• Opisy, warunki wstępne i oczekiwane wyniki można swobodnie rozwijać.\n• Dostępne jest wyszukiwanie przypadków w drzewie testów ad hoc.\n• Główne gałęzie są chronione rolą Admina lub Lidera.\n• Interfejs pozostaje spójny w jasnym i ciemnym motywie."),
+        ["Help.Update01Title"] = ("Version 0.1 update", "Aktualizacja v0.1"),
+        ["Help.Update01Body"] = ("• Added profile, role and project management.\n• Added test assignment, notifications and a team dashboard.\n• Added completed-session history and archive.\n• Added PDF and Excel reports with scope selection.\n• Added automatic saving and session resume support.\n• Added secured host/client synchronization for local networks.\n• Unified navigation, shortcuts, messages and both application themes.", "• Dodano zarządzanie profilami, rolami i projektami.\n• Dodano przypisywanie testów, centrum powiadomień i dashboard zespołu.\n• Dodano historię oraz archiwum zakończonych sesji.\n• Dodano raporty PDF i Excel z wyborem zakresu.\n• Dodano automatyczny zapis i obsługę wznowienia sesji.\n• Dodano zabezpieczoną synchronizację host i klient w sieci lokalnej.\n• Ujednolicono nawigację, skróty, komunikaty i oba motywy aplikacji."),
+        ["Common.TestMenu"] = ("TEST MENU", "MENU TESTOWE"),
+        ["Common.TestMenuDescription"] = ("The test menu is not visible to all users.", "Menu testowe nie jest widoczne dla wszystkich użytkowników."),
+        ["Common.AccountManagement"] = ("Account management", "Zarządzanie kontami"),
+        ["Common.AccountManagementDescription"] = ("Profiles, roles, PINs and assignments", "Profile, role, PIN-y i przypisania"),
+        ["Common.AccountApplication"] = ("ACCOUNT AND APPLICATION", "KONTO I APLIKACJA"),
+        ["Common.LogoutDescription"] = ("End the current user session", "Zakończ bieżącą sesję użytkownika"),
+        ["Common.BackToLogin"] = ("Return to the sign-in screen", "Wróć do ekranu logowania"),
+        ["Common.ManageRoles"] = ("Manage roles", "Zarządzaj rolami"),
+        ["Common.ManageRolesDescription"] = ("User roles and access", "Role użytkowników i dostęp"),
+        ["Common.AssignedProgress"] = ("Assigned test progress", "Postęp przypisanych testów"),
+        ["Common.RegressionExecution"] = ("executing regression", "wykonywanie regresji"),
+        ["Common.NotSpecified"] = ("Not specified", "Nie określono"),
+        ["Explorer.Regression"] = ("Regression", "Regresja"),
+        ["Explorer.TestsAndCases"] = ("TESTS AND TEST CASES", "TESTY I PRZYPADKI"),
+        ["Explorer.SearchCase"] = ("Search test cases...", "Szukaj przypadku..."),
+        ["Explorer.SelectTestType"] = ("Select a test type", "Wybierz rodzaj testów"),
+        ["Explorer.SelectTestTypeDescription"] = ("Expand the catalog on the left and select the area you want to execute.", "Rozwiń katalog po lewej stronie i wybierz obszar, który chcesz wykonać."),
+        ["Explorer.SelectCollectionDescription"] = ("Expand the catalog on the left and select the test case collection you want to execute.", "Rozwiń katalog po lewej stronie i wybierz zbiór przypadków, który chcesz wykonać."),
+        ["Explorer.ToggleCompactPanel"] = ("Toggle compact panel", "Przełącz kompaktowy panel"),
+        ["Explorer.HideTestPanel"] = ("Hide test panel", "Ukryj panel testów"),
+        ["Explorer.Remaining"] = ("Remaining", "Pozostało"),
+        ["Explorer.TestsSummary"] = ("Test summary", "Podsumowanie testów"),
+        ["Explorer.RegressionCompleted"] = ("Regression tests completed", "Testy regresji zakończone"),
+        ["Explorer.ResultsSaved"] = ("Results were saved automatically.", "Wyniki zostały zapisane automatycznie."),
+        ["Explorer.TestsCompleted"] = ("Tests completed!", "Testy ukończone!"),
+        ["Explorer.OtherRoles"] = ("Other roles", "Pozostałe role"),
+        ["Explorer.Back"] = ("←  BACK", "←  WSTECZ"),
+        ["Explorer.AddDescription"] = ("✎  Add a short description", "✎  Dodaj krótki opis"),
+        ["Explorer.EditDescription"] = ("Edit collection description", "Edytuj opis zbioru"),
+        ["Explorer.FinishAndReport"] = ("FINISH AND CREATE REPORT", "ZAKOŃCZ I UTWÓRZ RAPORT"),
+        ["Explorer.FinishAndReportTip"] = ("Finish early and generate a report from the current results", "Zakończ wcześniej i wygeneruj raport z aktualnych wyników"),
+        ["Explorer.Next"] = ("NEXT  →", "DALEJ  →"),
+        ["Explorer.ContinueOrDownload"] = ("You can continue testing or download a report with the current results.", "Możesz kontynuować testy lub pobrać raport z dotychczasowych wyników."),
+        ["Explorer.NextTest"] = ("Next test:", "Następny test:"),
+        ["Explorer.CasesToExecute"] = ("0 test cases to execute", "0 przypadków do wykonania"),
+        ["Explorer.AllCompleted"] = ("All scheduled tests have been completed. You can download the final report.", "Wszystkie zaplanowane testy zostały ukończone. Możesz pobrać raport końcowy."),
+        ["Explorer.DownloadReport"] = ("DOWNLOAD REPORT", "POBIERZ RAPORT"),
+        ["Explorer.FinishAndContinue"] = ("FINISH TEST AND CONTINUE  →", "ZAKOŃCZ TEST I PRZEJDŹ DALEJ  →"),
+        ["Explorer.Finish"] = ("FINISH", "ZAKOŃCZ"),
+        ["Explorer.RegressionTests"] = ("Regression tests", "Testy regresji"),
+        ["Explorer.FunctionalTests"] = ("Functional tests", "Testy funkcjonalne"),
+        ["Main.PrepareSession"] = ("Prepare a session and start executing tests", "Przygotuj sesję i rozpocznij wykonywanie testów"),
+        ["Main.LoggedInUser"] = ("SIGNED-IN USER", "ZALOGOWANY UŻYTKOWNIK"),
+        ["Main.Project"] = ("PROJECT", "PROJEKT"),
+        ["Main.NoProject"] = ("You have no assigned project. Contact a Leader or Administrator.", "Nie masz przypisanego projektu. Skontaktuj się z Liderem lub Adminem."),
+        ["Main.Start"] = ("START", "ROZPOCZNIJ"),
+        ["Main.ExecuteTests"] = ("EXECUTE TESTS", "WYKONAJ TESTY"),
+        ["Main.LoadTestCases"] = ("Load test cases", "Wczytaj przypadki testowe"),
+        ["Assignment.AssignTests"] = ("ASSIGN TESTS", "PRZYPISZ TESTY"),
+        ["Assignment.ExecuteTests"] = ("EXECUTE TESTS", "WYKONAJ TESTY"),
+        ["Assignment.InterruptTests"] = ("INTERRUPT TESTS", "PRZERWIJ TESTY"),
+        ["Assignment.RestartTests"] = ("START OVER", "ZACZNIJ OD NOWA"),
+        ["Assignment.FinishTests"] = ("FINISH TESTS", "ZAKOŃCZ TESTY"),
+        ["Assignment.InterruptTitle"] = ("Interrupt test execution?", "Przerwać wykonywanie testów?"),
+        ["Assignment.InterruptDescription"] = ("Your progress is saved automatically. You can return to the assigned tests later.", "Dotychczasowe postępy są zapisane automatycznie. Możesz wrócić do przypisanych testów później."),
+        ["Assignment.RestartTitle"] = ("Start the assigned tests over?", "Zacząć przypisane testy od nowa?"),
+        ["Assignment.RestartDescription"] = ("All results and comments from the current assigned session will be cleared. The assignment scope and version will remain unchanged.", "Wszystkie wyniki i komentarze z bieżącej przypisanej sesji zostaną wyczyszczone. Zakres przypisania i wersja pozostaną bez zmian."),
+        ["Assignment.RestartBusyTitle"] = ("Preparing tests from the beginning", "Przygotowywanie testów od nowa"),
+        ["Assignment.RestartBusyDescription"] = ("Please wait while the assigned session results are cleared.", "Proszę czekać. Trwa czyszczenie wyników przypisanej sesji."),
+        ["Assignment.RestartFailedTitle"] = ("Tests could not be restarted", "Nie udało się rozpocząć testów od nowa"),
+        ["Assignment.RestartFailedDescription"] = ("Not all results were cleared. Try again.", "Nie wszystkie wyniki zostały wyczyszczone. Spróbuj ponownie."),
+        ["Assignment.RestartSuccessTitle"] = ("Tests restarted", "Testy rozpoczęto od nowa"),
+        ["Assignment.RestartSuccessDescription"] = ("The results and comments from the current session were cleared.", "Wyniki i komentarze bieżącej sesji zostały wyczyszczone."),
+        ["Assignment.FinishTip"] = ("Finish the assigned session and submit the results", "Zakończ przypisaną sesję i wyślij wyniki"),
+        ["Structure.AddFolder"] = ("Add folder", "Dodaj folder"),
+        ["Structure.AddCollection"] = ("Add test case collection", "Dodaj zbiór przypadków"),
+        ["Structure.AddCase"] = ("Add test case", "Dodaj przypadek"),
+        ["Structure.Rename"] = ("Rename", "Zmień nazwę"),
+        ["Structure.DeleteFolder"] = ("Delete folder", "Usuń folder"),
+        ["Structure.DeleteCollection"] = ("Delete test case collection", "Usuń zbiór przypadków"),
+        ["Structure.AddFolderHere"] = ("Add folder here", "Dodaj folder tutaj"),
+        ["Structure.AddCollectionHere"] = ("Add test case collection here", "Dodaj zbiór przypadków tutaj"),
+        ["Structure.CopyFolder"] = ("Copy folder", "Kopiuj folder"),
+        ["Structure.PasteHere"] = ("Paste here", "Wklej tutaj"),
+        ["Structure.MoveUp"] = ("Move up", "Przenieś wyżej"),
+        ["Structure.MoveDown"] = ("Move down", "Przenieś niżej"),
+        ["Structure.DuplicateCollection"] = ("Duplicate test case collection", "Duplikuj zbiór przypadków"),
+        ["Structure.CopyCollection"] = ("Copy collection", "Kopiuj zbiór"),
+        ["Structure.PasteCaseHere"] = ("Paste test case here", "Wklej przypadek tutaj"),
+        ["Structure.SelectChild"] = ("Select a subfolder or test case collection from the tree on the left.", "Wybierz podfolder lub zbiór przypadków z drzewa po lewej stronie."),
+        ["Structure.EmptyFolder"] = ("This folder is empty. Right-click the empty area to add a folder or test case collection here.", "Ten folder jest pusty. Kliknij prawym przyciskiem myszy pustą przestrzeń, aby dodać tutaj folder lub zbiór przypadków."),
+        ["Assignment.CannotFinishTitle"] = ("Tests cannot be finished yet", "Nie można jeszcze zakończyć testów"),
+        ["Assignment.CannotFinishDescription"] = ("Not all status changes were saved, or the assignment still contains unfinished test cases. Check the first unfinished test case and try again.", "Nie wszystkie zmiany statusów zostały zapisane albo w przypisaniu pozostały przypadki do wykonania. Sprawdź pierwszy niewykonany przypadek i spróbuj ponownie."),
+        ["Assignment.CompletedTitle"] = ("Tests completed", "Testy zostały zakończone"),
+        ["Assignment.CompletedWithUnfinished"] = ("Results were saved and submitted. Unfinished test cases returned to the pool and can be assigned again.", "Wyniki zapisano i wysłano. Niewykonane przypadki wróciły do puli i mogą zostać przypisane ponownie."),
+        ["Assignment.CompletedDescription"] = ("Results were saved. Assignment managers were notified that the tests were completed.", "Wyniki zapisano. Osoby zarządzające przypisaniem otrzymały powiadomienie o ukończeniu testów."),
+        ["Assignment.PausedTitle"] = ("Tests paused", "Testy zostały wstrzymane"),
+        ["Assignment.WithdrawnDescription"] = ("The assigned session was withdrawn by a Leader or Administrator. Contact the test manager for details.", "Przypisana sesja została wycofana przez Lidera lub Admina. Po więcej szczegółów skontaktuj się z osobą zarządzającą testami."),
+        ["Assignment.ContactManager"] = ("Contact the session manager.", "Skontaktuj się z osobą zarządzającą sesją."),
+        ["Assignment.ContactManagerLogin"] = ("Contact the session manager: {0}.", "Skontaktuj się z osobą zarządzającą sesją: {0}."),
+        ["Assignment.UnavailableDescription"] = ("The test cases from this session were paused or removed and are no longer available.\n{0}", "Przypadki tej sesji zostały wstrzymane lub usunięte i nie są już dostępne.\n{0}"),
+        ["Assignment.UnfinishedTitle"] = ("Not all tests were executed", "Nie wykonano wszystkich testów"),
+        ["Assignment.UnfinishedDescription"] = ("{0} assigned test cases were not executed. Are you sure you want to continue?\n\nUnfinished tests will be submitted together with completed tests and will be visible to the test manager. They will then return to the pool and can be assigned again.\n\nTo return to test execution, select CANCEL.", "Nie wykonano {0} przypisanych przypadków. Czy na pewno chcesz kontynuować?\n\nNiewykonane testy zostaną wysłane razem z wykonanymi i będą widoczne osobie zarządzającej testami. Następnie wrócą do puli i będzie można przypisać je ponownie.\n\nAby wrócić do wykonywania testów, wybierz ANULUJ."),
+        ["Assignment.SubmitAnyway"] = ("SUBMIT ANYWAY", "WYŚLIJ MIMO TO"),
+        ["Report.FinishEarlyTitle"] = ("Finish the test early?", "Zakończyć test wcześniej?"),
+        ["Report.FinishEarlyDescription"] = ("The current test type has {0} unfinished test cases. They will be shown as unfinished in the report, and the current results will remain saved.", "W bieżącym rodzaju testów pozostało {0} niewykonanych przypadków. Zostaną pokazane w raporcie jako niewykonane, a dotychczasowe wyniki pozostaną zapisane."),
+        ["Report.Create"] = ("CREATE REPORT", "UTWÓRZ RAPORT"),
+        ["Report.Saved"] = ("REPORT SAVED", "RAPORT ZAPISANY"),
+        ["Report.SavedLocationTip"] = ("Saved: {0}", "Zapisano: {0}"),
+        ["Report.GeneratedTitle"] = ("Report generated successfully", "Raport wygenerowano pomyślnie"),
+        ["Report.ClearQuestion"] = ("The report was saved to:\n{0}\n\nClear the ad-hoc test results and restore all test cases to Pending?", "Raport został zapisany w lokalizacji:\n{0}\n\nCzy wyczyścić wyniki testów ad-hoc i przywrócić wszystkie przypadki do statusu Niewykonany?"),
+        ["Report.ClearStatuses"] = ("CLEAR STATUSES", "WYCZYŚĆ STATUSY"),
+        ["Report.ClearingTitle"] = ("Clearing ad-hoc results", "Czyszczenie wyników ad-hoc"),
+        ["Report.ClearingDescription"] = ("Please wait while all test cases are restored to Pending.", "Proszę czekać. Trwa przywracanie wszystkich przypadków do statusu Niewykonany."),
+        ["Report.ClearFailedTitle"] = ("Report saved, but statuses were not cleared", "Raport zapisano, ale nie wyczyszczono statusów"),
+        ["Report.ClearFailedDescription"] = ("Not all ad-hoc results could be restored. The report is safely saved. Try resetting the statuses again in settings.", "Nie wszystkie wyniki ad-hoc udało się przywrócić. Raport jest bezpiecznie zapisany. Spróbuj ponownie zresetować statusy w ustawieniach."),
+        ["Report.ClearedTitle"] = ("Ad-hoc results cleared", "Wyniki ad-hoc zostały wyczyszczone"),
+        ["Report.ClearedDescription"] = ("The report remains saved, and all test cases are ready to be executed again.", "Raport pozostaje zapisany, a wszystkie przypadki są ponownie gotowe do wykonania."),
+        ["Common.OperationInProgress"] = ("Operation in progress", "Trwa operacja"),
+        ["Common.PleaseWait"] = ("Please wait", "Proszę czekać"),
+        ["Common.SavingChanges"] = ("Saving changes.", "Trwa zapisywanie zmian."),
+        ["Common.PerformingOperation"] = ("An operation is in progress.", "Trwa wykonywanie operacji."),
+        ["Common.OperationConfirmation"] = ("Confirm operation", "Potwierdzenie operacji"),
+        ["Common.DeleteItem"] = ("Delete item", "Usuń element"),
+        ["Common.Delete"] = ("DELETE", "USUŃ"),
+        ["Common.OperationResult"] = ("Operation result", "Wynik operacji"),
+        ["Common.OperationCompleted"] = ("Operation completed", "Operacja zakończona"),
+        ["Assignment.WindowTitle"] = ("Assign tests", "Przypisywanie testów"),
+        ["Assignment.Title"] = ("Assign tests", "Przypisz testy"),
+        ["Assignment.Description"] = ("Prepare scopes for several people, review the summary, and then send the assignments.", "Przygotuj zakresy dla kilku osób, sprawdź podsumowanie i dopiero wtedy wyślij przypisania."),
+        ["Assignment.Session"] = ("SESSION", "SESJA"),
+        ["Assignment.Recipient"] = ("RECIPIENT", "ODBIORCA"),
+        ["Assignment.Version"] = ("VERSION", "WERSJA"),
+        ["Assignment.TestType"] = ("TEST TYPE", "RODZAJ TESTÓW"),
+        ["Assignment.SelectTestType"] = ("Select a test type", "Wybierz rodzaj testów"),
+        ["Assignment.Search"] = ("SEARCH FOR A FOLDER, COLLECTION OR TEST CASE", "WYSZUKAJ FOLDER, ZBIÓR LUB PRZYPADEK"),
+        ["Assignment.Scope"] = ("ASSIGNMENT SCOPE", "ZAKRES PRZYPISANIA"),
+        ["Assignment.SelectVisible"] = ("Select visible", "Zaznacz widoczne"),
+        ["Assignment.Add"] = ("ADD", "DODAJ"),
+        ["Assignment.CancelAssignment"] = ("CANCEL ASSIGNMENT", "ANULUJ PRZYPISANIE"),
+        ["Assignment.GoToSummary"] = ("GO TO SUMMARY", "PRZEJDŹ DO PODSUMOWANIA"),
+        ["Assignment.Summary"] = ("Assignment summary", "Podsumowanie przypisań"),
+        ["Assignment.SummaryDescription"] = ("Review recipients, versions, and scopes. Notifications will be sent only after confirmation.", "Sprawdź odbiorców, wersje i zakresy. Powiadomienia zostaną wysłane dopiero po zatwierdzeniu."),
+        ["Assignment.Total"] = ("Total", "Łącznie"),
+        ["Assignment.Assigned"] = ("Assigned", "Przypisane"),
+        ["Assignment.Unassigned"] = ("Unassigned", "Nieprzypisane"),
+        ["Assignment.CancelAll"] = ("CANCEL ALL", "ANULUJ WSZYSTKIE"),
+        ["Assignment.BackToEdit"] = ("BACK TO EDITING", "WRÓĆ DO EDYCJI"),
+        ["Assignment.Send"] = ("SEND ASSIGNMENTS", "WYŚLIJ PRZYPISANIA"),
+        ["Assignment.SelectTypeHint"] = ("First select the type of tests you want to assign.", "Najpierw wybierz rodzaj testów, które chcesz przypisać."),
+        ["Assignment.EmptyType"] = ("The selected test type is empty. It does not contain any folders, collections, or test cases yet.", "Wybrany rodzaj testów jest pusty. Nie zawiera jeszcze folderów, zbiorów ani przypadków."),
+        ["Assignment.AllAlreadyAssigned"] = ("All test cases of this type are already assigned to active sessions.", "Wszystkie przypadki tego rodzaju są już przypisane do aktywnych sesji."),
+        ["Assignment.NoSearchResults"] = ("No available test cases match the search.", "Nie znaleziono dostępnych przypadków pasujących do wyszukiwania."),
+        ["Assignment.SelectRecipient"] = ("Select an assignment recipient.", "Wybierz odbiorcę przypisania."),
+        ["Assignment.SelectAtLeastOne"] = ("Select at least one available test case.", "Zaznacz co najmniej jeden dostępny przypadek."),
+        ["Assignment.AddedToSummary"] = ("Added to summary: {0} — {1} test cases in total. The notification has not been sent yet.", "Dodano do podsumowania: {0} — łącznie {1} przypadków. Powiadomienie nie zostało jeszcze wysłane."),
+        ["Assignment.AndMore"] = (" and {0} more", " i {0} więcej"),
+        ["Assignment.Remove"] = ("REMOVE", "USUŃ"),
+        ["Assignment.DraftSummary"] = ("{0} • version {1} • {2} test cases", "{0} • wersja {1} • {2} przypadków"),
+        ["Assignment.SelectionCounts"] = ("Selected: {0}   •   Assigned: {1}   •   Remaining: {2}", "Wybrano: {0}   •   Przypisane: {1}   •   Pozostało: {2}"),
+        ["Assignment.SentTitle"] = ("Assignments sent", "Wysłano przypisania"),
+        ["Assignment.SentDescription"] = ("Sent {0} assignments to {1} recipients. The combined scope contains {2} test cases.", "Wysłano {0} przypisań do {1} odbiorców. Łączny zakres obejmuje {2} przypadków."),
+        ["Assignment.SendFailed"] = ("Assignments could not be sent: {0}", "Nie udało się wysłać przypisań: {0}"),
+        ["Assignment.CancelAllTitle"] = ("Cancel all prepared assignments?", "Anulować wszystkie przygotowane przypisania?"),
+        ["Assignment.CancelAllDescription"] = ("All draft scopes will be removed. None of these assignments or notifications has been sent yet.", "Wszystkie robocze zakresy zostaną usunięte. Żadne z tych przypisań ani powiadomień nie zostało jeszcze wysłane."),
+        ["Assignment.CancelledAll"] = ("All prepared assignments were cancelled. No notifications were sent.", "Anulowano wszystkie przygotowane przypisania. Nie wysłano żadnych powiadomień."),
+        ["Assignment.SessionStarted"] = ("Session started", "Sesja została rozpoczęta"),
+        ["Assignment.CancelTitle"] = ("Cancel assignment?", "Anulować przypisanie?"),
+        ["Assignment.WithdrawStartedQuestion"] = ("Tester “{0}” has already started this session. Are you sure you want to pause it? The tester will return to ad-hoc mode and receive a notification.", "Tester „{0}” rozpoczął już tę sesję. Czy na pewno chcesz ją wstrzymać? Tester wróci do trybu ad-hoc i otrzyma powiadomienie."),
+        ["Assignment.RemoveNotStartedQuestion"] = ("The assignment for user “{0}”, version {1}, has not been started and will be removed. The recipient will receive a notification.", "Przypisanie dla użytkownika „{0}”, wersja {1}, nie zostało rozpoczęte i zostanie usunięte. Odbiorca otrzyma powiadomienie."),
+        ["Assignment.WithdrawnSuccess"] = ("The assignment was withdrawn, and the recipient was notified.", "Przypisanie zostało wycofane, a odbiorca otrzymał powiadomienie."),
+        ["Assignment.CompletionWindowTitle"] = ("Complete assigned tests", "Zakończenie przypisanych testów"),
+        ["Assignment.CompletionQuestion"] = ("Finish the assigned tests?", "Zakończyć przypisane testy?"),
+        ["Assignment.CompletionInfo"] = ("The execution status will be saved. The assignment manager will be notified that the tests were completed.", "Status wykonania zostanie zapisany. Osoba zarządzająca przypisaniem otrzyma powiadomienie o ukończeniu testów."),
+        ["Assignment.DoNotShowAgain"] = ("Do not show again for this account", "Nie pokazuj ponownie dla tego konta"),
+        ["Assignment.ReportAndFinish"] = ("REPORT AND FINISH", "RAPORT I ZAKOŃCZ"),
+        ["Assignment.FinishAndSubmit"] = ("FINISH AND SUBMIT", "ZAKOŃCZ I WYŚLIJ"),
+        ["Logout.WindowTitle"] = ("Sign-out confirmation", "Potwierdzenie wylogowania"),
+        ["Logout.Question"] = ("Are you sure you want to sign out?", "Czy na pewno chcesz się wylogować?"),
+        ["Logout.Button"] = ("SIGN OUT", "WYLOGUJ"),
+        ["Logout.GenericDescription"] = ("The current session will end, and you will return to the sign-in screen.", "Bieżąca sesja zostanie zakończona i wrócisz do ekranu logowania."),
+        ["Logout.UserDescription"] = ("You will end the session for user “{0}” and return to the sign-in screen.", "Zakończysz sesję użytkownika „{0}” i wrócisz do ekranu logowania.")
+    };
+
+    public static string CurrentLanguage { get; private set; } = English;
+    public static event EventHandler? LanguageChanged;
+
+    public static bool IsPolish => CurrentLanguage == Polish;
+
+    public static void LoadAndApply()
+    {
+        var language = English;
+        try
+        {
+            if (File.Exists(SettingsPath))
+            {
+                var settings = JsonSerializer.Deserialize<DeviceLanguageSettings>(File.ReadAllText(SettingsPath));
+                language = Normalize(settings?.Language);
+            }
+        }
+        catch
+        {
+            language = English;
+        }
+
+        Apply(language);
+    }
+
+    public static void SaveAndApply(string? language)
+    {
+        var normalized = Normalize(language);
+        Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
+        File.WriteAllText(SettingsPath, JsonSerializer.Serialize(new DeviceLanguageSettings { Language = normalized }, new JsonSerializerOptions { WriteIndented = true }));
+        Apply(normalized);
+    }
+
+    public static void Apply(string? language)
+    {
+        CurrentLanguage = Normalize(language);
+        if (Application.Current is { } application)
+        {
+            foreach (var (key, value) in Texts)
+                application.Resources[key] = CurrentLanguage == Polish ? value.Pl : value.En;
+        }
+
+        LanguageChanged?.Invoke(null, EventArgs.Empty);
+    }
+
+    public static string T(string key) =>
+        Texts.TryGetValue(key, out var value)
+            ? (CurrentLanguage == Polish ? value.Pl : value.En)
+            : key;
+
+    public static string Format(
+        string key,
+        params object?[] args) =>
+        string.Format(
+            T(key),
+            args);
+
+    private static string Normalize(string? language) =>
+        string.Equals(language, Polish, StringComparison.OrdinalIgnoreCase) ? Polish : English;
+}

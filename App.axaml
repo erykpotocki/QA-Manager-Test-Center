@@ -1,0 +1,308 @@
+<Application
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:QARegressionManager"
+    x:Class="QARegressionManager.App"
+    RequestedThemeVariant="Light">
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+
+            <ResourceDictionary.ThemeDictionaries>
+
+                <!-- MOTYW JASNY -->
+                <ResourceDictionary x:Key="Light">
+
+                    <SolidColorBrush
+                        x:Key="AppBackgroundBrush"
+                        Color="#F4F7F5" />
+
+                    <SolidColorBrush
+                        x:Key="CardBackgroundBrush"
+                        Color="#FFFFFF" />
+
+                    <SolidColorBrush
+                        x:Key="PrimaryTextBrush"
+                        Color="#17221B" />
+
+                    <SolidColorBrush
+                        x:Key="SecondaryTextBrush"
+                        Color="#68726B" />
+
+                    <SolidColorBrush
+                        x:Key="FooterTextBrush"
+                        Color="#89928C" />
+
+                    <SolidColorBrush
+                        x:Key="FooterSignatureBrush"
+                        Color="#A0A8A3" />
+
+                    <SolidColorBrush
+                        x:Key="InputBackgroundBrush"
+                        Color="#FFFFFF" />
+
+                    <SolidColorBrush
+                        x:Key="InputBorderBrush"
+                        Color="#D8E0DB" />
+
+                    <SolidColorBrush
+                        x:Key="InputHoverBorderBrush"
+                        Color="#8FD7AA" />
+
+                    <SolidColorBrush
+                        x:Key="PanelSplitterBrush"
+                        Color="#D9E8DE" />
+
+                    <SolidColorBrush
+                        x:Key="PanelToggleAccentBrush"
+                        Color="#6FA785" />
+
+                    <SolidColorBrush
+                        x:Key="PanelToggleBrush"
+                        Color="#597565" />
+
+                    <SolidColorBrush
+                        x:Key="InputFocusBorderBrush"
+                        Color="#28C76F" />
+
+                    <SolidColorBrush
+                        x:Key="SelectionBrush"
+                        Color="#BEE8CD" />
+
+                    <SolidColorBrush
+                        x:Key="SelectedItemBrush"
+                        Color="#CFF1DA" />
+
+                    <SolidColorBrush
+                        x:Key="HoverItemBrush"
+                        Color="#E8F7ED" />
+
+                    <SolidColorBrush
+                        x:Key="CardBorderBrush"
+                        Color="#E1E8E3" />
+
+                    <SolidColorBrush
+                        x:Key="IconBackgroundBrush"
+                        Color="#E4F6EB" />
+
+                    <SolidColorBrush
+                        x:Key="DecorationOneBrush"
+                        Color="#DDF4E6" />
+
+                    <SolidColorBrush
+                        x:Key="DecorationTwoBrush"
+                        Color="#E6F7EC" />
+
+                    <SolidColorBrush
+                        x:Key="ThemeButtonBackgroundBrush"
+                        Color="#FFFFFF" />
+
+                    <SolidColorBrush
+                        x:Key="ThemeButtonHoverBrush"
+                        Color="#E8F7ED" />
+
+                    <SolidColorBrush
+                        x:Key="ThemeButtonPressedBrush"
+                        Color="#CFF1DA" />
+
+                </ResourceDictionary>
+
+                <!-- MOTYW CIEMNY -->
+                <ResourceDictionary x:Key="Dark">
+
+                    <SolidColorBrush
+                        x:Key="AppBackgroundBrush"
+                        Color="#151A17" />
+
+                    <SolidColorBrush
+                        x:Key="CardBackgroundBrush"
+                        Color="#202722" />
+
+                    <SolidColorBrush
+                        x:Key="PrimaryTextBrush"
+                        Color="#F2F7F3" />
+
+                    <SolidColorBrush
+                        x:Key="SecondaryTextBrush"
+                        Color="#B4C0B8" />
+
+                    <SolidColorBrush
+                        x:Key="FooterTextBrush"
+                        Color="#95A29A" />
+
+                    <SolidColorBrush
+                        x:Key="FooterSignatureBrush"
+                        Color="#76827B" />
+
+                    <SolidColorBrush
+                        x:Key="InputBackgroundBrush"
+                        Color="#2A332D" />
+
+                    <SolidColorBrush
+                        x:Key="InputBorderBrush"
+                        Color="#455249" />
+
+                    <SolidColorBrush
+                        x:Key="InputHoverBorderBrush"
+                        Color="#65B883" />
+
+                    <SolidColorBrush
+                        x:Key="PanelSplitterBrush"
+                        Color="#2C4434" />
+
+                    <SolidColorBrush
+                        x:Key="PanelToggleAccentBrush"
+                        Color="#6B9B7B" />
+
+                    <SolidColorBrush
+                        x:Key="PanelToggleBrush"
+                        Color="#C6D8CC" />
+
+                    <SolidColorBrush
+                        x:Key="InputFocusBorderBrush"
+                        Color="#3AD47A" />
+
+                    <SolidColorBrush
+                        x:Key="SelectionBrush"
+                        Color="#326B48" />
+
+                    <SolidColorBrush
+                        x:Key="SelectedItemBrush"
+                        Color="#31563E" />
+
+                    <SolidColorBrush
+                        x:Key="HoverItemBrush"
+                        Color="#293E30" />
+
+                    <SolidColorBrush
+                        x:Key="CardBorderBrush"
+                        Color="#364139" />
+
+                    <SolidColorBrush
+                        x:Key="IconBackgroundBrush"
+                        Color="#294333" />
+
+                    <SolidColorBrush
+                        x:Key="DecorationOneBrush"
+                        Color="#1D3325" />
+
+                    <SolidColorBrush
+                        x:Key="DecorationTwoBrush"
+                        Color="#203A2A" />
+
+                    <SolidColorBrush
+                        x:Key="ThemeButtonBackgroundBrush"
+                        Color="#28312B" />
+
+                    <SolidColorBrush
+                        x:Key="ThemeButtonHoverBrush"
+                        Color="#334239" />
+
+                    <SolidColorBrush
+                        x:Key="ThemeButtonPressedBrush"
+                        Color="#3B5544" />
+
+                </ResourceDictionary>
+
+            </ResourceDictionary.ThemeDictionaries>
+
+            <SolidColorBrush x:Key="AccentPrimaryBrush" Color="#347FC4" />
+            <SolidColorBrush x:Key="AccentPrimaryHoverBrush" Color="#2869A5" />
+            <SolidColorBrush x:Key="AccentSoftBrush" Color="#E3EFFA" />
+            <SolidColorBrush x:Key="AccentSelectionBrush" Color="#C9DFF2" />
+            <SolidColorBrush x:Key="AccentMutedBrush" Color="#659CD0" />
+
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <Style Selector="Window">
+            <Setter Property="Icon" Value="/Assets/AppIcon/QAM.ico" />
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontSize" Value="{DynamicResource AppBaseFontSize}" />
+            <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+        </Style>
+
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+        </Style>
+
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+        </Style>
+
+        <Style Selector="ComboBox">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="ComboBoxItem">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="CheckBox">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="8,1,8,5" />
+        </Style>
+
+        <Style Selector="RadioButton">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="8,1,8,5" />
+        </Style>
+
+        <Style Selector="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="MinHeight" Value="42" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="CornerRadius" Value="10" />
+        </Style>
+
+        <Style Selector="Button:disabled">
+            <Setter Property="Opacity" Value="0.52" />
+        </Style>
+
+        <Style Selector="Button.PrimaryAction">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+        </Style>
+
+        <Style Selector="Button.SecondaryAction">
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.DangerAction">
+            <Setter Property="Background" Value="#E44D57" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#E44D57" />
+        </Style>
+    </Application.Styles>
+
+</Application>

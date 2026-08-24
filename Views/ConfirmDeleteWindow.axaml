@@ -1,0 +1,129 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.ConfirmDeleteWindow"
+    Title="{DynamicResource Common.OperationConfirmation}"
+    Width="560"
+    Height="390"
+    MinWidth="520"
+    MinHeight="350"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Styles>
+
+        <Style Selector="Button.DialogButton">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="MinWidth" Value="125" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Secondary">
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Secondary:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverItemBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputHoverBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Danger">
+            <Setter Property="Background" Value="#DC4C56" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#DC4C56" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Danger:pointerover">
+            <Setter Property="Background" Value="#E76069" />
+            <Setter Property="BorderBrush" Value="#E76069" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Danger:pressed">
+            <Setter Property="Background" Value="#BE3540" />
+            <Setter Property="BorderBrush" Value="#BE3540" />
+        </Style>
+
+    </Window.Styles>
+
+    <Border
+        Margin="20"
+        Padding="26"
+        Background="{DynamicResource CardBackgroundBrush}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="20">
+
+        <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+            <Border
+                Grid.Row="0"
+                Width="58"
+                Height="58"
+                HorizontalAlignment="Left"
+                Background="#24DC4C56"
+                CornerRadius="18">
+
+                <TextBlock
+                    Text="!"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="{DynamicResource AppFontSize28}"
+                    FontWeight="Bold"
+                    Foreground="#DC4C56" />
+
+            </Border>
+
+            <TextBlock
+                Name="TitleTextBlock"
+                Grid.Row="1"
+                Margin="0,18,0,10"
+                Text="{DynamicResource Common.DeleteItem}"
+                FontSize="{DynamicResource AppFontSize23}"
+                FontWeight="Bold"
+                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+            <TextBlock
+                Name="MessageTextBlock"
+                Grid.Row="2"
+                TextWrapping="Wrap"
+                FontSize="{DynamicResource AppFontSize14}"
+                LineHeight="22"
+                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <Grid
+                Grid.Row="3"
+                Margin="0,24,0,0"
+                ColumnDefinitions="*,Auto,Auto">
+
+                <Button
+                    Grid.Column="1"
+                    Classes="DialogButton Secondary"
+                    Margin="0,0,10,0"
+                    Content="{DynamicResource Common.Cancel}"
+                    Click="CancelButton_OnClick" />
+
+                <Button
+                    Name="ConfirmButton"
+                    Grid.Column="2"
+                    Classes="DialogButton Danger"
+                    Content="USUŃ"
+                    Click="DeleteButton_OnClick" />
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
+
+</Window>

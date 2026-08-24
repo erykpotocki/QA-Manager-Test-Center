@@ -1,0 +1,88 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.RenameItemWindow"
+    Title="Zmień nazwę"
+    Width="520"
+    Height="310"
+    MinWidth="460"
+    MinHeight="280"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Border
+        Margin="20"
+        Padding="26"
+        Background="{DynamicResource CardBackgroundBrush}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="20">
+
+        <Grid
+            RowDefinitions="Auto,Auto,Auto,Auto,*">
+
+            <TextBlock
+                Name="TitleTextBlock"
+                Grid.Row="0"
+                Text="Zmień nazwę"
+                FontSize="{DynamicResource AppFontSize24}"
+                FontWeight="Bold"
+                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+            <TextBlock
+                Grid.Row="1"
+                Margin="0,6,0,22"
+                Text="Wprowadź nową nazwę elementu."
+                FontSize="{DynamicResource AppFontSize13}"
+                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <TextBlock
+                Grid.Row="2"
+                Margin="0,0,0,6"
+                Text="NOWA NAZWA"
+                FontSize="{DynamicResource AppFontSize12}"
+                FontWeight="SemiBold"
+                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <TextBox
+                Name="NameTextBox"
+                Grid.Row="3"
+                Height="42"
+                Padding="12,7"
+                FontSize="{DynamicResource AppFontSize15}"
+                CornerRadius="10"
+                PlaceholderText="Wprowadź nazwę"
+                Background="{DynamicResource InputBackgroundBrush}"
+                Foreground="{DynamicResource PrimaryTextBrush}"
+                BorderBrush="{DynamicResource InputBorderBrush}" />
+
+            <Grid
+                Grid.Row="4"
+                Margin="0,24,0,0"
+                ColumnDefinitions="*,Auto,Auto">
+
+                <Button
+                    Grid.Column="1"
+                    Width="110"
+                    Height="42"
+                    Margin="0,0,10,0"
+                    Content="ANULUJ"
+                    Click="CancelButton_OnClick" />
+
+                <Button
+                    Grid.Column="2"
+                    Width="130"
+                    Height="42"
+                    Content="ZAPISZ"
+                    Background="{DynamicResource AccentPrimaryBrush}"
+                    Foreground="White"
+                    Click="SaveButton_OnClick" />
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
+
+</Window>

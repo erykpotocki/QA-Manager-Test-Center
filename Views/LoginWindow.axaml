@@ -1,0 +1,362 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.LoginWindow"
+    Title="{DynamicResource Login.WindowTitle}"
+    Width="600"
+    Height="700"
+    MinWidth="540"
+    MinHeight="660"
+    WindowStartupLocation="CenterScreen"
+    CanResize="False"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter
+                Property="Background"
+                Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter
+                Property="Foreground"
+                Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.Primary">
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Margin" Value="0,18,0,0" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.Primary:pointerover">
+            <Setter Property="Background" Value="#3AD47A" />
+        </Style>
+
+        <Style Selector="Button.Primary:pressed">
+            <Setter Property="Background" Value="#169B50" />
+        </Style>
+
+        <Style Selector="Button.LanguagePicker">
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="CornerRadius" Value="24" />
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style Selector="Button.QuickTheme">
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="24" />
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style Selector="Button.LanguageOption">
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style Selector="FlyoutPresenter.LanguageFlyoutPresenter">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <Button Name="ThemeToggleButton" Classes="QuickTheme"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                Margin="0,12,68,0" Click="ThemeToggleButton_OnClick">
+            <TextBlock Name="ThemeIconTextBlock" Text="☾" FontSize="20"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="{DynamicResource PrimaryTextBrush}" />
+        </Button>
+
+        <Button Name="LanguagePickerButton"
+                Classes="LanguagePicker"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,12,12,0">
+            <Border Width="34" Height="34" CornerRadius="17"
+                    ClipToBounds="True"
+                    BorderBrush="{DynamicResource InputBorderBrush}"
+                    BorderThickness="1">
+                <Grid>
+                    <Grid Name="CurrentPolishFlag" RowDefinitions="*,*">
+                        <Border Grid.Row="0" Background="#FFFFFF" />
+                        <Border Grid.Row="1" Background="#DC143C" />
+                    </Grid>
+                    <Canvas Name="CurrentEnglishFlag" Background="#21468B" IsVisible="False">
+                        <Path Stroke="#FFFFFF" StrokeThickness="7"
+                              Data="M -4,1 L 38,33 M 38,1 L -4,33" />
+                        <Path Stroke="#CF142B" StrokeThickness="3"
+                              Data="M -4,1 L 38,33 M 38,1 L -4,33" />
+                        <Path Stroke="#FFFFFF" StrokeThickness="10"
+                              Data="M 17,0 L 17,34 M 0,17 L 34,17" />
+                        <Path Stroke="#CF142B" StrokeThickness="5"
+                              Data="M 17,0 L 17,34 M 0,17 L 34,17" />
+                    </Canvas>
+                </Grid>
+            </Border>
+
+            <Button.Flyout>
+                <Flyout Placement="BottomEdgeAlignedRight"
+                        FlyoutPresenterClasses="LanguageFlyoutPresenter">
+                    <Border Width="184" Padding="10"
+                            Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1" CornerRadius="14">
+                        <StackPanel Spacing="7">
+                            <TextBlock Text="{DynamicResource Language.Select}"
+                                       Margin="3,1,3,2"
+                                       FontSize="{DynamicResource AppFontSize11}"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                            <Button Classes="LanguageOption"
+                                    Click="PolishLanguageButton_OnClick">
+                                <Grid ColumnDefinitions="40,*">
+                                    <Border Width="32" Height="20" CornerRadius="3"
+                                            ClipToBounds="True"
+                                            BorderBrush="{DynamicResource InputBorderBrush}"
+                                            BorderThickness="1">
+                                        <Grid RowDefinitions="*,*">
+                                            <Border Grid.Row="0" Background="#FFFFFF" />
+                                            <Border Grid.Row="1" Background="#DC143C" />
+                                        </Grid>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Text="Polski"
+                                               VerticalAlignment="Center"
+                                               FontSize="{DynamicResource AppFontSize13}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                </Grid>
+                            </Button>
+                            <Button Classes="LanguageOption"
+                                    Click="EnglishLanguageButton_OnClick">
+                                <Grid ColumnDefinitions="40,*">
+                                    <Border Width="32" Height="20" CornerRadius="3"
+                                            ClipToBounds="True"
+                                            BorderBrush="{DynamicResource InputBorderBrush}"
+                                            BorderThickness="1">
+                                        <Viewbox Stretch="Fill">
+                                            <Canvas Width="32" Height="20" Background="#21468B">
+                                                <Path Stroke="#FFFFFF" StrokeThickness="5"
+                                                      Data="M -3,0 L 35,20 M 35,0 L -3,20" />
+                                                <Path Stroke="#CF142B" StrokeThickness="2"
+                                                      Data="M -3,0 L 35,20 M 35,0 L -3,20" />
+                                                <Path Stroke="#FFFFFF" StrokeThickness="7"
+                                                      Data="M 16,0 L 16,20 M 0,10 L 32,10" />
+                                                <Path Stroke="#CF142B" StrokeThickness="3.5"
+                                                      Data="M 16,0 L 16,20 M 0,10 L 32,10" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Text="English"
+                                               VerticalAlignment="Center"
+                                               FontSize="{DynamicResource AppFontSize13}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </Flyout>
+            </Button.Flyout>
+        </Button>
+        <Ellipse
+            Width="300"
+            Height="300"
+            Margin="-130,-145,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Fill="{DynamicResource DecorationOneBrush}"
+            IsHitTestVisible="False" />
+
+        <Ellipse
+            Width="280"
+            Height="280"
+            Margin="0,0,-120,-140"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Fill="{DynamicResource DecorationTwoBrush}"
+            IsHitTestVisible="False" />
+
+        <Border
+            Width="430"
+            Padding="38,34"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="26">
+
+            <StackPanel>
+                <Border
+                    Width="62"
+                    Height="62"
+                    Margin="0,0,0,14"
+                    HorizontalAlignment="Center"
+                    Background="{DynamicResource IconBackgroundBrush}"
+                    CornerRadius="19">
+                    <TextBlock
+                        Text="✓"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="{DynamicResource AppFontSize32}"
+                        FontWeight="Bold"
+                        Foreground="#19944D" />
+                </Border>
+
+                <TextBlock
+                    Text="QA Manager"
+                    HorizontalAlignment="Center"
+                    FontSize="{DynamicResource AppFontSize28}"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                <TextBlock
+                    Name="ScreenDescriptionTextBlock"
+                    Text="{DynamicResource Login.Description}"
+                    Margin="0,4,0,26"
+                    HorizontalAlignment="Center"
+                    FontSize="{DynamicResource AppFontSize14}"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <StackPanel Name="LoginPanel">
+                    <TextBlock
+                        Text="{DynamicResource Login.Login}"
+                        Margin="0,0,0,5"
+                        FontSize="{DynamicResource AppFontSize12}"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                    <TextBox
+                        Name="LoginTextBox"
+                        PlaceholderText="{DynamicResource Login.LoginPlaceholder}"
+                        KeyDown="LoginTextBox_OnKeyDown" />
+
+                    <TextBlock
+                        Text="{DynamicResource Login.Pin}"
+                        Margin="0,16,0,5"
+                        FontSize="{DynamicResource AppFontSize12}"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                    <TextBox
+                        Name="PinTextBox"
+                        MaxLength="6"
+                        PasswordChar="●"
+                        PlaceholderText="{DynamicResource Login.PinPlaceholder}"
+                        KeyDown="PinTextBox_OnKeyDown" />
+
+                    <Button
+                        Name="LoginButton"
+                        Classes="Primary"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Right"
+                        Content="{DynamicResource Login.SignIn}"
+                        Click="LoginButton_OnClick" />
+                </StackPanel>
+
+                <StackPanel
+                    Name="ChangePinPanel"
+                    IsVisible="False">
+
+                    <Border
+                        Padding="12"
+                        Margin="0,0,0,18"
+                        Background="{DynamicResource IconBackgroundBrush}"
+                        CornerRadius="10">
+                        <TextBlock
+                            Text="{DynamicResource Login.FirstLoginInfo}"
+                            TextWrapping="Wrap"
+                            FontSize="{DynamicResource AppFontSize13}"
+                            Foreground="{DynamicResource PrimaryTextBrush}" />
+                    </Border>
+
+                    <TextBlock
+                        Text="{DynamicResource Login.NewPin}"
+                        Margin="0,0,0,5"
+                        FontSize="{DynamicResource AppFontSize12}"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                    <TextBox
+                        Name="NewPinTextBox"
+                        MaxLength="6"
+                        PasswordChar="●"
+                        PlaceholderText="{DynamicResource Login.PinPlaceholder}"
+                        KeyDown="NewPinTextBox_OnKeyDown" />
+
+                    <TextBlock
+                        Text="{DynamicResource Login.RepeatPin}"
+                        Margin="0,16,0,5"
+                        FontSize="{DynamicResource AppFontSize12}"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                    <TextBox
+                        Name="ConfirmPinTextBox"
+                        MaxLength="6"
+                        PasswordChar="●"
+                        PlaceholderText="{DynamicResource Login.PinPlaceholder}"
+                        KeyDown="ConfirmPinTextBox_OnKeyDown" />
+
+                    <Button
+                        Name="ChangePinButton"
+                        Classes="Primary"
+                        Content="{DynamicResource Login.SavePin}"
+                        Click="ChangePinButton_OnClick" />
+                </StackPanel>
+
+                <TextBlock
+                    Name="ErrorTextBlock"
+                    Margin="0,14,0,0"
+                    HorizontalAlignment="Center"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap"
+                    FontSize="{DynamicResource AppFontSize13}"
+                    Foreground="#D13C3C"
+                    IsVisible="False" />
+            </StackPanel>
+        </Border>
+
+        <TextBlock
+            Text="QA Manager • © 2026 Eryk Potocki"
+            Margin="0,0,0,18"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            FontSize="{DynamicResource AppFontSize11}"
+            Foreground="{DynamicResource FooterTextBrush}" />
+    </Grid>
+</Window>

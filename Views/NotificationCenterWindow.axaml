@@ -1,0 +1,36 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.NotificationCenterWindow"
+    Title="Centrum powiadomień"
+    Width="620"
+    Height="620"
+    MinWidth="520"
+    MinHeight="480"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+    <Border Margin="20" Padding="26" Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="22">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Row="0" Spacing="5">
+                <TextBlock Text="Powiadomienia" FontSize="{DynamicResource AppFontSize26}" FontWeight="Bold" />
+                <TextBlock Text="Widzisz wyłącznie wiadomości przypisane do Twojego profilu."
+                           FontSize="{DynamicResource AppFontSize13}" Foreground="{DynamicResource SecondaryTextBrush}" />
+            </StackPanel>
+            <ScrollViewer Grid.Row="1" Margin="0,18,0,14" VerticalScrollBarVisibility="Auto">
+                <StackPanel Name="NotificationsPanel" Spacing="10" />
+            </ScrollViewer>
+            <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto">
+                <Button Name="ClearNotificationsButton" Grid.Column="0" Height="44" Padding="22,0"
+                        Background="#DC4C56" BorderBrush="#DC4C56"
+                        Foreground="White" FontWeight="SemiBold"
+                        Content="WYCZYŚĆ POWIADOMIENIA"
+                        IsEnabled="False"
+                        Click="ClearNotificationsButton_OnClick" />
+                <Button Grid.Column="2" Height="44" Padding="22,0"
+                        Background="{DynamicResource AccentPrimaryBrush}" Foreground="White" Content="ZAMKNIJ"
+                        Click="CloseButton_OnClick" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,191 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.AssignmentManagementWindow"
+    Title="{DynamicResource Assignment.WindowTitle}"
+    Width="980"
+    Height="760"
+    MinWidth="900"
+    MinHeight="650"
+    CanResize="True"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Styles>
+        <Style Selector="Button.assignmentAction">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="MinWidth" Value="132" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.assignmentAddAction">
+            <Setter Property="Height" Value="36" />
+            <Setter Property="MinWidth" Value="104" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Window.Styles>
+
+    <Border Margin="20" Padding="28"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="1" CornerRadius="22">
+        <Grid RowDefinitions="Auto,*">
+            <StackPanel Grid.Row="0" Spacing="5">
+                <TextBlock Text="{DynamicResource Assignment.Title}" FontSize="{DynamicResource AppFontSize26}" FontWeight="Bold"
+                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                <TextBlock Text="{DynamicResource Assignment.Description}"
+                           TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize13}"
+                           Foreground="{DynamicResource SecondaryTextBrush}" />
+            </StackPanel>
+
+            <Grid Grid.Row="1" Margin="0,14,0,0">
+                <Grid Name="EditorPanel" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto">
+                    <Grid Grid.Row="0" ColumnDefinitions="1.05*,0.95*,1.15*" ColumnSpacing="16">
+                        <StackPanel Grid.Column="0" Spacing="5">
+                            <TextBlock Text="{DynamicResource Assignment.Session}" FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" />
+                            <ComboBox Name="AssignmentComboBox" Height="38"
+                                      MinWidth="210" HorizontalAlignment="Stretch" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="5">
+                            <TextBlock Text="{DynamicResource Assignment.Recipient}" FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" />
+                            <ComboBox Name="RecipientComboBox" Height="38"
+                                      MinWidth="190" HorizontalAlignment="Stretch" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="5">
+                            <TextBlock Text="{DynamicResource Assignment.Version}" FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" />
+                            <TextBox Name="VersionTextBox" Height="38" MinWidth="220"
+                                     HorizontalAlignment="Stretch" Padding="12,7"
+                                     PlaceholderText="np. 1.2.1.1" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Grid.Row="1" Margin="0,12,0,8" Spacing="4">
+                        <TextBlock Text="{DynamicResource Assignment.TestType}" FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" />
+                        <ComboBox Name="TestTypeComboBox" Height="38"
+                                  PlaceholderText="{DynamicResource Assignment.SelectTestType}" />
+                    </StackPanel>
+
+                    <Grid Grid.Row="2" Margin="0,0,0,10" ColumnDefinitions="*,Auto" ColumnSpacing="14">
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="{DynamicResource Assignment.Search}"
+                                       FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" />
+                            <TextBox Name="SearchTextBox" Height="38" Padding="12,6"
+                                     PlaceholderText="np. Kasjerzy" />
+                        </StackPanel>
+                        <Border Grid.Column="1" MinWidth="280" Height="38" Padding="14,0"
+                                 VerticalAlignment="Bottom" CornerRadius="10"
+                                 Background="{DynamicResource IconBackgroundBrush}"
+                                 ToolTip.Tip="Liczba przypadków zajętych przez wszystkie aktywne sesje i bieżące pozycje podsumowania w tym projekcie.">
+                            <TextBlock Name="AssignmentCountsTextBlock"
+                                       VerticalAlignment="Center" TextAlignment="Center"
+                                       TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize12}"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                        </Border>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Margin="0,0,0,8" ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{DynamicResource Assignment.Scope}" FontSize="{DynamicResource AppFontSize12}" FontWeight="Bold"
+                                   VerticalAlignment="Center" />
+                        <CheckBox Name="SelectAllCheckBox" Grid.Column="1"
+                                  IsThreeState="True" Content="{DynamicResource Assignment.SelectVisible}" />
+                    </Grid>
+
+                    <Border Grid.Row="4" Padding="14"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1" CornerRadius="12">
+                        <ScrollViewer Name="CasesScrollViewer"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Name="CasesPanel" Spacing="5" />
+                        </ScrollViewer>
+                    </Border>
+
+                    <Grid Grid.Row="5" Margin="0,10,0,0" RowDefinitions="Auto,48,Auto">
+                        <TextBlock Name="ResultTextBlock" Grid.Row="0" Margin="0,0,0,4"
+                                   TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize13}" IsVisible="False" />
+                        <Button Grid.Row="1" Classes="assignmentAddAction PrimaryAction"
+                                Margin="0,0,0,12" HorizontalAlignment="Right"
+                                VerticalAlignment="Top" Content="{DynamicResource Assignment.Add}"
+                                Click="AddToSummaryButton_OnClick" />
+                        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                                    HorizontalAlignment="Right" Spacing="10">
+                            <Button Name="WithdrawButton" Classes="assignmentAction"
+                                    Content="{DynamicResource Assignment.CancelAssignment}" Background="#DC4C56" Foreground="White"
+                                    ToolTip.Tip="Wybierz istniejącą sesję, aby anulować przypisanie"
+                                    Click="WithdrawButton_OnClick" />
+                            <Button Classes="assignmentAction SecondaryAction" Content="{DynamicResource Common.Close}"
+                                    Click="CloseButton_OnClick" />
+                            <Button Name="GoToSummaryButton" Classes="assignmentAction PrimaryAction"
+                                    Content="{DynamicResource Assignment.GoToSummary}" IsVisible="False"
+                                    Click="GoToSummaryButton_OnClick" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+
+                <Grid Name="SummaryPanel" IsVisible="False"
+                      RowDefinitions="Auto,Auto,*,Auto">
+                    <StackPanel Grid.Row="0" Spacing="5">
+                        <TextBlock Text="{DynamicResource Assignment.Summary}" FontSize="{DynamicResource AppFontSize22}" FontWeight="Bold" />
+                        <TextBlock Text="{DynamicResource Assignment.SummaryDescription}"
+                                   TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize13}"
+                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" Margin="0,16,0,14"
+                          ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                        <Border Grid.Column="0" Padding="14" CornerRadius="11"
+                                Background="{DynamicResource IconBackgroundBrush}">
+                            <StackPanel HorizontalAlignment="Stretch">
+                                <TextBlock Text="{DynamicResource Assignment.Total}" FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" TextAlignment="Center" />
+                                <TextBlock Name="SummaryTotalTextBlock" FontSize="{DynamicResource AppFontSize24}" FontWeight="Bold" TextAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Padding="14" CornerRadius="11" Background="#242E7DFF">
+                            <StackPanel HorizontalAlignment="Stretch">
+                                <TextBlock Text="{DynamicResource Assignment.Assigned}" FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" TextAlignment="Center" />
+                                <TextBlock Name="SummaryAssignedTextBlock" FontSize="{DynamicResource AppFontSize24}" FontWeight="Bold" Foreground="#2E7DFF" TextAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Padding="14" CornerRadius="11" Background="#2428C76F">
+                            <StackPanel HorizontalAlignment="Stretch">
+                                <TextBlock Text="{DynamicResource Assignment.Unassigned}" FontSize="{DynamicResource AppFontSize12}" FontWeight="SemiBold" TextAlignment="Center" />
+                                <TextBlock Name="SummaryRemainingTextBlock" FontSize="{DynamicResource AppFontSize24}" FontWeight="Bold" Foreground="#159653" TextAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Grid.Row="2" Padding="12"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1" CornerRadius="12">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Name="DraftSummaryPanel" Spacing="8" />
+                        </ScrollViewer>
+                    </Border>
+
+                    <Grid Grid.Row="3" Margin="0,16,0,0"
+                          ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
+                        <TextBlock Name="SummaryResultTextBlock" VerticalAlignment="Center"
+                                   TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize13}" IsVisible="False" />
+                        <Button Grid.Column="1" Classes="assignmentAction"
+                                Content="{DynamicResource Assignment.CancelAll}" Background="#DC4C56"
+                                Foreground="White" Click="CancelAllDraftsButton_OnClick" />
+                        <Button Grid.Column="2" Classes="assignmentAction"
+                                Content="{DynamicResource Assignment.BackToEdit}" Click="BackToEditorButton_OnClick" />
+                        <Button Name="SendAssignmentsButton" Grid.Column="3" Classes="assignmentAction"
+                                Content="{DynamicResource Assignment.Send}" Background="#1F6FBF"
+                                Foreground="White" Click="SendAssignmentsButton_OnClick" />
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

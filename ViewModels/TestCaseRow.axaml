@@ -1,0 +1,283 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.TestCaseRow">
+
+    <UserControl.Styles>
+
+        <Style Selector="Border.TestCaseRow">
+
+            <Setter
+                Property="Padding"
+                Value="16,12" />
+
+            <Setter
+                Property="Margin"
+                Value="0,0,0,9" />
+
+            <Setter
+                Property="CornerRadius"
+                Value="12" />
+
+            <Setter
+                Property="Background"
+                Value="{DynamicResource InputBackgroundBrush}" />
+
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputBorderBrush}" />
+
+            <Setter
+                Property="BorderThickness"
+                Value="1" />
+
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.InProgressRow">
+
+            <Setter
+                Property="Background"
+                Value="#241F8FFF" />
+
+            <Setter
+                Property="BorderBrush"
+                Value="#1F8FFF" />
+
+            <Setter
+                Property="BorderThickness"
+                Value="2" />
+
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.SuccessRow">
+
+            <Setter
+                Property="Background"
+                Value="#2428C76F" />
+
+            <Setter
+                Property="BorderBrush"
+                Value="#28C76F" />
+
+            <Setter
+                Property="BorderThickness"
+                Value="2" />
+
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.FailedRow">
+
+            <Setter
+                Property="Background"
+                Value="#24DC4C56" />
+
+            <Setter
+                Property="BorderBrush"
+                Value="#DC4C56" />
+
+            <Setter
+                Property="BorderThickness"
+                Value="2" />
+
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.NaRow">
+
+            <Setter
+                Property="Background"
+                Value="#24F0B429" />
+
+            <Setter
+                Property="BorderBrush"
+                Value="#D6A013" />
+
+            <Setter
+                Property="BorderThickness"
+                Value="2" />
+
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.BlockedRow">
+
+            <Setter
+                Property="Background"
+                Value="#2EA84A16" />
+
+            <Setter
+                Property="BorderBrush"
+                Value="#A84A16" />
+
+            <Setter
+                Property="BorderThickness"
+                Value="2" />
+
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.DragTargetRow">
+
+            <Setter
+                Property="BorderBrush"
+                Value="#28C76F" />
+
+            <Setter
+                Property="BorderThickness"
+                Value="2" />
+
+        </Style>
+
+        <Style Selector="ComboBox.StatusBox">
+
+            <Setter
+                Property="Width"
+                Value="170" />
+
+            <Setter
+                Property="Height"
+                Value="38" />
+
+            <Setter
+                Property="Padding"
+                Value="12,0" />
+
+            <Setter
+                Property="CornerRadius"
+                Value="9" />
+
+            <Setter
+                Property="Background"
+                Value="{DynamicResource InputBackgroundBrush}" />
+
+            <Setter
+                Property="Foreground"
+                Value="{DynamicResource PrimaryTextBrush}" />
+
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputBorderBrush}" />
+
+            <Setter
+                Property="BorderThickness"
+                Value="1" />
+
+        </Style>
+
+        <Style Selector="ComboBoxItem">
+
+            <Setter
+                Property="Padding"
+                Value="12,8" />
+
+            <Setter
+                Property="Foreground"
+                Value="{DynamicResource PrimaryTextBrush}" />
+
+            <Setter
+                Property="Background"
+                Value="{DynamicResource InputBackgroundBrush}" />
+
+        </Style>
+
+        <Style Selector="ComboBoxItem:pointerover">
+
+            <Setter
+                Property="Background"
+                Value="{DynamicResource HoverItemBrush}" />
+
+        </Style>
+
+    </UserControl.Styles>
+
+    <Border
+        Name="RootBorder"
+        Classes="TestCaseRow">
+
+        <Grid RowDefinitions="Auto,Auto">
+        <Grid Grid.Row="0"
+            ColumnDefinitions="Auto,*,Auto">
+
+            <TextBlock
+                Name="NumberTextBlock"
+                Grid.Column="0"
+                Width="42"
+                VerticalAlignment="Center"
+                FontWeight="Bold"
+                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <TextBlock
+                Name="NameTextBlock"
+                Grid.Column="1"
+                Margin="8,0,12,0"
+                VerticalAlignment="Center"
+                TextWrapping="Wrap"
+                FontSize="{DynamicResource AppFontSize15}"
+                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+            <ComboBox
+                Name="StatusComboBox"
+                Grid.Column="2"
+                Classes="StatusBox"
+                SelectedIndex="0">
+
+                <ComboBoxItem
+                    Name="PendingStatusComboBoxItem"
+                    Content="Pending"
+                    Tag="None" />
+
+                <ComboBoxItem
+                    Content="In Progress"
+                    Tag="InProgress" />
+
+                <ComboBoxItem
+                    Content="Success"
+                    Tag="Success" />
+
+                <ComboBoxItem
+                    Content="Failed"
+                    Tag="Failed" />
+
+                <ComboBoxItem
+                    Content="N/A"
+                    Tag="NA" />
+
+                <ComboBoxItem
+                    Content="Blocked"
+                    Tag="Blocked" />
+
+            </ComboBox>
+
+        </Grid>
+
+        <Border Name="BlockedCommentBorder"
+                Grid.Row="1"
+                IsVisible="False"
+                Margin="50,10,0,0"
+                Padding="10"
+                CornerRadius="9"
+                BorderThickness="1"
+                BorderBrush="#A84A16"
+                Background="{DynamicResource InputBackgroundBrush}">
+            <StackPanel Spacing="5">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox Name="BlockedCommentTextBox"
+                             Grid.Column="0"
+                             MinHeight="38" MaxLength="240"
+                             PlaceholderText="Krótko opisz przyczynę zablokowania"
+                             TextWrapping="Wrap" AcceptsReturn="True" />
+                    <Button Name="SaveBlockedCommentButton"
+                            Grid.Column="1"
+                            Classes="PrimaryAction"
+                            MinWidth="96" MinHeight="38" Height="38"
+                            Margin="10,0,0,0" Padding="14,0"
+                            Content="ZAPISZ" IsEnabled="False"
+                            Click="SaveBlockedCommentButton_OnClick" />
+                </Grid>
+                <TextBlock Name="BlockedCommentHintTextBlock"
+                           Text="Pole jest wymagane przed zapisaniem statusu."
+                           FontSize="{DynamicResource AppFontSize11}" Foreground="#DC4C56" />
+            </StackPanel>
+        </Border>
+        </Grid>
+
+    </Border>
+
+</UserControl>

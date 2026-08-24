@@ -1,0 +1,202 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.ProjectToolsWindow"
+    Title="{DynamicResource ProjectTools.Title}"
+    Width="560"
+    Height="470"
+    MinWidth="430"
+    MinHeight="360"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Styles>
+        <Style Selector="Button.ToolAction">
+            <Setter Property="Height" Value="72" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Padding" Value="18,10" />
+            <Setter Property="CornerRadius" Value="15" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter
+                Property="Background"
+                Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.ToolAction:pointerover">
+            <Setter
+                Property="Background"
+                Value="{DynamicResource HoverItemBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputHoverBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.CloseButton">
+            <Setter Property="Width" Value="150" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.CloseButton:pointerover">
+            <Setter Property="Background" Value="#3AD47A" />
+        </Style>
+
+        <Style Selector="Button.CloseButton:pressed">
+            <Setter Property="Background" Value="#169B50" />
+        </Style>
+    </Window.Styles>
+
+    <Border
+        Margin="20"
+        Padding="28"
+        Background="{DynamicResource CardBackgroundBrush}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="22">
+
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <!-- NAGŁÓWEK -->
+
+            <StackPanel
+                Grid.Row="0"
+                Spacing="7">
+
+                <TextBlock
+                    Text="{DynamicResource ProjectTools.Title}"
+                    FontSize="{DynamicResource AppFontSize26}"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                <TextBlock
+                    Text="{DynamicResource ProjectTools.Description}"
+                    FontSize="{DynamicResource AppFontSize15}"
+                    TextWrapping="Wrap"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            </StackPanel>
+
+            <!-- ZAWARTOŚĆ PRZEWIJANA -->
+
+            <ScrollViewer
+                Grid.Row="1"
+                Margin="0,24,0,18"
+                VerticalContentAlignment="Center"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+
+                <StackPanel
+                    MaxWidth="380"
+                    HorizontalAlignment="Center"
+                    Spacing="14">
+
+                    <Button
+                        Classes="ToolAction"
+                        Click="ImportButton_OnClick">
+
+                        <Grid ColumnDefinitions="42,*">
+
+                            <TextBlock
+                                Grid.Column="0"
+                                Text="↓"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="{DynamicResource AppFontSize24}"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="12,0,0,0"
+                                VerticalAlignment="Center"
+                                Spacing="2">
+
+                                <TextBlock
+                                    Text="{DynamicResource ProjectTools.Import}"
+                                    FontSize="{DynamicResource AppFontSize17}"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                <TextBlock
+                                    Text="{DynamicResource ProjectTools.ImportDescription}"
+                                    FontSize="{DynamicResource AppFontSize12}"
+                                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                            </StackPanel>
+
+                        </Grid>
+
+                    </Button>
+
+                    <Button
+                        Classes="ToolAction"
+                        Click="ExportButton_OnClick">
+
+                        <Grid ColumnDefinitions="42,*">
+
+                            <TextBlock
+                                Grid.Column="0"
+                                Text="↑"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="{DynamicResource AppFontSize24}"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="12,0,0,0"
+                                VerticalAlignment="Center"
+                                Spacing="2">
+
+                                <TextBlock
+                                    Text="{DynamicResource ProjectTools.Export}"
+                                    FontSize="{DynamicResource AppFontSize17}"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                <TextBlock
+                                    Text="{DynamicResource ProjectTools.ExportDescription}"
+                                    FontSize="{DynamicResource AppFontSize12}"
+                                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                            </StackPanel>
+
+                        </Grid>
+
+                    </Button>
+
+                </StackPanel>
+
+            </ScrollViewer>
+
+            <!-- DOLNY PASEK -->
+
+            <Button
+                Grid.Row="2"
+                Classes="CloseButton"
+                HorizontalAlignment="Center"
+                Content="{DynamicResource Common.Close}"
+                Click="CloseButton_OnClick" />
+
+        </Grid>
+
+    </Border>
+
+</Window>

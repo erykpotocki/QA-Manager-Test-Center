@@ -1,0 +1,355 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.AdminTestMenuWindow"
+    Title="Menu testowe"
+    Width="620"
+    Height="860"
+    MinWidth="580"
+    MinHeight="540"
+    CanResize="True"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Styles>
+
+        <Style Selector="Button.DialogButton">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Primary">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Danger">
+            <Setter Property="Background" Value="#DC4C56" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#DC4C56" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Secondary">
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+    </Window.Styles>
+
+    <Border
+        Margin="20"
+        Padding="28"
+        Background="{DynamicResource CardBackgroundBrush}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="22">
+
+        <ScrollViewer
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled"
+            Padding="0,0,18,0">
+
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+
+            <TextBlock
+                Grid.Row="0"
+                Text="Menu testowe"
+                FontSize="{DynamicResource AppFontSize26}"
+                FontWeight="Bold"
+                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+            <TextBlock
+                Name="AccessDescriptionTextBlock"
+                Grid.Row="1"
+                Margin="0,6,0,22"
+                TextWrapping="Wrap"
+                Text="Narzędzia administracyjne do zarządzania lokalnymi profilami i przypisaniami testów."
+                FontSize="{DynamicResource AppFontSize14}"
+                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <StackPanel Grid.Row="2" Spacing="7">
+
+                <TextBlock
+                    Text="PROFIL UŻYTKOWNIKA"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <ComboBox
+                    Name="ProfileComboBox"
+                    Height="44"
+                    PlaceholderText="Wybierz profil użytkownika"
+                    HorizontalAlignment="Stretch" />
+
+            </StackPanel>
+
+            <StackPanel
+                Name="SelectedProfileActionsPanel"
+                Grid.Row="3"
+                Margin="0,22,0,0"
+                Spacing="12"
+                IsVisible="False">
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button
+                        Classes="DialogButton Primary"
+                        Content="RESETUJ PIN"
+                        Click="ResetSelectedButton_OnClick" />
+                    <Button
+                        Name="DeleteSelectedUserButton"
+                        Classes="DialogButton Danger"
+                        Content="USUŃ KONTO"
+                        Click="DeleteSelectedUserButton_OnClick" />
+                </StackPanel>
+
+            <Border
+                Name="RoleManagementPanel"
+                Padding="16"
+                Background="{DynamicResource IconBackgroundBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="12">
+
+                <StackPanel Spacing="10">
+
+                    <TextBlock
+                        Text="ROLE UŻYTKOWNIKA"
+                        FontSize="{DynamicResource AppFontSize13}"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                    <TextBlock
+                        Text="Admin lub Lider może nadawać role systemowe i projektowe. Zmiany będą widoczne po ponownym zalogowaniu użytkownika."
+                        TextWrapping="Wrap"
+                        FontSize="{DynamicResource AppFontSize12}"
+                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                    <WrapPanel Orientation="Horizontal">
+                        <CheckBox Name="AdministratorRoleCheckBox" Margin="0,0,18,8" Content="Admin" />
+                        <CheckBox Name="LeaderRoleCheckBox" Margin="0,0,18,8" Content="Lider" />
+                        <CheckBox Name="TesterRoleCheckBox" Margin="0,0,18,8" Content="Tester" />
+                    </WrapPanel>
+
+                    <TextBox
+                        Name="AdditionalProjectRolesTextBox"
+                        Height="40"
+                        Padding="11,6"
+                        PlaceholderText="Inne role projektowe, oddzielone przecinkami" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Button
+                            Classes="DialogButton Primary"
+                            HorizontalAlignment="Left"
+                            Content="ZAPISZ ROLE"
+                            Click="SaveRolesButton_OnClick" />
+                        <TextBlock Name="RoleSaveResultTextBlock"
+                                   VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize13}"
+                                   TextWrapping="Wrap"
+                                   FontWeight="SemiBold" IsVisible="False" />
+                    </StackPanel>
+
+                    <Button Classes="DialogButton Secondary"
+                            HorizontalAlignment="Left"
+                            Content="OTWÓRZ EDYTOR RÓL I PROJEKTÓW"
+                            Click="OpenRoleAndProjectEditorButton_OnClick" />
+
+                </StackPanel>
+
+            </Border>
+
+            </StackPanel>
+
+            <Border
+                Name="AccountManagementPanel"
+                Grid.Row="4"
+                Margin="0,10,0,0"
+                Padding="16"
+                Background="{DynamicResource IconBackgroundBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="12">
+
+                <StackPanel Spacing="9">
+                    <TextBlock Text="ZARZĄDZANIE KONTAMI" FontSize="{DynamicResource AppFontSize13}" FontWeight="Bold" />
+                    <TextBlock Text="Nowe konto otrzyma domyślny PIN 000000 i ustawi własny PIN przy pierwszym logowaniu."
+                               TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize12}"
+                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <Grid ColumnDefinitions="*,10,Auto">
+                        <TextBox Name="NewUserLoginTextBox" Grid.Column="0" Height="42"
+                                 Padding="11,6" PlaceholderText="Login nowego użytkownika" />
+                        <Button Grid.Column="2" Classes="DialogButton Primary"
+                                Content="DODAJ KONTO" Click="AddUserButton_OnClick" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Grid.Row="5"
+                Height="1"
+                Margin="0,14,0,12"
+                Background="{DynamicResource CardBorderBrush}" />
+
+            <Border
+                Name="ResetAllProfilesPanel"
+                Grid.Row="6"
+                Padding="11"
+                Background="#18DC4C56"
+                BorderBrush="#55DC4C56"
+                BorderThickness="1"
+                CornerRadius="12">
+
+                <StackPanel Spacing="8">
+
+                    <TextBlock
+                        Text="RESET WSZYSTKICH PROFILI"
+                        FontSize="{DynamicResource AppFontSize13}"
+                        FontWeight="Bold"
+                        Foreground="#DC4C56" />
+
+                    <TextBlock
+                        Text="Ustawia PIN 000000 wszystkim użytkownikom, również aktualnemu administratorowi."
+                        TextWrapping="Wrap"
+                        FontSize="{DynamicResource AppFontSize13}"
+                        Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                    <Button
+                        Classes="DialogButton Danger"
+                        Margin="0,2,0,0"
+                        HorizontalAlignment="Left"
+                        Content="RESETUJ PIN WSZYSTKIM"
+                        Click="ResetAllButton_OnClick" />
+
+                </StackPanel>
+
+            </Border>
+
+            <StackPanel
+                Name="ResetAssignmentsPanel"
+                Grid.Row="7"
+                Margin="0,14,0,0"
+                Spacing="10">
+
+                <Border Padding="11"
+                        Background="#18DC4C56"
+                        BorderBrush="#55DC4C56"
+                        BorderThickness="1"
+                        CornerRadius="12">
+                <StackPanel Spacing="5">
+
+                    <TextBlock
+                        Text="ZEROWANIE PRZYPISAŃ TESTÓW"
+                        FontSize="{DynamicResource AppFontSize13}"
+                        FontWeight="Bold"
+                        Foreground="#DC4C56" />
+
+                    <TextBlock
+                        Text="Wycofuje wszystkie aktywne przypisania i odblokowuje ich przypadki. Operacja nie usuwa historii ani wcześniejszych raportów."
+                        TextWrapping="Wrap"
+                        FontSize="{DynamicResource AppFontSize13}"
+                        Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                    <Button
+                        Classes="DialogButton Danger"
+                        Margin="0,2,0,0"
+                        HorizontalAlignment="Left"
+                        Content="ZERUJ PRZYPISANIA TESTÓW"
+                        Click="ResetAssignmentsButton_OnClick" />
+
+                </StackPanel>
+                </Border>
+
+                <Border Padding="11"
+                        Background="#18DC4C56"
+                        BorderBrush="#55DC4C56"
+                        BorderThickness="1"
+                        CornerRadius="12">
+                <StackPanel Spacing="5">
+
+                    <TextBlock
+                        Text="RESET POSTĘPU WYKONANIA TESTÓW"
+                        FontSize="{DynamicResource AppFontSize13}"
+                        FontWeight="Bold"
+                        Foreground="#DC4C56" />
+
+                    <TextBlock
+                        Text="Usuwa wszystkie przypisania, historię sesji i powiązane powiadomienia oraz przywraca statusy przypadków do stanu niewykonanego."
+                        TextWrapping="Wrap"
+                        FontSize="{DynamicResource AppFontSize13}"
+                        Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                    <Button
+                        Classes="DialogButton Danger"
+                        Margin="0,2,0,0"
+                        HorizontalAlignment="Left"
+                        Content="ZRESETUJ POSTĘP TESTÓW"
+                        Click="ResetAllAssignmentDataButton_OnClick" />
+
+                </StackPanel>
+                </Border>
+
+                <Border Name="GlobalTestResetPanel"
+                        Padding="14"
+                        Background="#24DC4C56"
+                        BorderBrush="#AADC4C56"
+                        BorderThickness="2"
+                        CornerRadius="12">
+                    <StackPanel Spacing="9">
+                        <TextBlock Text="GLOBALNY RESET TESTOWY"
+                                   FontSize="{DynamicResource AppFontSize14}"
+                                   FontWeight="Bold" Foreground="#DC4C56" />
+                        <TextBlock Text="Zachowuje konta, role i strukturę przypadków. Ustawia wszystkim PIN 000000, wygląd Light / Blue / Arial, usuwa przypisania, powiadomienia i sesje oraz zeruje statusy i komentarze przypadków."
+                                   TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize13}"
+                                   Foreground="{DynamicResource PrimaryTextBrush}" />
+                        <TextBlock Text="PIN AKTUALNIE ZALOGOWANEGO UŻYTKOWNIKA"
+                                   FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold"
+                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <TextBox Name="GlobalResetPinTextBox" Height="42" MaxLength="6"
+                                 PasswordChar="●" PlaceholderText="6 cyfr" />
+                        <Button Classes="DialogButton Danger" HorizontalAlignment="Left"
+                                Content="WYKONAJ GLOBALNY RESET TESTOWY"
+                                Click="GlobalTestResetButton_OnClick" />
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+
+            <Grid
+                Grid.Row="8"
+                Margin="0,20,0,0"
+                ColumnDefinitions="*,Auto">
+
+                <TextBlock
+                    Name="ResultTextBlock"
+                    Grid.Column="0"
+                    Margin="0,0,16,0"
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap"
+                    FontSize="{DynamicResource AppFontSize13}"
+                    Foreground="#19944D"
+                    IsVisible="False" />
+
+                <Button
+                    Grid.Column="1"
+                    Classes="DialogButton Secondary"
+                    MinWidth="120"
+                    Content="ZAMKNIJ"
+                    Click="CloseButton_OnClick" />
+
+            </Grid>
+
+        </Grid>
+
+        </ScrollViewer>
+
+    </Border>
+
+</Window>

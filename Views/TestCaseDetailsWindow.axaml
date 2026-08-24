@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="QARegressionManager.Views.TestCaseDetailsWindow"
+        Title="Szczegóły przypadku testowego"
+        Width="820" Height="760" MinWidth="680" MinHeight="560"
+        WindowStartupLocation="CenterOwner">
+  <Border Margin="20" Padding="24" Classes="Card">
+    <Grid RowDefinitions="Auto,*,Auto">
+      <StackPanel Spacing="5">
+        <TextBlock Text="Szczegóły przypadku" FontSize="{DynamicResource AppFontSize26}" FontWeight="Bold" />
+        <TextBlock Text="Nazwa, opis, warunki wstępne i kroki należą do demonstracyjnego katalogu i mogą być edytowane." TextWrapping="Wrap" Foreground="{DynamicResource SecondaryTextBrush}" />
+      </StackPanel>
+      <ScrollViewer Grid.Row="1" Margin="0,20,0,18" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="14" Margin="0,0,14,0">
+          <TextBlock Text="NAZWA" FontWeight="SemiBold" />
+          <TextBox Name="NameTextBox" />
+          <TextBlock Text="OPIS" FontWeight="SemiBold" />
+          <TextBox Name="SummaryTextBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="90" />
+          <TextBlock Text="WARUNKI WSTĘPNE" FontWeight="SemiBold" />
+          <TextBox Name="PreconditionsTextBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="90" />
+          <TextBlock Text="PLATFORMY" FontWeight="SemiBold" />
+          <TextBox Name="PlatformsTextBox" PlaceholderText="Nazwy oddzielone przecinkami" />
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="KROKI" FontWeight="SemiBold" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="+ DODAJ KROK" Classes="SecondaryAction" Click="AddStepButton_OnClick" />
+          </Grid>
+          <StackPanel Name="StepsPanel" Spacing="10" />
+        </StackPanel>
+      </ScrollViewer>
+      <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Content="ANULUJ" Classes="SecondaryAction" Click="CancelButton_OnClick" />
+        <Button Content="ZAPISZ" Classes="PrimaryAction" Click="SaveButton_OnClick" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

@@ -1,0 +1,1755 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.ExplorerView">
+
+    <UserControl.Styles>
+
+        <!-- PRZYCISK MOTYWU -->
+
+        <Style Selector="Button.ThemeButton">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background"
+                    Value="{DynamicResource ThemeButtonBackgroundBrush}" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+
+                        <ContentPresenter
+                            Content="{TemplateBinding Content}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.ThemeButton:pointerover">
+            <Setter Property="Background"
+                    Value="{DynamicResource ThemeButtonHoverBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputHoverBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.ThemeButton:pressed">
+            <Setter Property="Background"
+                    Value="{DynamicResource ThemeButtonPressedBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputFocusBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.SettingsMenuItem">
+            <Setter Property="Height" Value="66" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                        <ContentPresenter
+                            Content="{TemplateBinding Content}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.SettingsMenuItem:pointerover">
+            <Setter Property="Background"
+                    Value="{DynamicResource HoverItemBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputHoverBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.AssignmentButton">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentMutedBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:1.35" />
+                    <BrushTransition Property="BorderBrush" Duration="0:0:1.35" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.LogoutButton">
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter
+                Property="Background"
+                Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter
+                Property="Foreground"
+                Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.LogoutButton:pointerover">
+            <Setter
+                Property="Background"
+                Value="{DynamicResource HoverItemBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputHoverBorderBrush}" />
+        </Style>
+
+        <!-- PRZYCISKI NAWIGACJI -->
+
+        <Style Selector="Button.NavigationButton">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="MinWidth" Value="120" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+
+                        <ContentPresenter
+                            Content="{TemplateBinding Content}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.NavigationButton.PreviousButton">
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.NavigationButton.PreviousButton:pointerover">
+            <Setter Property="Background"
+                    Value="{DynamicResource HoverItemBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputHoverBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.NavigationButton.NextButton">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.NavigationButton.NextButton:pointerover">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryHoverBrush}" />
+        </Style>
+
+        <Style Selector="Button.NavigationButton.NextButton:pressed">
+            <Setter Property="Background" Value="#169B50" />
+            <Setter Property="BorderBrush" Value="#169B50" />
+        </Style>
+
+        <Style Selector="Button.NavigationButton:disabled">
+            <Setter Property="Opacity" Value="0.4" />
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+
+        <Style Selector="Button.CollectionDescriptionAction">
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.CollectionDescriptionAction:pointerover">
+            <Setter Property="Foreground" Value="#169B50" />
+        </Style>
+
+        <Style Selector="Button.CollectionDescriptionEdit">
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <!-- DRZEWO -->
+
+        <Style Selector="TreeViewItem">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Margin" Value="0,2" />
+        </Style>
+
+        <Style Selector="Border.CompactTreePanel TreeViewItem">
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+
+        <Style Selector="Border.CompactTreePanel TextBlock.ProjectTreeLabel">
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+
+        <Style Selector="Border.CompactTreePanel TextBlock.TestTypeTreeLabel">
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+
+        <Style Selector="Button.PanelToggleButton">
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource PanelToggleBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter
+                        Content="{TemplateBinding Content}"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.PanelToggleButton:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource PanelToggleAccentBrush}" />
+        </Style>
+
+        <Style Selector="Border.ProjectTreeHeader">
+            <Setter Property="Background" Value="{DynamicResource HoverItemBrush}" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Margin" Value="0,0,0,5" />
+            <Setter Property="Padding" Value="7,7" />
+        </Style>
+
+        <Style Selector="TextBlock.ProjectTreeLabel">
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+
+        <Style Selector="Border.TestTypeTreeHeader">
+            <Setter Property="Background" Value="{DynamicResource IconBackgroundBrush}" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Margin" Value="0,8,0,3" />
+            <Setter Property="Padding" Value="7,6" />
+        </Style>
+
+        <Style Selector="TextBlock.TestTypeTreeLabel">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+
+        <!-- STATUS SEKCJI W DRZEWIE -->
+
+        <Style Selector="Border.TreeProgressRow">
+            <Setter Property="Padding" Value="7,5" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- AKTUALNIE OTWARTA SEKCJA -->
+
+        <Style Selector="Border.TreeProgressRow.ActiveTreeRow">
+            <Setter Property="Background" Value="#3028C76F" />
+            <Setter Property="BorderBrush" Value="#9028C76F" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <Style Selector="Border.TreeProgressRow.SuccessRow">
+            <Setter Property="Background" Value="#2428C76F" />
+            <Setter Property="BorderBrush" Value="#7028C76F" />
+        </Style>
+
+        <Style Selector="Border.TreeProgressRow.FailedRow">
+            <Setter Property="Background" Value="#24DC4C56" />
+            <Setter Property="BorderBrush" Value="#DC4C56" />
+        </Style>
+
+        <Style Selector="Border.TreeProgressRow.WarningRow">
+            <Setter Property="Background" Value="#24F0B429" />
+            <Setter Property="BorderBrush" Value="#D6A013" />
+        </Style>
+
+        <Style Selector="Border.TreeProgressRow.BlockedRow">
+            <Setter Property="Background" Value="#2EA84A16" />
+            <Setter Property="BorderBrush" Value="#A84A16" />
+        </Style>
+
+        <Style Selector="Border.TreeProgressRow.InProgressRow">
+            <Setter Property="Background" Value="#241F8FFF" />
+            <Setter Property="BorderBrush" Value="#1F8FFF" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- LISTA STATUSÓW -->
+
+        <Style Selector="ComboBox.StatusBox">
+            <Setter Property="Width" Value="145" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="ComboBoxItem">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="Padding" Value="10,7" />
+        </Style>
+
+        <Style Selector="ComboBoxItem:pointerover">
+            <Setter Property="Background"
+                    Value="{DynamicResource HoverItemBrush}" />
+        </Style>
+
+        <!-- WIERSZE PRZYPADKÓW -->
+
+        <Style Selector="Border.TestCaseRow">
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="Margin" Value="0,0,0,9" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.SuccessRow">
+            <Setter Property="Background" Value="#2428C76F" />
+            <Setter Property="BorderBrush" Value="#28C76F" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.FailedRow">
+            <Setter Property="Background" Value="#24DC4C56" />
+            <Setter Property="BorderBrush" Value="#DC4C56" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.NaRow">
+            <Setter Property="Background" Value="#24F0B429" />
+            <Setter Property="BorderBrush" Value="#D6A013" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <Style Selector="Border.TestCaseRow.BlockedRow">
+            <Setter Property="Background" Value="#2EA84A16" />
+            <Setter Property="BorderBrush" Value="#A84A16" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+    </UserControl.Styles>
+
+    <Grid Background="{DynamicResource AppBackgroundBrush}">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="74" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="38" />
+        </Grid.RowDefinitions>
+
+        <!-- GÓRNY PASEK -->
+
+        <Border
+            Grid.Row="0"
+            Padding="22,0"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="0,0,0,1">
+
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+
+                <StackPanel
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Spacing="2">
+
+                    <TextBlock
+                        Text="QA Manager"
+                        FontSize="{DynamicResource AppFontSize24}"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                    <TextBlock
+                        Name="ProjectInfoTextBlock"
+                        Text="TEST PROJECT"
+                        FontSize="{DynamicResource AppFontSize13}"
+                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="14,0,8,0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Spacing="6"
+                    ClipToBounds="True">
+
+                    <Button Name="AssignTestsButton" Classes="AssignmentButton"
+                            Content="{DynamicResource Assignment.AssignTests}" IsVisible="False"
+                            Click="AssignTestsButton_OnClick" />
+
+                    <Button Name="ExecuteAssignedTestsButton" Classes="AssignmentButton"
+                            IsVisible="False" ClipToBounds="False"
+                            Click="ExecuteAssignedTestsButton_OnClick">
+                        <Grid ClipToBounds="False">
+                            <TextBlock Name="ExecuteAssignedTestsLabel" Text="{DynamicResource Assignment.ExecuteTests}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                            <Border Name="ExecuteAssignmentPendingDot"
+                                    Width="11" Height="11"
+                                    Margin="0,-10,-10,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Background="#DC4C56"
+                                    CornerRadius="6"
+                                    IsVisible="False"
+                                    RenderTransformOrigin="50%,50%">
+                                <Border.RenderTransform>
+                                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                                </Border.RenderTransform>
+                            </Border>
+                        </Grid>
+                    </Button>
+
+                    <Button Name="RestartAssignedTestsButton"
+                            Classes="AssignmentButton"
+                            Content="{DynamicResource Assignment.RestartTests}"
+                            IsVisible="False"
+                            Click="RestartAssignedTestsButton_OnClick" />
+
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Column="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Spacing="10">
+
+                    <Border
+                        Name="RefreshIndicatorBorder"
+                        Width="34"
+                        Height="34"
+                        IsVisible="False"
+                        Background="{DynamicResource IconBackgroundBrush}"
+                        BorderBrush="{DynamicResource InputBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        ToolTip.Tip="{DynamicResource Common.RefreshingData}">
+                        <TextBlock
+                            Name="RefreshIndicatorIcon"
+                            Text="↻"
+                            FontSize="{DynamicResource AppFontSize20}"
+                            Foreground="#2878D0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RenderTransformOrigin="50%,50%">
+                            <TextBlock.RenderTransform>
+                                <RotateTransform />
+                            </TextBlock.RenderTransform>
+                        </TextBlock>
+                    </Border>
+
+                    <Border
+                        Name="LoggedInUserPanel"
+                        Height="46"
+                        Padding="14,0"
+                        Background="{DynamicResource InputBackgroundBrush}"
+                        BorderBrush="#D9A91B"
+                        BorderThickness="1"
+                        CornerRadius="14"
+                        Cursor="Hand"
+                        PointerPressed="LoggedInUserPanel_OnPointerPressed"
+                        ToolTip.Tip="{DynamicResource Common.LocalModeDescription}">
+
+                        <Border.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{DynamicResource Common.Refresh}" Click="RefreshButton_OnClick" />
+                                <Separator />
+                                <MenuItem Header="{DynamicResource Common.Logout}" Click="LogoutButton_OnClick" />
+                            </ContextMenu>
+                        </Border.ContextMenu>
+
+                        <StackPanel
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Spacing="8">
+
+                            <Ellipse
+                                Width="9"
+                                Height="9"
+                                Fill="#D9A91B" />
+
+                            <StackPanel VerticalAlignment="Center" Spacing="0">
+                                <TextBlock
+                                    Name="LoggedInUserTextBlock"
+                                    Text="Zalogowany: użytkownik"
+                                    FontSize="{DynamicResource AppFontSize13}"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+                                <TextBlock Text="{DynamicResource Common.LocalMode}" FontSize="{DynamicResource AppFontSize10}"
+                                           Foreground="#B58912" />
+                            </StackPanel>
+
+                        </StackPanel>
+
+                    </Border>
+
+                    <ScrollViewer
+                        Name="RoleBadgesScrollViewer"
+                        MaxWidth="380"
+                        HorizontalScrollBarVisibility="Hidden"
+                        VerticalScrollBarVisibility="Disabled">
+
+                        <StackPanel
+                            Name="RoleBadgesPanel"
+                            Orientation="Horizontal"
+                            Spacing="6" />
+
+                    </ScrollViewer>
+
+                    <Button
+                        Name="RoleOverflowButton"
+                        Classes="ThemeButton"
+                        Width="38"
+                        Height="38"
+                        Padding="0"
+                        Content="…"
+                        FontSize="20"
+                        FontWeight="Bold"
+                        IsVisible="False"
+                        ToolTip.Tip="{DynamicResource Explorer.OtherRoles}">
+                        <Button.Flyout>
+                            <Flyout Placement="BottomEdgeAlignedRight">
+                                <Border
+                                    Padding="12"
+                                    Background="{DynamicResource CardBackgroundBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="12">
+                                    <StackPanel
+                                        Name="HiddenRoleBadgesPanel"
+                                        Spacing="6" />
+                                </Border>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+
+                </StackPanel>
+
+                <!-- Stała grupa najważniejszych akcji. Jej pozycja nie zależy
+                     od liczby ról ani szerokości panelu użytkownika. -->
+                <StackPanel
+                    Grid.Column="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Spacing="6">
+
+                    <Button
+                        Name="NotificationCenterButton"
+                        Classes="ThemeButton"
+                        ClipToBounds="False"
+                        Click="NotificationCenterButton_OnClick">
+
+                        <Grid Width="42" Height="42" ClipToBounds="False">
+                            <TextBlock Text="🔔" FontSize="{DynamicResource AppFontSize18}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                            <Border Name="NotificationBadgeBorder" MinWidth="20" Height="20"
+                                    Padding="5,0" Margin="0,-7,-8,0"
+                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Background="#DC4C56" CornerRadius="10" IsVisible="False">
+                                <TextBlock Name="NotificationBadgeTextBlock" Text="0"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           FontSize="{DynamicResource AppFontSize10}" FontWeight="Bold" Foreground="White" />
+                            </Border>
+                        </Grid>
+
+                    </Button>
+
+                    <Button Name="ProgressDashboardButton" Classes="ThemeButton"
+                            Width="42" Padding="0" ClipToBounds="False"
+                            ToolTip.Tip="{DynamicResource Common.AssignedProgress}"
+                            Click="ProgressDashboardButton_OnClick">
+                        <Grid Width="42" Height="42" ClipToBounds="False">
+                        <Path Width="23" Height="23"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Stretch="Uniform"
+                              Stroke="{DynamicResource PrimaryTextBrush}"
+                              StrokeThickness="1.8"
+                              StrokeLineCap="Round"
+                              StrokeJoin="Round"
+                              Fill="Transparent"
+                              Data="M 2,21 L 22,21 M 4,19 L 4,13 L 8,13 L 8,19 M 10,19 L 10,10 L 14,10 L 14,19 M 16,19 L 16,5 L 20,5 L 20,19 M 4,11 L 10,7 L 14,9 L 21,2 M 18,2 L 21,2 L 21,5" />
+                            <Border Name="DashboardPendingReportDot"
+                                    Width="11" Height="11"
+                                    Margin="0,-5,-5,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Background="#DC4C56"
+                                    CornerRadius="6"
+                                    IsVisible="False" />
+                        </Grid>
+                    </Button>
+
+                    <Button
+                        Name="ProjectToolsButton"
+                        Classes="ThemeButton"
+                        Width="42"
+                        Padding="0"
+                        ToolTip.Tip="{DynamicResource Common.Settings}">
+
+                        <Canvas Width="24" Height="24">
+                            <Path Stroke="{DynamicResource PrimaryTextBrush}"
+                                  StrokeThickness="1.8"
+                                  StrokeLineCap="Round"
+                                  Data="M 3,6 L 9,6 M 15,6 L 21,6 M 3,12 L 13,12 M 19,12 L 21,12 M 3,18 L 6,18 M 12,18 L 21,18" />
+                            <Ellipse Width="6" Height="6" Canvas.Left="9" Canvas.Top="3"
+                                     Fill="{DynamicResource CardBackgroundBrush}"
+                                     Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="1.8" />
+                            <Ellipse Width="6" Height="6" Canvas.Left="13" Canvas.Top="9"
+                                     Fill="{DynamicResource CardBackgroundBrush}"
+                                     Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="1.8" />
+                            <Ellipse Width="6" Height="6" Canvas.Left="6" Canvas.Top="15"
+                                     Fill="{DynamicResource CardBackgroundBrush}"
+                                     Stroke="{DynamicResource PrimaryTextBrush}" StrokeThickness="1.8" />
+                        </Canvas>
+
+                        <Button.Flyout>
+                            <Flyout Placement="BottomEdgeAlignedRight">
+
+                                <Border
+                                    Width="350"
+                                    Padding="14"
+                                    Background="{DynamicResource CardBackgroundBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="16">
+
+                                    <StackPanel Spacing="6">
+
+                                        <TextBlock
+                                            Text="{DynamicResource Common.SettingsArea}"
+                                            Margin="6,2,6,0"
+                                            FontSize="{DynamicResource AppFontSize12}"
+                                            FontWeight="Bold"
+                                            Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                        <TextBlock
+                                            Text="{DynamicResource Common.SettingsDescription}"
+                                            Margin="6,0,6,8"
+                                            FontSize="{DynamicResource AppFontSize12}"
+                                            TextWrapping="Wrap"
+                                            Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                        <Button
+                                            Name="ThemeToggleButton"
+                                            Classes="SettingsMenuItem"
+                                            Click="ThemeToggleButton_OnClick">
+
+                                            <Grid ColumnDefinitions="42,*">
+                                                <Border Grid.Column="0" Width="36" Height="36"
+                                                        Background="{DynamicResource IconBackgroundBrush}"
+                                                        CornerRadius="10">
+                                                    <TextBlock Name="ThemeIconTextBlock" Text="☾"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               FontSize="{DynamicResource AppFontSize20}" Foreground="#19944D" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="10,0,0,0"
+                                                            VerticalAlignment="Center" Spacing="2">
+                                                    <TextBlock Text="{DynamicResource Common.ApplicationSettings}" FontSize="{DynamicResource AppFontSize14}"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                                    <TextBlock Text="{DynamicResource Common.AppearanceDescription}" FontSize="{DynamicResource AppFontSize12}"
+                                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+
+                                        </Button>
+
+                                        <Button
+                                            Classes="SettingsMenuItem"
+                                            Click="NetworkSyncButton_OnClick">
+
+                                            <Grid ColumnDefinitions="42,*">
+                                                <Border Grid.Column="0" Width="36" Height="36"
+                                                        Background="{DynamicResource IconBackgroundBrush}"
+                                                        CornerRadius="10">
+                                                    <TextBlock Text="↔" HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize19}"
+                                                               Foreground="#2878D0" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="10,0,0,0"
+                                                            VerticalAlignment="Center" Spacing="2">
+                                                    <TextBlock Text="{DynamicResource Common.NetworkSync}" FontSize="{DynamicResource AppFontSize14}"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                                    <TextBlock Text="{DynamicResource Common.NetworkSyncDescription}" FontSize="{DynamicResource AppFontSize12}"
+                                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+
+                                        </Button>
+
+                                        <Button
+                                            Classes="SettingsMenuItem"
+                                            Click="ProjectToolsButton_OnClick">
+
+                                            <Grid ColumnDefinitions="42,*">
+
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="36"
+                                                    Height="36"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Background="{DynamicResource IconBackgroundBrush}"
+                                                    CornerRadius="10">
+
+                                                    <TextBlock
+                                                        Text="⇅"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        FontSize="{DynamicResource AppFontSize19}"
+                                                        FontWeight="SemiBold"
+                                                        Foreground="#19944D" />
+
+                                                </Border>
+
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Margin="10,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Spacing="2">
+
+                                                    <TextBlock
+                                                        Text="{DynamicResource Common.ProjectStructure}"
+                                                        FontSize="{DynamicResource AppFontSize14}"
+                                                        FontWeight="SemiBold"
+                                                        Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                                    <TextBlock
+                                                        Text="{DynamicResource Common.ProjectStructureDescription}"
+                                                        FontSize="{DynamicResource AppFontSize12}"
+                                                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                                </StackPanel>
+
+                                            </Grid>
+
+                                        </Button>
+
+                                        <Button
+                                            Classes="SettingsMenuItem"
+                                            Click="ResetStatusesButton_OnClick">
+
+                                            <Grid ColumnDefinitions="42,*">
+
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="36"
+                                                    Height="36"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Background="{DynamicResource IconBackgroundBrush}"
+                                                    CornerRadius="10">
+
+                                                    <TextBlock
+                                                        Text="↺"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        FontSize="{DynamicResource AppFontSize20}"
+                                                        FontWeight="SemiBold"
+                                                        Foreground="#19944D" />
+
+                                                </Border>
+
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Margin="10,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Spacing="2">
+
+                                                    <TextBlock
+                                                        Text="{DynamicResource Common.ResetStatuses}"
+                                                        FontSize="{DynamicResource AppFontSize14}"
+                                                        FontWeight="SemiBold"
+                                                        Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                                    <TextBlock
+                                                        Text="{DynamicResource Common.ResetStatusesDescription}"
+                                                        FontSize="{DynamicResource AppFontSize12}"
+                                                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                                </StackPanel>
+
+                                            </Grid>
+
+                                        </Button>
+
+                                        <Button
+                                            Classes="SettingsMenuItem"
+                                            Click="HelpInfoButton_OnClick">
+
+                                            <Grid ColumnDefinitions="42,*">
+
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="36"
+                                                    Height="36"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Background="{DynamicResource IconBackgroundBrush}"
+                                                    CornerRadius="10">
+
+                                                    <TextBlock
+                                                        Text="?"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        FontSize="{DynamicResource AppFontSize19}"
+                                                        FontWeight="Bold"
+                                                        Foreground="#19944D" />
+
+                                                </Border>
+
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Margin="10,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Spacing="2">
+
+                                                    <TextBlock
+                                                        Text="{DynamicResource Common.HelpInfo}"
+                                                        FontSize="{DynamicResource AppFontSize14}"
+                                                        FontWeight="SemiBold"
+                                                        Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                                    <TextBlock
+                                                        Text="{DynamicResource Common.HelpInfoDescription}"
+                                                        FontSize="{DynamicResource AppFontSize12}"
+                                                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                                </StackPanel>
+
+                                            </Grid>
+
+                                        </Button>
+
+                                        <StackPanel
+                                            Name="AdminTestMenuPanel"
+                                            IsVisible="False"
+                                            Spacing="6">
+
+                                            <Border
+                                                Height="1"
+                                                Margin="6,8,6,5"
+                                                Background="{DynamicResource CardBorderBrush}" />
+
+                                            <TextBlock
+                                                Text="{DynamicResource Common.TestMenu}"
+                                                Margin="6,2,6,0"
+                                                FontSize="{DynamicResource AppFontSize12}"
+                                                FontWeight="Bold"
+                                                Foreground="#DC4C56" />
+
+                                            <TextBlock
+                                                Text="{DynamicResource Common.TestMenuDescription}"
+                                                Margin="6,0,6,6"
+                                                FontSize="{DynamicResource AppFontSize12}"
+                                                TextWrapping="Wrap"
+                                                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                            <Button
+                                                Classes="SettingsMenuItem"
+                                                Click="AdminTestMenuButton_OnClick">
+
+                                                <Grid ColumnDefinitions="42,*">
+
+                                                    <Border
+                                                        Grid.Column="0"
+                                                        Width="36"
+                                                        Height="36"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Background="#18DC4C56"
+                                                        CornerRadius="10">
+
+                                                        <TextBlock
+                                                            Text="⚿"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            FontSize="{DynamicResource AppFontSize20}"
+                                                            FontWeight="SemiBold"
+                                                            Foreground="#DC4C56" />
+
+                                                    </Border>
+
+                                                    <StackPanel
+                                                        Grid.Column="1"
+                                                        Margin="10,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        Spacing="2">
+
+                                                        <TextBlock
+                                                            Text="{DynamicResource Common.AccountManagement}"
+                                                            FontSize="{DynamicResource AppFontSize14}"
+                                                            FontWeight="SemiBold"
+                                                            Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                                        <TextBlock
+                                                            Text="{DynamicResource Common.AccountManagementDescription}"
+                                                            FontSize="{DynamicResource AppFontSize12}"
+                                                            Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                                    </StackPanel>
+
+                                                </Grid>
+
+                                            </Button>
+
+                                        </StackPanel>
+
+                                        <Border Height="1" Margin="6,8,6,5"
+                                                Background="{DynamicResource CardBorderBrush}" />
+
+                                        <TextBlock Text="{DynamicResource Common.AccountApplication}"
+                                                   Margin="6,2,6,0"
+                                                   FontSize="{DynamicResource AppFontSize12}" FontWeight="Bold"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                        <Button Classes="SettingsMenuItem"
+                                                Click="LogoutButton_OnClick">
+                                            <Grid ColumnDefinitions="42,*">
+                                                <Border Grid.Column="0" Width="36" Height="36"
+                                                        Background="#18DC4C56" CornerRadius="10">
+                                                    <TextBlock Text="↪" FontSize="{DynamicResource AppFontSize20}"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="#DC4C56" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="10,0,0,0"
+                                                            VerticalAlignment="Center" Spacing="2">
+                                                    <TextBlock Text="{DynamicResource Common.Logout}" FontSize="{DynamicResource AppFontSize14}"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                                    <TextBlock Text="{DynamicResource Common.LogoutDescription}" FontSize="{DynamicResource AppFontSize12}"
+                                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+
+                                    </StackPanel>
+
+                                </Border>
+
+                            </Flyout>
+                        </Button.Flyout>
+
+                    </Button>
+
+                </StackPanel>
+
+            </Grid>
+
+        </Border>
+
+        <!-- GŁÓWNA CZĘŚĆ -->
+
+        <Grid Name="ExplorerBodyGrid" Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="330" MinWidth="300" MaxWidth="560" />
+                <ColumnDefinition Width="24" />
+                <ColumnDefinition Width="*" MinWidth="560" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LEWY PANEL -->
+
+            <Border
+                Name="TestTreePanelBorder"
+                Grid.Column="0"
+                Margin="18,18,9,18"
+                Padding="14,16,5,16"
+                Background="{DynamicResource CardBackgroundBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="18">
+
+                <Grid RowDefinitions="Auto,Auto,*">
+
+                    <TextBlock
+                        Name="TestTreeTitleTextBlock"
+                        Grid.Row="0"
+                        Text="{DynamicResource Explorer.TestsAndCases}"
+                        Margin="4,0,0,8"
+                        FontSize="{DynamicResource AppFontSize13}"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                    <TextBox
+                        Name="TestTreeSearchTextBox"
+                        Grid.Row="1"
+                        Margin="0,0,10,10"
+                        PlaceholderText="{DynamicResource Explorer.SearchCase}"
+                        TextChanged="TestTreeSearchTextBox_OnTextChanged" />
+
+                    <ScrollViewer
+                        Name="TestTreeScrollViewer"
+                        Grid.Row="2"
+                        Margin="0"
+                        Padding="0,0,10,14"
+                        HorizontalScrollBarVisibility="Hidden"
+                        VerticalScrollBarVisibility="Auto">
+
+                        <TreeView
+                            Name="TestTreeView"
+                            MinWidth="190"
+                            HorizontalAlignment="Stretch"
+                            Margin="0,0,8,8" />
+
+                    </ScrollViewer>
+
+                </Grid>
+
+            </Border>
+
+            <GridSplitter
+                Name="TestTreeGridSplitter"
+                Grid.Column="1"
+                Width="2"
+                HorizontalAlignment="Center"
+                ResizeDirection="Columns"
+                ResizeBehavior="PreviousAndNext"
+                Background="{DynamicResource PanelSplitterBrush}" />
+
+            <StackPanel
+                Grid.Column="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsVisible="False"
+                Spacing="0">
+
+                <Button
+                    Name="ToggleCompactTestTreePanelButton"
+                    Classes="PanelToggleButton"
+                    Content="‹"
+                    ToolTip.Tip="{DynamicResource Explorer.ToggleCompactPanel}"
+                    Click="ToggleCompactTestTreePanelButton_OnClick" />
+
+                <Button
+                    Name="CollapseTestTreePanelButton"
+                    Classes="PanelToggleButton"
+                    Content="≪"
+                    ToolTip.Tip="{DynamicResource Explorer.HideTestPanel}"
+                    Click="CollapseTestTreePanelButton_OnClick" />
+
+            </StackPanel>
+
+            <!-- PRAWA STRONA -->
+
+            <Border
+                Grid.Column="2"
+                Margin="9,18,18,18"
+                Padding="26"
+                Background="{DynamicResource CardBackgroundBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="18">
+
+                <Grid
+                    Name="ContentAreaGrid"
+                    Background="Transparent">
+
+                    <!-- EKRAN POWITALNY -->
+
+                    <StackPanel
+                        Name="WelcomePanel"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12">
+
+                        <Border
+                            Width="72"
+                            Height="72"
+                            Background="{DynamicResource IconBackgroundBrush}"
+                            CornerRadius="22">
+
+                            <TextBlock
+                                Text="✓"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="{DynamicResource AppFontSize34}"
+                                FontWeight="Bold"
+                                Foreground="#28C76F" />
+
+                        </Border>
+
+                        <TextBlock
+                            Name="WelcomeTitleTextBlock"
+                            Text="{DynamicResource Explorer.SelectTestType}"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center"
+                            FontSize="{DynamicResource AppFontSize24}"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                        <TextBlock
+                            Name="WelcomeDescriptionTextBlock"
+                            Text="{DynamicResource Explorer.SelectTestTypeDescription}"
+                            MaxWidth="620"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap"
+                            FontSize="{DynamicResource AppFontSize14}"
+                            Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                    </StackPanel>
+
+                    <Button
+                        Name="EmptyFolderBackButton"
+                        Classes="NavigationButton PreviousButton"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Content="{DynamicResource Explorer.Back}"
+                        IsVisible="False"
+                        Click="EmptyFolderBackButton_OnClick" />
+
+                    <!-- PANEL WYKONYWANIA TESTÓW -->
+
+                    <Grid
+                        Name="TestExecutionPanel"
+                        IsVisible="False"
+                        RowDefinitions="Auto,Auto,*,Auto">
+
+                        <!-- NAGŁÓWEK SEKCJI -->
+
+                        <Grid
+                            Grid.Row="0"
+                            Margin="0,0,0,18"
+                            ColumnDefinitions="*,Auto">
+
+                            <StackPanel Grid.Column="0" Spacing="4">
+
+                                <TextBlock
+                                    Name="CurrentSectionTitleTextBlock"
+                                    Text="Sprzedaż"
+                                    FontSize="{DynamicResource AppFontSize28}"
+                                    FontWeight="Bold"
+                                    TextWrapping="Wrap"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                <TextBlock
+                                    Name="CurrentSectionPathTextBlock"
+                                    Text="Testy regresji / GUI"
+                                    FontSize="{DynamicResource AppFontSize13}"
+                                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                <Button
+                                    Name="AddCollectionDescriptionButton"
+                                    Classes="CollectionDescriptionAction"
+                                    Content="{DynamicResource Explorer.AddDescription}"
+                                    Click="CollectionDescriptionButton_OnClick" />
+
+                                <Grid
+                                    Name="CollectionDescriptionPanel"
+                                    MaxWidth="760"
+                                    HorizontalAlignment="Left"
+                                    ColumnDefinitions="*,Auto"
+                                    IsVisible="False">
+
+                                    <TextBlock
+                                        Name="CurrentCollectionDescriptionTextBlock"
+                                        Grid.Column="0"
+                                        MaxLines="2"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="Wrap"
+                                        FontSize="{DynamicResource AppFontSize12}"
+                                        LineHeight="17"
+                                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                    <Button
+                                        Name="EditCollectionDescriptionButton"
+                                        Grid.Column="1"
+                                        Classes="CollectionDescriptionEdit"
+                                        Margin="6,0,0,0"
+                                        ToolTip.Tip="{DynamicResource Explorer.EditDescription}"
+                                        Content="✎"
+                                        Click="CollectionDescriptionButton_OnClick" />
+
+                                </Grid>
+
+                            </StackPanel>
+
+                            <TextBlock
+                                Name="CurrentSectionProgressTextBlock"
+                                Grid.Column="1"
+                                Text="0 / 5"
+                                Margin="18,0,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="{DynamicResource AppFontSize18}"
+                                FontWeight="Bold"
+                                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                        </Grid>
+
+                        <!-- PODSUMOWANIE CAŁEJ SESJI -->
+
+                        <Grid
+                            Grid.Row="1"
+                            Margin="0,0,0,20"
+                            ColumnDefinitions="*,*,*,*,*,*">
+
+                            <Border
+                                Grid.Column="0"
+                                Margin="0,0,5,0"
+                                Padding="12"
+                                CornerRadius="11"
+                                Background="#E8F7ED">
+
+                                <StackPanel>
+                                    <TextBlock
+                                        Name="SuccessCountTextBlock"
+                                        Text="0"
+                                        FontSize="{DynamicResource AppFontSize20}"
+                                        FontWeight="Bold"
+                                        Foreground="#18894A" />
+
+                                    <TextBlock
+                                        Text="{DynamicResource Status.Success}"
+                                        FontSize="{DynamicResource AppFontSize11}"
+                                        Foreground="#18894A" />
+                                </StackPanel>
+
+                            </Border>
+
+                            <Border
+                                Grid.Column="1"
+                                Margin="5,0"
+                                Padding="12"
+                                CornerRadius="11"
+                                Background="#E8F2FF">
+
+                                <StackPanel>
+                                    <TextBlock
+                                        Name="InProgressCountTextBlock"
+                                        Text="0"
+                                        FontSize="{DynamicResource AppFontSize20}"
+                                        FontWeight="Bold"
+                                        Foreground="#2878D0" />
+
+                                    <TextBlock
+                                        Text="{DynamicResource Status.InProgress}"
+                                        FontSize="{DynamicResource AppFontSize11}"
+                                        Foreground="#2878D0" />
+                                </StackPanel>
+
+                            </Border>
+
+                            <Border
+                                Grid.Column="2"
+                                Margin="5,0"
+                                Padding="12"
+                                CornerRadius="11"
+                                Background="#FDEBEC">
+
+                                <StackPanel>
+                                    <TextBlock
+                                        Name="FailedCountTextBlock"
+                                        Text="0"
+                                        FontSize="{DynamicResource AppFontSize20}"
+                                        FontWeight="Bold"
+                                        Foreground="#C43D45" />
+
+                                    <TextBlock
+                                        Text="{DynamicResource Status.Failed}"
+                                        FontSize="{DynamicResource AppFontSize11}"
+                                        Foreground="#C43D45" />
+                                </StackPanel>
+
+                            </Border>
+
+                            <Border
+                                Grid.Column="3"
+                                Margin="5,0"
+                                Padding="12"
+                                CornerRadius="11"
+                                Background="#FFF7D8">
+
+                                <StackPanel>
+                                    <TextBlock
+                                        Name="NaCountTextBlock"
+                                        Text="0"
+                                        FontSize="{DynamicResource AppFontSize20}"
+                                        FontWeight="Bold"
+                                        Foreground="#A67C00" />
+
+                                    <TextBlock
+                                        Text="{DynamicResource Status.NotApplicable}"
+                                        FontSize="{DynamicResource AppFontSize11}"
+                                        Foreground="#A67C00" />
+                                </StackPanel>
+
+                            </Border>
+
+                            <Border
+                                Grid.Column="4"
+                                Margin="5,0"
+                                Padding="12"
+                                CornerRadius="11"
+                                Background="#FFF0DE">
+
+                                <StackPanel>
+                                    <TextBlock
+                                        Name="BlockedCountTextBlock"
+                                        Text="0"
+                                        FontSize="{DynamicResource AppFontSize20}"
+                                        FontWeight="Bold"
+                                        Foreground="#B86816" />
+
+                                    <TextBlock
+                                        Text="{DynamicResource Status.Blocked}"
+                                        FontSize="{DynamicResource AppFontSize11}"
+                                        Foreground="#B86816" />
+                                </StackPanel>
+
+                            </Border>
+
+                            <Border
+                                Grid.Column="5"
+                                Margin="5,0,0,0"
+                                Padding="12"
+                                CornerRadius="11"
+                                Background="{DynamicResource IconBackgroundBrush}">
+
+                                <StackPanel>
+                                    <TextBlock
+                                        Name="RemainingCountTextBlock"
+                                        Text="0"
+                                        FontSize="{DynamicResource AppFontSize20}"
+                                        FontWeight="Bold"
+                                        Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                    <TextBlock
+                                        Name="RemainingLabelTextBlock"
+                                        Text="{DynamicResource Explorer.Remaining}"
+                                        FontSize="{DynamicResource AppFontSize11}"
+                                        Foreground="{DynamicResource SecondaryTextBrush}" />
+                                </StackPanel>
+
+                            </Border>
+
+                        </Grid>
+
+                        <!-- DYNAMICZNE PRZYPADKI -->
+
+                        <ScrollViewer
+                            Name="TestCasesScrollViewer"
+                            Grid.Row="2"
+                            Padding="0,0,12,0">
+
+                            <StackPanel
+                                Name="TestCasesStackPanel"
+                                Margin="0,0,8,0" />
+
+                        </ScrollViewer>
+
+                        <!-- WSTECZ / DALEJ -->
+
+                        <Grid
+                            Grid.Row="3"
+                            Margin="0,18,0,0"
+                            ColumnDefinitions="Auto,*,Auto,Auto">
+
+                            <Button
+                                Name="FinishEarlyButton"
+                                Grid.Column="0"
+                                Classes="NavigationButton PreviousButton"
+                                MinWidth="210"
+                                Margin="0,0,10,0"
+                                Content="{DynamicResource Explorer.FinishAndReport}"
+                                ToolTip.Tip="{DynamicResource Explorer.FinishAndReportTip}"
+                                Click="FinishEarlyButton_OnClick" />
+
+                            <Button
+                                Name="PreviousSectionButton"
+                                Grid.Column="2"
+                                Classes="NavigationButton PreviousButton"
+                                Margin="0,0,10,0"
+                                Content="{DynamicResource Explorer.Back}"
+                                Click="PreviousSectionButton_OnClick" />
+
+                            <Button
+                                Name="NextSectionButton"
+                                Grid.Column="3"
+                                Classes="NavigationButton NextButton"
+                                Content="{DynamicResource Explorer.Next}"
+                                Click="NextSectionButton_OnClick" />
+
+                        </Grid>
+
+                    </Grid>
+
+                    <!-- PODSUMOWANIE TESTÓW -->
+
+                    <Grid
+                        Name="SummaryPanel"
+                        IsVisible="False"
+                        RowDefinitions="Auto,*,Auto">
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Text="{DynamicResource Explorer.TestsSummary}"
+                            FontSize="{DynamicResource AppFontSize28}"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                        <ScrollViewer
+                            Grid.Row="1"
+                            Margin="0,18,0,0"
+                            VerticalScrollBarVisibility="Auto">
+
+                            <StackPanel
+                                MaxWidth="980"
+                                HorizontalAlignment="Center"
+                                Spacing="0">
+
+                                <Border
+                                    Width="72"
+                                    Height="72"
+                                    HorizontalAlignment="Center"
+                                    Background="#2428C76F"
+                                    CornerRadius="22">
+
+                                    <TextBlock
+                                        Text="✓"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="{DynamicResource AppFontSize34}"
+                                        FontWeight="Bold"
+                                        Foreground="#28C76F" />
+
+                                </Border>
+
+                                <TextBlock
+                                    Name="SummaryCompletedTitleTextBlock"
+                                    Margin="0,14,0,0"
+                                    Text="{DynamicResource Explorer.RegressionCompleted}"
+                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
+                                    FontSize="{DynamicResource AppFontSize26}"
+                                    FontWeight="Bold"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                <Grid
+                                    Margin="0,34,0,0"
+                                    ColumnDefinitions="*,*,*,*,*,*">
+
+                                    <Border Grid.Column="0" Margin="0,0,5,0" Padding="12" CornerRadius="11" Background="#E8F7ED">
+                                        <StackPanel>
+                                            <TextBlock Name="SummarySuccessCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#18894A" />
+                                            <TextBlock Text="{DynamicResource Status.Success}" FontSize="{DynamicResource AppFontSize11}" Foreground="#18894A" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="1" Margin="5,0" Padding="12" CornerRadius="11" Background="#E8F2FF">
+                                        <StackPanel>
+                                            <TextBlock Name="SummaryInProgressCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#2878D0" />
+                                            <TextBlock Text="{DynamicResource Status.InProgress}" FontSize="{DynamicResource AppFontSize11}" Foreground="#2878D0" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="2" Margin="5,0" Padding="12" CornerRadius="11" Background="#FDEBEC">
+                                        <StackPanel>
+                                            <TextBlock Name="SummaryFailedCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#C43D45" />
+                                            <TextBlock Text="{DynamicResource Status.Failed}" FontSize="{DynamicResource AppFontSize11}" Foreground="#C43D45" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="3" Margin="5,0" Padding="12" CornerRadius="11" Background="#FFF7D8">
+                                        <StackPanel>
+                                            <TextBlock Name="SummaryNaCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#A67C00" />
+                                            <TextBlock Text="{DynamicResource Status.NotApplicable}" FontSize="{DynamicResource AppFontSize11}" Foreground="#A67C00" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="4" Margin="5,0" Padding="12" CornerRadius="11" Background="#FFF0DE">
+                                        <StackPanel>
+                                            <TextBlock Name="SummaryBlockedCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#B86816" />
+                                            <TextBlock Text="{DynamicResource Status.Blocked}" FontSize="{DynamicResource AppFontSize11}" Foreground="#B86816" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="5" Margin="5,0,0,0" Padding="12" CornerRadius="11" Background="{DynamicResource IconBackgroundBrush}">
+                                        <StackPanel>
+                                            <TextBlock Name="SummaryRemainingCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                                            <TextBlock Text="{DynamicResource Explorer.Remaining}" FontSize="{DynamicResource AppFontSize11}" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        </StackPanel>
+                                    </Border>
+
+                                </Grid>
+
+                                <Border
+                                    Height="1"
+                                    Margin="40,32,40,0"
+                                    Background="{DynamicResource CardBorderBrush}" />
+
+                                <TextBlock
+                                    Margin="0,30,0,0"
+                                    Text="{DynamicResource Explorer.ResultsSaved}"
+                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
+                                    FontSize="{DynamicResource AppFontSize15}"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    Text="{DynamicResource Explorer.ContinueOrDownload}"
+                                    MaxWidth="760"
+                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap"
+                                    FontSize="{DynamicResource AppFontSize14}"
+                                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                <StackPanel
+                                    Name="SummaryNextTypePanel"
+                                    Margin="0,38,0,0"
+                                    HorizontalAlignment="Center"
+                                    Spacing="7">
+
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Spacing="4">
+
+                                        <TextBlock
+                                            Text="{DynamicResource Explorer.NextTest}"
+                                            FontSize="{DynamicResource AppFontSize14}"
+                                            Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                        <TextBlock
+                                            Name="SummaryNextTypeNameTextBlock"
+                                            Text="{DynamicResource Explorer.FunctionalTests}"
+                                            FontSize="{DynamicResource AppFontSize14}"
+                                            FontWeight="Bold"
+                                            Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                    </StackPanel>
+
+                                    <TextBlock
+                                        Name="SummaryNextTypeCaseCountTextBlock"
+                                        Text="{DynamicResource Explorer.CasesToExecute}"
+                                        HorizontalAlignment="Center"
+                                        FontSize="{DynamicResource AppFontSize13}"
+                                        Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                </StackPanel>
+
+                                <TextBlock
+                                    Name="SummaryAllDoneTextBlock"
+                                    IsVisible="False"
+                                    Margin="0,38,0,0"
+                                    Text="{DynamicResource Explorer.AllCompleted}"
+                                    MaxWidth="700"
+                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap"
+                                    FontSize="{DynamicResource AppFontSize15}"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                            </StackPanel>
+
+                        </ScrollViewer>
+
+                        <Grid
+                            Grid.Row="2"
+                            Margin="0,24,0,0"
+                            ColumnDefinitions="Auto,*,Auto,Auto">
+
+                            <Button
+                                Name="DownloadReportButton"
+                                Grid.Column="0"
+                                Classes="NavigationButton PreviousButton"
+                                Content="{DynamicResource Explorer.DownloadReport}"
+                                Click="DownloadReportButton_OnClick" />
+
+                            <Button
+                                Name="SummaryBackButton"
+                                Grid.Column="2"
+                                Classes="NavigationButton PreviousButton"
+                                Margin="0,0,10,0"
+                                Content="{DynamicResource Explorer.Back}"
+                                Click="SummaryBackButton_OnClick" />
+
+                            <Button
+                                Name="SummaryContinueButton"
+                                Grid.Column="3"
+                                Classes="NavigationButton NextButton"
+                                MinWidth="270"
+                                Content="{DynamicResource Explorer.FinishAndContinue}"
+                                Click="SummaryContinueButton_OnClick" />
+
+                        </Grid>
+
+                        <Border
+                            Name="CompletionCelebrationOverlay"
+                            Grid.RowSpan="3"
+                            IsVisible="False"
+                            Opacity="0"
+                            ZIndex="20"
+                            Background="#CC000000"
+                            CornerRadius="18">
+
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Spacing="12">
+
+                                <TextBlock
+                                    Text="✦  ✧  ✦  •  ✦  ✧  ✦"
+                                    HorizontalAlignment="Center"
+                                    FontSize="{DynamicResource AppFontSize34}"
+                                    FontWeight="Bold"
+                                    Foreground="#28C76F" />
+
+                                <TextBlock
+                                    Text="{DynamicResource Explorer.TestsCompleted}"
+                                    HorizontalAlignment="Center"
+                                    FontSize="{DynamicResource AppFontSize24}"
+                                    FontWeight="Bold"
+                                    Foreground="White" />
+
+                            </StackPanel>
+
+                        </Border>
+
+                    </Grid>
+
+                </Grid>
+
+            </Border>
+
+        </Grid>
+
+        <!-- STOPKA -->
+
+        <Border
+            Grid.Row="2"
+            Padding="18,0"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="0,1,0,0">
+
+            <Grid>
+
+                <TextBlock
+                    Text="{DynamicResource Common.Ready}"
+                    VerticalAlignment="Center"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <TextBlock
+                    Text="QA Manager • v0.2 • © 2026 Eryk Potocki"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="{DynamicResource AppFontSize11}"
+                    Foreground="{DynamicResource FooterTextBrush}" />
+
+            </Grid>
+
+        </Border>
+
+    </Grid>
+
+</UserControl>

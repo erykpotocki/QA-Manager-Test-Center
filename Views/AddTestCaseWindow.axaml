@@ -1,0 +1,84 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.AddTestCaseWindow"
+    Title="Dodaj przypadek testowy"
+    Width="520"
+    Height="330"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Border
+        Margin="20"
+        Padding="26"
+        Background="{DynamicResource CardBackgroundBrush}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="20">
+
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+
+            <TextBlock
+                Grid.Row="0"
+                Text="Dodaj przypadek testowy"
+                FontSize="{DynamicResource AppFontSize24}"
+                FontWeight="Bold"
+                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+            <TextBlock
+                Grid.Row="1"
+                Margin="0,6,0,22"
+                Text="Nowy przypadek zostanie zapisany lokalnie."
+                FontSize="{DynamicResource AppFontSize13}"
+                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <TextBlock
+                Grid.Row="2"
+                Margin="0,0,0,6"
+                Text="NAZWA PRZYPADKU"
+                FontSize="{DynamicResource AppFontSize12}"
+                FontWeight="SemiBold"
+                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <TextBox
+                Name="TestCaseNameTextBox"
+                Grid.Row="3"
+                Height="42"
+                Padding="12,7"
+                FontSize="{DynamicResource AppFontSize15}"
+                CornerRadius="10"
+                PlaceholderText="Np. Sprzedaż po utracie połączenia"
+                Background="{DynamicResource InputBackgroundBrush}"
+                Foreground="{DynamicResource PrimaryTextBrush}"
+                BorderBrush="{DynamicResource InputBorderBrush}" />
+
+            <Grid
+                Grid.Row="4"
+                Margin="0,24,0,0"
+                ColumnDefinitions="*,Auto,Auto">
+
+                <Button
+                    Grid.Column="1"
+                    Width="110"
+                    Height="42"
+                    Margin="0,0,10,0"
+                    Content="ANULUJ"
+                    Click="CancelButton_OnClick" />
+
+                <Button
+                    Grid.Column="2"
+                    Width="110"
+                    Height="42"
+                    Content="DODAJ"
+                    Background="{DynamicResource AccentPrimaryBrush}"
+                    Foreground="White"
+                    Click="AddButton_OnClick" />
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
+
+</Window>

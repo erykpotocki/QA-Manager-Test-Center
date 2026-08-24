@@ -1,0 +1,132 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.ConfirmLogoutWindow"
+    Title="{DynamicResource Logout.WindowTitle}"
+    Width="540"
+    Height="350"
+    MinWidth="500"
+    MinHeight="320"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Styles>
+
+        <Style Selector="Button.DialogButton">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="MinWidth" Value="132" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Secondary">
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Secondary:pointerover">
+            <Setter Property="Background"
+                    Value="{DynamicResource HoverItemBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputHoverBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Primary">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Primary:pointerover">
+            <Setter Property="Background" Value="#3AD47A" />
+            <Setter Property="BorderBrush" Value="#3AD47A" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Primary:pressed">
+            <Setter Property="Background" Value="#169B50" />
+            <Setter Property="BorderBrush" Value="#169B50" />
+        </Style>
+
+    </Window.Styles>
+
+    <Border
+        Margin="20"
+        Padding="28"
+        Background="{DynamicResource CardBackgroundBrush}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="22">
+
+        <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+            <Border
+                Grid.Row="0"
+                Width="56"
+                Height="56"
+                HorizontalAlignment="Left"
+                Background="{DynamicResource IconBackgroundBrush}"
+                CornerRadius="16">
+
+                <TextBlock
+                    Text="↪"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="{DynamicResource AppFontSize25}"
+                    FontWeight="SemiBold"
+                    Foreground="#19944D" />
+
+            </Border>
+
+            <TextBlock
+                Grid.Row="1"
+                Margin="0,18,0,8"
+                Text="{DynamicResource Logout.Question}"
+                FontSize="{DynamicResource AppFontSize23}"
+                FontWeight="Bold"
+                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+            <TextBlock
+                Name="MessageTextBlock"
+                Grid.Row="2"
+                TextWrapping="Wrap"
+                FontSize="{DynamicResource AppFontSize14}"
+                LineHeight="21"
+                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <Grid
+                Grid.Row="3"
+                Margin="0,24,0,0"
+                ColumnDefinitions="*,Auto,Auto">
+
+                <Button
+                    Grid.Column="1"
+                    Classes="DialogButton Secondary"
+                    Margin="0,0,10,0"
+                    Content="{DynamicResource Common.Cancel}"
+                    Click="CancelButton_OnClick" />
+
+                <Button
+                    Grid.Column="2"
+                    Classes="DialogButton Primary"
+                    Content="{DynamicResource Logout.Button}"
+                    Click="LogoutButton_OnClick" />
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
+
+</Window>

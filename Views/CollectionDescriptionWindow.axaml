@@ -1,0 +1,126 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.CollectionDescriptionWindow"
+    Title="Opis zbioru przypadków"
+    Width="580"
+    Height="390"
+    MinWidth="540"
+    MinHeight="360"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Styles>
+
+        <Style Selector="Button.DialogButton">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="MinWidth" Value="125" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Secondary">
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Primary">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+    </Window.Styles>
+
+    <Border
+        Margin="20"
+        Padding="28"
+        Background="{DynamicResource CardBackgroundBrush}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="22">
+
+        <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+            <TextBlock
+                Grid.Row="0"
+                Text="Krótki opis zbioru"
+                FontSize="{DynamicResource AppFontSize25}"
+                FontWeight="Bold"
+                Foreground="{DynamicResource PrimaryTextBrush}" />
+
+            <TextBlock
+                Grid.Row="1"
+                Margin="0,6,0,18"
+                Text="Dodaj pomocny kontekst dla testera. Opis może pozostać pusty."
+                FontSize="{DynamicResource AppFontSize14}"
+                Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <TextBox
+                Name="DescriptionTextBox"
+                Grid.Row="2"
+                MinHeight="120"
+                MaxLength="180"
+                AcceptsReturn="True"
+                TextWrapping="Wrap"
+                VerticalContentAlignment="Top"
+                Padding="14,12"
+                FontSize="{DynamicResource AppFontSize14}"
+                CornerRadius="11"
+                TextChanged="DescriptionTextBox_OnTextChanged" />
+
+            <Grid
+                Grid.Row="3"
+                Margin="0,8,0,0"
+                ColumnDefinitions="*,Auto">
+
+                <TextBlock
+                    Grid.Column="0"
+                    Text="Ctrl+Enter zapisuje opis"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <TextBlock
+                    Name="CharacterCountTextBlock"
+                    Grid.Column="1"
+                    Text="0/180"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            </Grid>
+
+            <Grid
+                Grid.Row="4"
+                Margin="0,22,0,0"
+                ColumnDefinitions="*,Auto,Auto">
+
+                <Button
+                    Grid.Column="1"
+                    Classes="DialogButton Secondary"
+                    Margin="0,0,10,0"
+                    Content="ANULUJ"
+                    Click="CancelButton_OnClick" />
+
+                <Button
+                    Grid.Column="2"
+                    Classes="DialogButton Primary"
+                    Content="ZAPISZ"
+                    Click="SaveButton_OnClick" />
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
+
+</Window>

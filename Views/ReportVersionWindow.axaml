@@ -1,0 +1,211 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.ReportVersionWindow"
+    Title="Generowanie raportu"
+    Width="620"
+    Height="755"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter
+                Property="Background"
+                Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter
+                Property="Foreground"
+                Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputBorderBrush}" />
+        </Style>
+
+        <Style Selector="ComboBox">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter
+                Property="Background"
+                Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter
+                Property="Foreground"
+                Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.DialogButton">
+            <Setter Property="Height" Value="42" />
+            <Setter Property="MinWidth" Value="118" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Primary">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Secondary">
+            <Setter
+                Property="Background"
+                Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter
+                Property="Foreground"
+                Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.DialogButton.Secondary:pointerover">
+            <Setter
+                Property="Background"
+                Value="{DynamicResource HoverItemBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource InputHoverBorderBrush}" />
+        </Style>
+    </Window.Styles>
+
+    <Border
+        Margin="20"
+        Padding="28"
+        Background="{DynamicResource CardBackgroundBrush}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="22">
+
+        <Grid RowDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Row="0" Spacing="6">
+                <TextBlock
+                    Text="Przygotuj raport"
+                    FontSize="{DynamicResource AppFontSize24}"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                <TextBlock
+                    Name="DescriptionTextBlock"
+                    Text="Podaj wersję aplikacji i sprawdź miejsce zapisu raportu."
+                    TextWrapping="Wrap"
+                    FontSize="{DynamicResource AppFontSize14}"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+            </StackPanel>
+
+            <StackPanel
+                Grid.Row="1"
+                Margin="0,22,0,16"
+                Spacing="6">
+
+                <TextBlock
+                    Text="NAZWA PLIKU"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <TextBox
+                    Name="FileNameTextBox"
+                    GotFocus="FileNameTextBox_OnGotFocus" />
+
+                <TextBlock
+                    Text="WERSJA"
+                    Margin="0,14,0,0"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <TextBox
+                    Name="VersionTextBox"
+                    PlaceholderText="np. 1.2.1.1" />
+
+                <TextBlock
+                    Text="FORMAT RAPORTU"
+                    Margin="0,14,0,0"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <ComboBox
+                    Name="ReportFormatComboBox"
+                    SelectedIndex="0">
+                    <ComboBoxItem Content="PDF - czytelny raport dla odbiorcy" />
+                    <ComboBoxItem Content="Excel - arkusz z podsumowaniem i filtrami" />
+                    <ComboBoxItem Content="JSON - dane techniczne" />
+                </ComboBox>
+
+                <TextBlock
+                    Text="ZAKRES RAPORTU"
+                    Margin="0,14,0,0"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <ComboBox
+                    Name="ReportScopeComboBox"
+                    SelectedIndex="0">
+                    <ComboBoxItem Content="Pełny zakres - uwzględnij także niewykonane" />
+                    <ComboBoxItem Content="Tylko przypadki ze zmienionym statusem" />
+                </ComboBox>
+
+                <TextBlock
+                    Text="MIEJSCE ZAPISU"
+                    Margin="0,14,0,0"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <TextBox
+                        Name="DestinationPathTextBox"
+                        Grid.Column="0"
+                        IsReadOnly="True"
+                        FontSize="{DynamicResource AppFontSize13}" />
+
+                    <Button
+                        Grid.Column="1"
+                        Classes="DialogButton Secondary"
+                        Content="WYBIERZ MIEJSCE"
+                        Click="BrowseButton_OnClick" />
+                </Grid>
+
+                <TextBlock
+                    Name="ErrorTextBlock"
+                    Margin="0,4,0,0"
+                    FontSize="{DynamicResource AppFontSize12}"
+                    Foreground="#D13C3C"
+                    IsVisible="False" />
+            </StackPanel>
+
+            <StackPanel
+                Grid.Row="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Spacing="10">
+
+                <Button
+                    Classes="DialogButton"
+                    Content="ANULUJ"
+                    Click="CancelButton_OnClick" />
+
+                <Button
+                    Classes="DialogButton Primary"
+                    Content="GENERUJ RAPORT"
+                    Click="GenerateButton_OnClick" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

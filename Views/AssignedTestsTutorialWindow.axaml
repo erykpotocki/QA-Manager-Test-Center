@@ -1,0 +1,82 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.AssignedTestsTutorialWindow"
+    Title="Jak wykonywać przypisane testy"
+    Width="570" Height="430" MinWidth="540" MinHeight="410"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+    <Window.Styles>
+        <Style Selector="Button.TutorialPrimary">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Width" Value="140" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.TutorialSecondary">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Width" Value="140" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+        </Style>
+    </Window.Styles>
+    <Border Margin="20" Padding="28"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="1" CornerRadius="22">
+        <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+            <Border Grid.Row="0" Width="60" Height="60"
+                    HorizontalAlignment="Left" Background="#2428C76F"
+                    CornerRadius="18">
+                <TextBlock Text="✓" HorizontalAlignment="Center"
+                           VerticalAlignment="Center" FontSize="30"
+                           FontWeight="Bold" Foreground="#19944D" />
+            </Border>
+            <TextBlock Name="TutorialTitleTextBlock" Grid.Row="1"
+                       Margin="0,18,0,10" TextWrapping="Wrap"
+                       FontSize="23" FontWeight="Bold"
+                       Foreground="{DynamicResource PrimaryTextBrush}" />
+            <TextBlock Name="TutorialMessageTextBlock" Grid.Row="2"
+                       TextWrapping="Wrap" FontSize="15" LineHeight="23"
+                       Foreground="{DynamicResource SecondaryTextBrush}" />
+            <StackPanel Grid.Row="3" Margin="0,12"
+                        Orientation="Horizontal" HorizontalAlignment="Center"
+                        Spacing="8">
+                <Border Name="TutorialDot0" Height="8" CornerRadius="4" />
+                <Border Name="TutorialDot1" Height="8" CornerRadius="4" />
+                <Border Name="TutorialDot2" Height="8" CornerRadius="4" />
+                <Border Name="TutorialDot3" Height="8" CornerRadius="4" />
+            </StackPanel>
+            <Grid Grid.Row="4" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                <CheckBox Name="DontShowAgainCheckBox"
+                          Content="Nie pokazuj ponownie"
+                          MinHeight="44"
+                          VerticalAlignment="Center"
+                          VerticalContentAlignment="Center"
+                          FontSize="14"
+                          FontWeight="SemiBold"
+                          Foreground="{DynamicResource SecondaryTextBrush}" />
+                <Button Grid.Column="1" Classes="TutorialSecondary" Content="POMIŃ"
+                        Click="SkipButton_OnClick" />
+                <Button Name="NextButton" Grid.Column="2"
+                        Classes="TutorialPrimary" Content="DALEJ"
+                        Click="NextButton_OnClick" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

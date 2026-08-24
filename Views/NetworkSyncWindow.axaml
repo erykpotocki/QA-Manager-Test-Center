@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="QARegressionManager.Views.NetworkSyncWindow"
+        Title="{DynamicResource Network.Title}"
+        Width="680" Height="650"
+        MinWidth="620" MinHeight="580"
+        WindowStartupLocation="CenterOwner">
+    <Border Margin="20" Padding="26"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="1" CornerRadius="20">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="14">
+            <StackPanel Grid.Row="0" Spacing="5">
+                <TextBlock Text="{DynamicResource Network.Title}"
+                           FontSize="{DynamicResource AppFontSize27}" FontWeight="Bold" />
+                <TextBlock Text="{DynamicResource Network.Description}"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource SecondaryTextBrush}" />
+            </StackPanel>
+
+            <Border Grid.Row="1" Padding="14" CornerRadius="12"
+                    Background="{DynamicResource IconBackgroundBrush}">
+                <StackPanel Spacing="4">
+                    <TextBlock Name="CurrentModeTextBlock" FontWeight="Bold" />
+                    <TextBlock Name="CurrentAddressTextBlock" TextWrapping="Wrap"
+                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="2" Name="HostConfigurationBorder" Padding="16" CornerRadius="14"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="{DynamicResource Network.ThisComputerHost}" FontWeight="Bold" />
+                    <TextBlock Text="{DynamicResource Network.HostDescription}"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <Button Name="ConfigureHostButton" Content="{DynamicResource Network.CreateHost}"
+                            HorizontalAlignment="Left" Padding="18,11"
+                            Click="ConfigureHostButton_OnClick" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="3" Padding="16" CornerRadius="14"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="{DynamicResource Network.ConnectComputer}" FontWeight="Bold" />
+                    <TextBlock Text="{DynamicResource Network.ClientDescription}"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <Button Name="ConfigureClientButton" Content="{DynamicResource Network.SelectConnectionFile}"
+                            HorizontalAlignment="Left" Padding="18,11"
+                            Click="ConfigureClientButton_OnClick" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock Grid.Row="4" Name="ResultTextBlock" Margin="2,2,2,0"
+                       TextWrapping="Wrap" VerticalAlignment="Top"
+                       Foreground="#19944D" />
+
+            <Grid Grid.Row="5" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Button Grid.Column="0" Name="LocalModeButton" Content="{DynamicResource Network.LocalMode}" Padding="18,11"
+                        Click="LocalModeButton_OnClick" />
+                <Button Grid.Column="2" Content="{DynamicResource Common.Close}" Padding="22,11"
+                        Background="#25C875" Foreground="White"
+                        Click="CloseButton_OnClick" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

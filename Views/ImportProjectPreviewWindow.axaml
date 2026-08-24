@@ -1,0 +1,43 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QARegressionManager.Views.ImportProjectPreviewWindow"
+    Title="{DynamicResource ProjectTools.Import}"
+    Width="560" Height="500" CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Background="{DynamicResource AppBackgroundBrush}">
+
+    <Border Margin="20" Padding="26"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="1" CornerRadius="20">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+            <TextBlock Grid.Row="0" Text="{DynamicResource ProjectTools.Import}" FontSize="{DynamicResource AppFontSize24}" FontWeight="Bold"
+                       Foreground="{DynamicResource PrimaryTextBrush}" />
+
+            <Grid Grid.Row="1" Margin="0,22,0,0" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,18,10" Text="{DynamicResource ProjectTools.ProjectLabel}" Foreground="{DynamicResource SecondaryTextBrush}" />
+                <TextBlock Name="ProjectNameTextBlock" Grid.Row="0" Grid.Column="1" Margin="0,0,0,10" FontWeight="Bold" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,18,10" Text="{DynamicResource ProjectTools.VersionLabel}" Foreground="{DynamicResource SecondaryTextBrush}" />
+                <TextBlock Name="ApplicationVersionTextBlock" Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" FontWeight="Bold" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,18,10" Text="Tester:" Foreground="{DynamicResource SecondaryTextBrush}" />
+                <TextBlock Name="TesterNameTextBlock" Grid.Row="2" Grid.Column="1" Margin="0,0,0,10" FontWeight="Bold" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,18,0" Text="{DynamicResource ProjectTools.ExportDateLabel}" Foreground="{DynamicResource SecondaryTextBrush}" />
+                <TextBlock Name="ExportedAtTextBlock" Grid.Row="3" Grid.Column="1" FontWeight="Bold" />
+            </Grid>
+
+            <Border Grid.Row="2" Height="1" Margin="0,24,0,22" Background="{DynamicResource CardBorderBrush}" />
+
+            <StackPanel Grid.Row="3" Spacing="8">
+                <TextBlock Text="{DynamicResource ProjectTools.Statuses}" FontSize="{DynamicResource AppFontSize12}" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                <RadioButton Name="PreserveStatusesRadioButton" Content="{DynamicResource ProjectTools.PreserveStatuses}" IsChecked="True" />
+                <RadioButton Name="OverwriteStatusesRadioButton" Content="{DynamicResource ProjectTools.OverwriteStatuses}" />
+            </StackPanel>
+
+            <Grid Grid.Row="4" Margin="0,28,0,0" ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Bottom">
+                <Button Grid.Column="1" Width="110" Height="42" Margin="0,0,10,0" Content="{DynamicResource Common.Cancel}" Click="CancelButton_OnClick" />
+                <Button Grid.Column="2" Width="130" Height="42" Content="{DynamicResource ProjectTools.ImportAction}" Background="{DynamicResource AccentPrimaryBrush}" Foreground="White" Click="ImportButton_OnClick" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,81 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="QARegressionManager.Views.RoleManagementWindow"
+        Title="Zarządzanie rolami i projektami" Width="760" Height="860"
+        MinWidth="680" MinHeight="620" WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppBackgroundBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="20" Spacing="14">
+            <TextBlock Text="Role i projekty" FontSize="{DynamicResource AppFontSize27}" FontWeight="Bold" />
+            <TextBlock Text="Admin ma automatyczny dostęp do wszystkich projektów. Pozostałym użytkownikom dostęp nadają role projektowe."
+                       TextWrapping="Wrap" Foreground="{DynamicResource SecondaryTextBrush}" />
+
+            <Border Padding="18" Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="16">
+                <StackPanel Spacing="11">
+                    <TextBlock Text="ROLE UŻYTKOWNIKA" FontWeight="Bold" />
+                    <ComboBox Name="ProfileComboBox" Height="44" SelectionChanged="ProfileComboBox_OnSelectionChanged" />
+                    <WrapPanel>
+                        <CheckBox Name="AdministratorRoleCheckBox" Content="Admin" Margin="0,0,20,8" />
+                        <CheckBox Name="LeaderRoleCheckBox" Content="Lider" Margin="0,0,20,8" />
+                        <CheckBox Name="TesterRoleCheckBox" Content="Tester" Margin="0,0,20,8" />
+                    </WrapPanel>
+                    <TextBlock Text="ROLE PROJEKTOWE" FontSize="{DynamicResource AppFontSize12}" FontWeight="Bold" />
+                    <WrapPanel Name="UserProjectRolesPanel" />
+                    <Button Width="180" Height="42" HorizontalAlignment="Left" Content="ZAPISZ ROLE UŻYTKOWNIKA"
+                            Click="SaveUserRolesButton_OnClick" />
+                </StackPanel>
+            </Border>
+
+            <Border Padding="18" Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="16">
+                <StackPanel Spacing="11">
+                    <Grid ColumnDefinitions="*,10,Auto">
+                        <ComboBox Name="RoleDefinitionComboBox" Grid.Column="0" Height="44"
+                                  PlaceholderText="Wybierz rolę do edycji"
+                                  SelectionChanged="RoleDefinitionComboBox_OnSelectionChanged" />
+                        <Button Grid.Column="2" Height="44" Padding="18,0" Content="+ NOWA ROLA"
+                                Click="NewRoleButton_OnClick" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,12,180">
+                        <StackPanel Grid.Column="0" Spacing="5">
+                            <TextBlock Text="NAZWA ROLI" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" />
+                            <TextBox Name="RoleNameTextBox" Height="42" PlaceholderText="Np. TESTER API" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="5">
+                            <TextBlock Text="KOLOR OBRAMOWANIA" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" />
+                            <TextBox Name="RoleColorTextBox" Height="42" Text="#7154B8" />
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Text="DOSTĘP DO PROJEKTÓW" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" />
+                    <WrapPanel Name="RoleProjectsPanel" />
+                    <TextBlock Text="CZŁONKOWIE ROLI" FontSize="{DynamicResource AppFontSize11}" FontWeight="Bold" />
+                    <WrapPanel Name="RoleMembersPanel" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Height="42" Padding="18,0" Content="ZAPISZ ROLĘ" Click="SaveRoleDefinitionButton_OnClick" />
+                        <Button Height="42" Padding="18,0" Background="#DC4C56" Foreground="White"
+                                Content="USUŃ ROLĘ" Click="DeleteRoleDefinitionButton_OnClick" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Padding="18" Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="16">
+                <StackPanel Spacing="9">
+                    <TextBlock Text="UTWÓRZ NOWY PROJEKT" FontWeight="Bold" />
+                    <TextBlock Text="Nowy projekt pojawi się od razu na liście projektów dostępnych dla ról."
+                               TextWrapping="Wrap" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <Grid ColumnDefinitions="*,10,Auto">
+                        <TextBox Name="NewProjectNameTextBox" Height="42" PlaceholderText="Nazwa projektu" />
+                        <Button Grid.Column="2" Height="42" Padding="18,0" Content="+ UTWÓRZ PROJEKT"
+                                Click="CreateProjectButton_OnClick" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Name="ResultTextBlock" TextWrapping="Wrap" IsVisible="False" />
+            <Button Height="44" Width="130" HorizontalAlignment="Right" Content="ZAMKNIJ"
+                    Click="CloseButton_OnClick" />
+        </StackPanel>
+    </ScrollViewer>
+</Window>
