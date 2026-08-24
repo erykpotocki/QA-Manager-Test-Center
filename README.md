@@ -6,6 +6,14 @@
 
 > Project status: active development, version line `v0.2.x`.
 
+## Download for Windows
+
+**[Download QA Manager v0.2.3 installer](https://github.com/erykpotocki/QA-Manager-Test-Center/raw/refs/heads/main/downloads/QA-Manager-v0.2.3-Setup.exe)**
+
+The installer contains a self-contained Windows x64 build, so installing the .NET SDK is not required. Windows may display a SmartScreen warning because this development build is not digitally signed.
+
+SHA-256: `C59D319DADAF71BA566ACF75525450F26EB654352EADA39BA5B74881E94F3879`
+
 ## Interface preview
 
 ### Test explorer and ad-hoc execution
@@ -116,6 +124,7 @@ Host/client synchronization uses HTTPS, certificate fingerprint verification and
 - `Views` — Avalonia views
 - `Assets` — application icon and visual resources
 - `docs/screenshots` — screenshots used in this README
+- `downloads` — ready-to-install Windows builds
 - `installer` — installer configuration
 - `scripts` — release scripts
 
