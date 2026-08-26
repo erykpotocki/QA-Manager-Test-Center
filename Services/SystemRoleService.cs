@@ -106,11 +106,30 @@ public static class SystemRoleService
     public static string GetDisplayName(
         string role)
     {
-        return string.Equals(
+        if (string.Equals(
                 role,
                 AdministratorRole,
-                StringComparison.OrdinalIgnoreCase)
-            ? "Admin"
-            : role;
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return "Admin";
+        }
+
+        if (string.Equals(
+                role,
+                LeaderRole,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return "Przełożony";
+        }
+
+        if (string.Equals(
+                role,
+                TesterRole,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return "Pracownik";
+        }
+
+        return role;
     }
 }

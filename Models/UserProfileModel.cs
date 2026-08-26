@@ -71,6 +71,9 @@ public sealed class ProjectRoleDefinitionModel
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
     public string BorderColor { get; set; } = "#7154B8";
+    public string BackgroundColor { get; set; } = string.Empty;
+    public string TextColor { get; set; } = string.Empty;
+    public bool IsProfessionalRole { get; set; }
     public List<string> ProjectKeys { get; set; } = new();
 }
 

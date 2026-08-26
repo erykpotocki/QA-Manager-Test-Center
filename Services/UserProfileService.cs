@@ -17,17 +17,159 @@ public sealed class UserProfileService
         "role-and-project-definitions-v1";
     private const string DemoQaRolesMigration =
         "demo-qa-roles-v1";
+    private const string ProfessionalRolesMigration =
+        "professional-roles-v1";
+    private const string DemoProjectAccessMigration =
+        "demo-project-access-v1";
+    private const string ExplicitRoleCategoriesMigration =
+        "explicit-role-categories-v1";
+    private const string ThematicDemoProjectsMigration =
+        "thematic-demo-projects-v4-company-domains";
+    private const string DefaultRoleColorsMigration =
+        "default-role-colors-v1";
+    private const string PaymentsProjectRoleScopeMigration =
+        "payments-project-role-scope-v1";
+    private const string EnglishProjectRolesMigration =
+        "english-project-roles-v1";
     private const string EnglishDemoProjectKey =
         "test-project-english";
-    private const string PolishDemoProjectKey =
+    private const string LegacyPolishDemoProjectKey =
         "test-project-polish";
+    private const string AdminPolishDemoProjectKey =
+        "test-admin-polish";
+    private const string LeaderPolishDemoProjectKey =
+        "test-leader-polish";
+    private const string PlantsProjectKey = "plants-polish";
+    private const string PlanetariumProjectKey = "planetarium-polish";
+    private const string OfficeProjectKey = "office-polish";
+    private const string SalesProjectKey = "sales-polish";
+    private const string PaymentsProjectKey = "payments-polish";
+    private const string AutomotiveProjectKey = "automotive-polish";
+    private const string HospitalProjectKey = "hospital-polish";
+    private const string DemoLeaderProjectRole =
+        "Project Lead";
 
     private static readonly ProjectRoleDefinitionModel[] DemoQaRoles =
     {
-        new() { Name = "QA Analyst", BorderColor = "#2E86D1" },
-        new() { Name = "Automation Engineer", BorderColor = "#28A06A" },
-        new() { Name = "Test Architect", BorderColor = "#9A6BE8" },
-        new() { Name = "Quality Observer", BorderColor = "#F0A34A" }
+        new() { Name = "QA Analyst", BorderColor = "#2E86D1", IsProfessionalRole = true },
+        new() { Name = "Automation Engineer", BorderColor = "#28A06A", IsProfessionalRole = true },
+        new() { Name = "Test Architect", BorderColor = "#9A6BE8", IsProfessionalRole = true },
+        new() { Name = "Quality Observer", BorderColor = "#F0A34A", IsProfessionalRole = true }
+    };
+
+    private static readonly ProjectRoleDefinitionModel[] ProfessionalRoles =
+    {
+        new()
+        {
+            Name = "Developer",
+            BorderColor = "#1F5F96",
+            BackgroundColor = "#2E86D1",
+            TextColor = "#FFFFFF",
+            IsProfessionalRole = true
+        },
+        new()
+        {
+            Name = "Automation Tester",
+            BorderColor = "#1C704B",
+            BackgroundColor = "#28A06A",
+            TextColor = "#FFFFFF",
+            IsProfessionalRole = true
+        },
+        new()
+        {
+            Name = "Manager",
+            BorderColor = "#9B6D10",
+            BackgroundColor = "#D99A18",
+            TextColor = "#17212B",
+            IsProfessionalRole = true
+        }
+    };
+
+    private static readonly ProjectRoleDefinitionModel[] ThematicProjectRoles =
+    {
+        new() { Name = "Botanik", BorderColor = "#1C3E31", BackgroundColor = "#315A49", TextColor = "#C8E9DA", IsProfessionalRole = true, ProjectKeys = new() { PlantsProjectKey } },
+        new() { Name = "Ogrodnik", BorderColor = "#214448", BackgroundColor = "#35666A", TextColor = "#D5F0F1", IsProfessionalRole = true, ProjectKeys = new() { PlantsProjectKey } },
+        new() { Name = "Arborysta", BorderColor = "#2E363C", BackgroundColor = "#4B555D", TextColor = "#E8EDF0", IsProfessionalRole = true, ProjectKeys = new() { PlantsProjectKey } },
+        new() { Name = "Liść", BorderColor = "#1C3E31", BackgroundColor = "#315A49", TextColor = "#C8E9DA", IsProfessionalRole = true, ProjectKeys = new() { PlantsProjectKey } },
+        new() { Name = "Meteorolog", BorderColor = "#243C69", BackgroundColor = "#3B5683", TextColor = "#E8EEFC", IsProfessionalRole = true, ProjectKeys = new() { PlanetariumProjectKey } },
+        new() { Name = "Synoptyk", BorderColor = "#2C4C67", BackgroundColor = "#4B7395", TextColor = "#E0EFFB", IsProfessionalRole = true, ProjectKeys = new() { PlanetariumProjectKey } },
+        new() { Name = "Technik stacji pogodowej", BorderColor = "#164F66", BackgroundColor = "#2B6B82", TextColor = "#DEF5FC", IsProfessionalRole = true, ProjectKeys = new() { PlanetariumProjectKey } },
+        new() { Name = "Łowca burz", BorderColor = "#3D2D63", BackgroundColor = "#5A4782", TextColor = "#EFE8FA", IsProfessionalRole = true, ProjectKeys = new() { PlanetariumProjectKey } },
+        new() { Name = "Urzędnik", BorderColor = "#2E363C", BackgroundColor = "#4B555D", TextColor = "#E8EDF0", IsProfessionalRole = true, ProjectKeys = new() { OfficeProjectKey } },
+        new() { Name = "Kierownik referatu", BorderColor = "#2D2340", BackgroundColor = "#4A3A67", TextColor = "#E6DDF4", IsProfessionalRole = true, ProjectKeys = new() { OfficeProjectKey } },
+        new() { Name = "Pracownik kancelarii", BorderColor = "#2C4C67", BackgroundColor = "#4B7395", TextColor = "#E0EFFB", IsProfessionalRole = true, ProjectKeys = new() { OfficeProjectKey } },
+        new() { Name = "Sprzedawca", BorderColor = "#214448", BackgroundColor = "#35666A", TextColor = "#D5F0F1", IsProfessionalRole = true, ProjectKeys = new() { SalesProjectKey, PaymentsProjectKey } },
+        new() { Name = "Dostawca", BorderColor = "#2C4C67", BackgroundColor = "#4B7395", TextColor = "#E0EFFB", IsProfessionalRole = true, ProjectKeys = new() { SalesProjectKey } },
+        new() { Name = "Magazynier", BorderColor = "#2E363C", BackgroundColor = "#4B555D", TextColor = "#E8EDF0", IsProfessionalRole = true, ProjectKeys = new() { SalesProjectKey } },
+        new() { Name = "Kierownik sklepu", BorderColor = "#2D2340", BackgroundColor = "#4A3A67", TextColor = "#E6DDF4", IsProfessionalRole = true, ProjectKeys = new() { SalesProjectKey } },
+        new() { Name = "Bankier", BorderColor = "#2D2340", BackgroundColor = "#4A3A67", TextColor = "#E6DDF4", IsProfessionalRole = true, ProjectKeys = new() { PaymentsProjectKey } },
+        new() { Name = "Tester QA", BorderColor = "#2C4C67", BackgroundColor = "#4B7395", TextColor = "#E0EFFB", IsProfessionalRole = true, ProjectKeys = new() { PaymentsProjectKey } },
+        new() { Name = "Analityk płatności", BorderColor = "#1C3E31", BackgroundColor = "#315A49", TextColor = "#C8E9DA", IsProfessionalRole = true, ProjectKeys = new() { PaymentsProjectKey } },
+        new() { Name = "Kasjer", BorderColor = "#684315", BackgroundColor = "#8D6224", TextColor = "#FFF0C8", IsProfessionalRole = true, ProjectKeys = new() { PaymentsProjectKey } },
+        new() { Name = "Operator terminala", BorderColor = "#174F68", BackgroundColor = "#2C708E", TextColor = "#E1F4FC", IsProfessionalRole = true, ProjectKeys = new() { PaymentsProjectKey } },
+        new() { Name = "Specjalista systemów kasowych", BorderColor = "#31496B", BackgroundColor = "#4A668D", TextColor = "#E8F0FC", IsProfessionalRole = true, ProjectKeys = new() { PaymentsProjectKey } },
+        new() { Name = "Mechanik", BorderColor = "#424B52", BackgroundColor = "#5C676F", TextColor = "#EEF2F4", IsProfessionalRole = true, ProjectKeys = new() { AutomotiveProjectKey } },
+        new() { Name = "Diagnosta samochodowy", BorderColor = "#243C69", BackgroundColor = "#3B5683", TextColor = "#E8EEFC", IsProfessionalRole = true, ProjectKeys = new() { AutomotiveProjectKey } },
+        new() { Name = "Doradca serwisowy", BorderColor = "#245374", BackgroundColor = "#3C6F91", TextColor = "#E5F4FC", IsProfessionalRole = true, ProjectKeys = new() { AutomotiveProjectKey } },
+        new() { Name = "Kierownik serwisu", BorderColor = "#715211", BackgroundColor = "#936D20", TextColor = "#FFF2C4", IsProfessionalRole = true, ProjectKeys = new() { AutomotiveProjectKey } },
+        new() { Name = "Lekarz", BorderColor = "#1E4F78", BackgroundColor = "#315F86", TextColor = "#E4F2FC", IsProfessionalRole = true, ProjectKeys = new() { HospitalProjectKey } },
+        new() { Name = "Ratownik medyczny", BorderColor = "#8A2730", BackgroundColor = "#B64049", TextColor = "#FFF0F1", IsProfessionalRole = true, ProjectKeys = new() { HospitalProjectKey } },
+        new() { Name = "Pielęgniarka", BorderColor = "#176451", BackgroundColor = "#2D7B67", TextColor = "#E1F7EF", IsProfessionalRole = true, ProjectKeys = new() { HospitalProjectKey } },
+        new() { Name = "Rejestrator medyczny", BorderColor = "#3E4B57", BackgroundColor = "#566673", TextColor = "#EDF2F5", IsProfessionalRole = true, ProjectKeys = new() { HospitalProjectKey } }
+    };
+
+    private static readonly ProjectRoleDefinitionModel[] EnglishProjectRoles =
+    {
+        new() { Name = "Localization Tester", BorderColor = "#174F68", BackgroundColor = "#2C708E", TextColor = "#E1F4FC", IsProfessionalRole = true, ProjectKeys = new() { EnglishDemoProjectKey } },
+        new() { Name = "English Content Reviewer", BorderColor = "#1C3E31", BackgroundColor = "#315A49", TextColor = "#C8E9DA", IsProfessionalRole = true, ProjectKeys = new() { EnglishDemoProjectKey } },
+        new() { Name = "Translation QA", BorderColor = "#3D2D63", BackgroundColor = "#5A4782", TextColor = "#EFE8FA", IsProfessionalRole = true, ProjectKeys = new() { EnglishDemoProjectKey } },
+        new() { Name = "Internationalization Engineer", BorderColor = "#243C69", BackgroundColor = "#3B5683", TextColor = "#E8EEFC", IsProfessionalRole = true, ProjectKeys = new() { EnglishDemoProjectKey } },
+        new() { Name = "Accessibility Reviewer", BorderColor = "#684315", BackgroundColor = "#8D6224", TextColor = "#FFF0C8", IsProfessionalRole = true, ProjectKeys = new() { EnglishDemoProjectKey } }
+    };
+
+    private static readonly string[] PaymentsProjectRoleNames =
+    {
+        "Analityk płatności",
+        "Bankier",
+        "Kasjer",
+        "Operator terminala",
+        "Specjalista systemów kasowych",
+        "Sprzedawca",
+        "Tester QA"
+    };
+
+    private static readonly (string Name, string Border, string Background, string Text)[] DefaultRoleVisuals =
+    {
+        ("Automation Engineer", "#145A46", "#27745E", "#DDF5EC"),
+        ("Automation Tester", "#176451", "#2D7B67", "#E1F7EF"),
+        ("Developer", "#1E4F78", "#315F86", "#E4F2FC"),
+        ("Manager", "#6B4C0F", "#8C671C", "#FFF0BD"),
+        ("Project Lead", "#70500E", "#967022", "#FFF1BE"),
+        ("QA Analyst", "#28527A", "#3D6C96", "#E5F2FD"),
+        ("Quality Observer", "#5D4A1E", "#7A6532", "#FFF2C7"),
+        ("Test Architect", "#3D2D63", "#5A4782", "#EFE8FA"),
+
+        ("Botanik", "#1B5135", "#2F6B49", "#DDF4E6"),
+        ("Ogrodnik", "#43551D", "#61752E", "#F0F6D5"),
+        ("Arborysta", "#4B3824", "#685039", "#F3E7D8"),
+        ("Liść", "#17613A", "#2C7B4E", "#DDF7E8"),
+
+        ("Astronom", "#202F66", "#344983", "#E5EAFF"),
+        ("Prezenter planetarium", "#293D76", "#435A96", "#E8EDFF"),
+        ("Obsługa planetarium", "#164F66", "#2B6B82", "#DEF5FC"),
+
+        ("Urzędnik", "#3E4B57", "#566673", "#EDF2F5"),
+        ("Kierownik referatu", "#38445F", "#53617D", "#EEF1FA"),
+        ("Pracownik kancelarii", "#46545E", "#64727C", "#F0F4F6"),
+
+        ("Sprzedawca", "#744019", "#985C2A", "#FFF0E2"),
+        ("Dostawca", "#245374", "#3C6F91", "#E5F4FC"),
+        ("Magazynier", "#424B52", "#5C676F", "#EEF2F4"),
+        ("Kierownik sklepu", "#715211", "#936D20", "#FFF2C4"),
+
+        ("Bankier", "#243C69", "#3B5683", "#E8EEFC"),
+        ("Tester QA", "#155B59", "#297673", "#DDF7F4"),
+        ("Analityk płatności", "#433060", "#60477C", "#F0E7F8")
     };
 
     public const string InitialPin =
@@ -186,7 +328,7 @@ public sealed class UserProfileService
         var demoProfiles =
             new[]
             {
-                (Login: "admin", DisplayName: "Demo Administrator", Role: SystemRoleService.AdministratorRole),
+                (Login: "admin", DisplayName: "Admin", Role: SystemRoleService.AdministratorRole),
                 (Login: "leader", DisplayName: "Demo Leader", Role: SystemRoleService.LeaderRole),
                 (Login: "tester1", DisplayName: "Demo Tester 1", Role: SystemRoleService.TesterRole),
                 (Login: "tester2", DisplayName: "Demo Tester 2", Role: SystemRoleService.TesterRole)
@@ -197,6 +339,10 @@ public sealed class UserProfileService
         var assignDemoQaRoles =
             !data.AppliedDataMigrations.Contains(
                 DemoQaRolesMigration,
+                StringComparer.OrdinalIgnoreCase);
+        var assignDemoProjectAccess =
+            !data.AppliedDataMigrations.Contains(
+                DemoProjectAccessMigration,
                 StringComparer.OrdinalIgnoreCase);
         EnsureRoleAndProjectDefinitions(data);
 
@@ -244,6 +390,39 @@ public sealed class UserProfileService
                     .Select(role => role.Name)
                     .ToList();
             }
+
+            if (assignDemoProjectAccess)
+            {
+                profile.ProjectRoles = profile.Login.ToLowerInvariant() switch
+                {
+                    "admin" => data.ProjectRoleDefinitions
+                        .Select(role => role.Name)
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList(),
+                    "leader" => new() { DemoLeaderProjectRole },
+                    "tester1" or "tester2" => new(),
+                    _ => profile.ProjectRoles
+                };
+            }
+        }
+
+        var ownerProfile =
+            data.Profiles.FirstOrDefault(
+                profile =>
+                    string.Equals(
+                        profile.Login,
+                        "epotocki",
+                        StringComparison.OrdinalIgnoreCase));
+        if (ownerProfile is not null)
+        {
+            ownerProfile.DisplayName =
+                "Eryk Potocki";
+        }
+
+        if (assignDemoProjectAccess)
+        {
+            data.AppliedDataMigrations.Add(
+                DemoProjectAccessMigration);
         }
 
         await SaveAsync(
@@ -255,7 +434,18 @@ public sealed class UserProfileService
         var data = await LoadAsync();
         EnsureRoleAndProjectDefinitions(data);
         return (
-            data.Projects.OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase).ToArray(),
+            data.Projects
+                .OrderBy(item =>
+                    string.Equals(
+                        item.Name,
+                        DemoCatalog.PaymentsProjectName,
+                        StringComparison.OrdinalIgnoreCase)
+                        ? 0
+                        : DemoCatalog.IsTestProject(item.Name)
+                            ? 2
+                            : 1)
+                .ThenBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
+                .ToArray(),
             data.ProjectRoleDefinitions.OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase).ToArray());
     }
 
@@ -266,6 +456,17 @@ public sealed class UserProfileService
         var data = await LoadAsync();
         data.Projects = projects.ToList();
         data.ProjectRoleDefinitions = roles.ToList();
+
+        var validProjectKeys = data.Projects
+            .Select(item => item.Key)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var role in data.ProjectRoleDefinitions)
+        {
+            role.ProjectKeys = role.ProjectKeys
+                .Where(validProjectKeys.Contains)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
 
         var validRoleNames = data.ProjectRoleDefinitions
             .Select(item => item.Name)
@@ -313,10 +514,83 @@ public sealed class UserProfileService
             data,
             EnglishDemoProjectKey,
             DemoCatalog.PrimaryProjectName);
-        EnsureDemoProjectDefinition(
-            data,
-            PolishDemoProjectKey,
-            DemoCatalog.SecondaryProjectName);
+        EnsureDemoProjectDefinition(data, PlantsProjectKey, DemoCatalog.PlantsProjectName);
+        EnsureDemoProjectDefinition(data, PlanetariumProjectKey, DemoCatalog.PlanetariumProjectName);
+        EnsureDemoProjectDefinition(data, OfficeProjectKey, DemoCatalog.OfficeProjectName);
+        EnsureDemoProjectDefinition(data, SalesProjectKey, DemoCatalog.SalesProjectName);
+        EnsureDemoProjectDefinition(data, PaymentsProjectKey, DemoCatalog.PaymentsProjectName);
+        EnsureDemoProjectDefinition(data, AutomotiveProjectKey, DemoCatalog.AutomotiveProjectName);
+        EnsureDemoProjectDefinition(data, HospitalProjectKey, DemoCatalog.HospitalProjectName);
+
+        data.Projects.RemoveAll(project =>
+            string.Equals(
+                project.Key,
+                LegacyPolishDemoProjectKey,
+                StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(
+                project.Key,
+                AdminPolishDemoProjectKey,
+                StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(
+                project.Key,
+                LeaderPolishDemoProjectKey,
+                StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(
+                project.Name,
+                DemoCatalog.LegacyPolishProjectName,
+                StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(
+                project.Name,
+                DemoCatalog.AdminPolishProjectName,
+                StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(
+                project.Name,
+                DemoCatalog.LeaderPolishProjectName,
+                StringComparison.OrdinalIgnoreCase));
+
+        foreach (var role in data.ProjectRoleDefinitions)
+        {
+            role.ProjectKeys.RemoveAll(key =>
+                string.Equals(
+                    key,
+                    LegacyPolishDemoProjectKey,
+                    StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(
+                    key,
+                    AdminPolishDemoProjectKey,
+                    StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(
+                    key,
+                    LeaderPolishDemoProjectKey,
+                    StringComparison.OrdinalIgnoreCase));
+        }
+
+        var leaderRole = data.ProjectRoleDefinitions.FirstOrDefault(role =>
+            string.Equals(
+                role.Name,
+                DemoLeaderProjectRole,
+                StringComparison.OrdinalIgnoreCase));
+
+        if (leaderRole is null)
+        {
+            leaderRole = new ProjectRoleDefinitionModel
+            {
+                Name = DemoLeaderProjectRole,
+                BorderColor = "#D99A18",
+                IsProfessionalRole = true
+            };
+            data.ProjectRoleDefinitions.Add(leaderRole);
+        }
+
+        if (!data.AppliedDataMigrations.Contains(
+                DemoProjectAccessMigration,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            leaderRole.ProjectKeys = new()
+            {
+                LeaderPolishDemoProjectKey
+            };
+        }
 
         if (!data.AppliedDataMigrations.Contains(
                 DemoQaRolesMigration,
@@ -335,11 +609,345 @@ public sealed class UserProfileService
                     {
                         Name = demoRole.Name,
                         BorderColor = demoRole.BorderColor,
+                        IsProfessionalRole = true,
                         ProjectKeys = new()
                     });
             }
 
             data.AppliedDataMigrations.Add(DemoQaRolesMigration);
+        }
+
+        if (!data.AppliedDataMigrations.Contains(
+                ProfessionalRolesMigration,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            foreach (var professionalRole in ProfessionalRoles)
+            {
+                if (!data.ProjectRoleDefinitions.Any(role =>
+                        string.Equals(
+                            role.Name,
+                            professionalRole.Name,
+                            StringComparison.OrdinalIgnoreCase)))
+                {
+                    data.ProjectRoleDefinitions.Add(
+                        new ProjectRoleDefinitionModel
+                        {
+                            Name = professionalRole.Name,
+                            BorderColor = professionalRole.BorderColor,
+                            BackgroundColor = professionalRole.BackgroundColor,
+                            TextColor = professionalRole.TextColor,
+                            IsProfessionalRole = true,
+                            ProjectKeys = new()
+                        });
+                }
+            }
+
+            var admin = data.Profiles.FirstOrDefault(profile =>
+                string.Equals(profile.Login, "admin", StringComparison.OrdinalIgnoreCase));
+            if (admin is not null)
+            {
+                admin.ProjectRoles ??= new();
+                foreach (var professionalRole in ProfessionalRoles)
+                {
+                    if (!admin.ProjectRoles.Contains(
+                            professionalRole.Name,
+                            StringComparer.OrdinalIgnoreCase))
+                    {
+                        admin.ProjectRoles.Add(professionalRole.Name);
+                    }
+                }
+            }
+
+            data.AppliedDataMigrations.Add(ProfessionalRolesMigration);
+        }
+
+        if (!data.AppliedDataMigrations.Contains(
+                ExplicitRoleCategoriesMigration,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            foreach (var role in data.ProjectRoleDefinitions)
+            {
+                role.IsProfessionalRole = true;
+            }
+
+            data.AppliedDataMigrations.Add(ExplicitRoleCategoriesMigration);
+        }
+
+        if (!data.AppliedDataMigrations.Contains(
+                ThematicDemoProjectsMigration,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            var replacedPlanetariumRoles = new[]
+            {
+                "Astronom",
+                "Prezenter planetarium",
+                "Obsługa planetarium"
+            };
+
+            data.ProjectRoleDefinitions.RemoveAll(role =>
+                replacedPlanetariumRoles.Contains(
+                    role.Name,
+                    StringComparer.OrdinalIgnoreCase));
+
+            foreach (var profile in data.Profiles)
+            {
+                profile.ProjectRoles ??= new();
+                profile.ProjectRoles.RemoveAll(role =>
+                    replacedPlanetariumRoles.Contains(
+                        role,
+                        StringComparer.OrdinalIgnoreCase));
+            }
+
+            foreach (var thematicRole in ThematicProjectRoles)
+            {
+                var role = data.ProjectRoleDefinitions.FirstOrDefault(item =>
+                    string.Equals(item.Name, thematicRole.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (role is null)
+                {
+                    role = new ProjectRoleDefinitionModel
+                    {
+                        Name = thematicRole.Name,
+                        BorderColor = thematicRole.BorderColor,
+                        BackgroundColor = thematicRole.BackgroundColor,
+                        TextColor = thematicRole.TextColor,
+                        IsProfessionalRole = true
+                    };
+                    data.ProjectRoleDefinitions.Add(role);
+                }
+
+                role.IsProfessionalRole = true;
+                role.ProjectKeys = thematicRole.ProjectKeys.ToList();
+            }
+
+            var admin = data.Profiles.FirstOrDefault(profile =>
+                string.Equals(profile.Login, "admin", StringComparison.OrdinalIgnoreCase));
+            if (admin is not null)
+            {
+                admin.ProjectRoles ??= new();
+                foreach (var role in ThematicProjectRoles)
+                {
+                    if (!admin.ProjectRoles.Contains(role.Name, StringComparer.OrdinalIgnoreCase))
+                    {
+                        admin.ProjectRoles.Add(role.Name);
+                    }
+                }
+            }
+
+            var englishRoleNames = new[]
+            {
+                "Automation Engineer",
+                "Automation Tester",
+                "Developer",
+                "Manager",
+                "Project Lead",
+                "QA Analyst",
+                "Quality Observer",
+                "Test Architect"
+            };
+
+            foreach (var role in data.ProjectRoleDefinitions.Where(role =>
+                         englishRoleNames.Contains(
+                             role.Name,
+                             StringComparer.OrdinalIgnoreCase)))
+            {
+                role.ProjectKeys = new() { EnglishDemoProjectKey };
+            }
+
+            data.AppliedDataMigrations.Add(ThematicDemoProjectsMigration);
+        }
+
+        if (!data.AppliedDataMigrations.Contains(
+                EnglishProjectRolesMigration,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            var previousEnglishRoleNames = new[]
+            {
+                "Automation Engineer",
+                "Automation Tester",
+                "Developer",
+                "Manager",
+                "Project Lead",
+                "QA Analyst",
+                "Quality Observer",
+                "Test Architect"
+            };
+
+            var removedRoleNames = new HashSet<string>(
+                StringComparer.OrdinalIgnoreCase);
+
+            foreach (var role in data.ProjectRoleDefinitions.Where(role =>
+                         previousEnglishRoleNames.Contains(
+                             role.Name,
+                             StringComparer.OrdinalIgnoreCase)))
+            {
+                role.ProjectKeys.RemoveAll(projectKey =>
+                    string.Equals(
+                        projectKey,
+                        EnglishDemoProjectKey,
+                        StringComparison.OrdinalIgnoreCase));
+
+                if (role.ProjectKeys.Count == 0)
+                {
+                    removedRoleNames.Add(role.Name);
+                }
+            }
+
+            data.ProjectRoleDefinitions.RemoveAll(role =>
+                removedRoleNames.Contains(role.Name));
+
+            foreach (var profile in data.Profiles)
+            {
+                profile.ProjectRoles ??= new();
+                profile.ProjectRoles.RemoveAll(roleName =>
+                    removedRoleNames.Contains(roleName));
+            }
+
+            foreach (var template in EnglishProjectRoles)
+            {
+                var role = data.ProjectRoleDefinitions.FirstOrDefault(item =>
+                    string.Equals(
+                        item.Name,
+                        template.Name,
+                        StringComparison.OrdinalIgnoreCase));
+
+                if (role is null)
+                {
+                    role = new ProjectRoleDefinitionModel
+                    {
+                        Name = template.Name,
+                        BorderColor = template.BorderColor,
+                        BackgroundColor = template.BackgroundColor,
+                        TextColor = template.TextColor,
+                        IsProfessionalRole = true,
+                        ProjectKeys = new() { EnglishDemoProjectKey }
+                    };
+                    data.ProjectRoleDefinitions.Add(role);
+                }
+                else if (!role.ProjectKeys.Contains(
+                             EnglishDemoProjectKey,
+                             StringComparer.OrdinalIgnoreCase))
+                {
+                    role.ProjectKeys.Add(EnglishDemoProjectKey);
+                }
+            }
+
+            var admin = data.Profiles.FirstOrDefault(profile =>
+                string.Equals(
+                    profile.Login,
+                    "admin",
+                    StringComparison.OrdinalIgnoreCase));
+            if (admin is not null)
+            {
+                admin.ProjectRoles ??= new();
+                foreach (var role in EnglishProjectRoles)
+                {
+                    if (!admin.ProjectRoles.Contains(
+                            role.Name,
+                            StringComparer.OrdinalIgnoreCase))
+                    {
+                        admin.ProjectRoles.Add(role.Name);
+                    }
+                }
+            }
+
+            data.AppliedDataMigrations.Add(
+                EnglishProjectRolesMigration);
+        }
+
+        if (!data.AppliedDataMigrations.Contains(
+                DefaultRoleColorsMigration,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            foreach (var visual in DefaultRoleVisuals)
+            {
+                var role = data.ProjectRoleDefinitions.FirstOrDefault(item =>
+                    string.Equals(item.Name, visual.Name, StringComparison.OrdinalIgnoreCase));
+                if (role is null)
+                {
+                    continue;
+                }
+
+                role.BorderColor = visual.Border;
+                role.BackgroundColor = visual.Background;
+                role.TextColor = visual.Text;
+            }
+
+            data.AppliedDataMigrations.Add(DefaultRoleColorsMigration);
+        }
+
+        if (!data.AppliedDataMigrations.Contains(
+                PaymentsProjectRoleScopeMigration,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            var paymentRoleNames =
+                PaymentsProjectRoleNames.ToHashSet(
+                    StringComparer.OrdinalIgnoreCase);
+
+            // Starsze dane demonstracyjne mogły przypisać niemal każdą rolę
+            // do PŁATNOŚCI. Najpierw czyścimy ten zakres, a następnie dodajemy
+            // wyłącznie stanowiska związane z płatnościami, terminalami i kasą.
+            foreach (var role in data.ProjectRoleDefinitions)
+            {
+                role.ProjectKeys.RemoveAll(key =>
+                    string.Equals(
+                        key,
+                        PaymentsProjectKey,
+                        StringComparison.OrdinalIgnoreCase));
+            }
+
+            foreach (var template in ThematicProjectRoles.Where(role =>
+                         paymentRoleNames.Contains(role.Name)))
+            {
+                var role = data.ProjectRoleDefinitions.FirstOrDefault(item =>
+                    string.Equals(
+                        item.Name,
+                        template.Name,
+                        StringComparison.OrdinalIgnoreCase));
+
+                if (role is null)
+                {
+                    role = new ProjectRoleDefinitionModel
+                    {
+                        Name = template.Name,
+                        BorderColor = template.BorderColor,
+                        BackgroundColor = template.BackgroundColor,
+                        TextColor = template.TextColor,
+                        IsProfessionalRole = true
+                    };
+                    data.ProjectRoleDefinitions.Add(role);
+                }
+
+                if (!role.ProjectKeys.Contains(
+                        PaymentsProjectKey,
+                        StringComparer.OrdinalIgnoreCase))
+                {
+                    role.ProjectKeys.Add(PaymentsProjectKey);
+                }
+            }
+
+            var admin = data.Profiles.FirstOrDefault(profile =>
+                string.Equals(
+                    profile.Login,
+                    "admin",
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (admin is not null)
+            {
+                admin.ProjectRoles ??= new();
+                foreach (var roleName in PaymentsProjectRoleNames)
+                {
+                    if (!admin.ProjectRoles.Contains(
+                            roleName,
+                            StringComparer.OrdinalIgnoreCase))
+                    {
+                        admin.ProjectRoles.Add(roleName);
+                    }
+                }
+            }
+
+            data.AppliedDataMigrations.Add(
+                PaymentsProjectRoleScopeMigration);
         }
 
         data.AppliedDataMigrations.Add(RoleAndProjectDefinitionsMigration);
@@ -454,6 +1062,14 @@ public sealed class UserProfileService
 
         return data.Profiles
             .OrderBy(
+                profile =>
+                    string.Equals(
+                        profile.Login,
+                        "epotocki",
+                        StringComparison.OrdinalIgnoreCase)
+                        ? 0
+                        : 1)
+            .ThenBy(
                 profile =>
                     profile.Login,
                 StringComparer.OrdinalIgnoreCase)
@@ -676,10 +1292,6 @@ public sealed class UserProfileService
             {
                 project.Name = DemoCatalog.PrimaryProjectName;
             }
-            else if (string.Equals(project.Key, PolishDemoProjectKey, StringComparison.OrdinalIgnoreCase))
-            {
-                project.Name = DemoCatalog.SecondaryProjectName;
-            }
         }
 
         await SaveAsync(data);
@@ -746,6 +1358,19 @@ public sealed class UserProfileService
                     item.Id == profileId)
             ?? throw new InvalidOperationException(
                 "Nie znaleziono profilu użytkownika.");
+
+        if (string.Equals(
+                profile.Login,
+                "admin",
+                StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(
+                profile.Login,
+                "epotocki",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "Konta admin i epotocki są chronione i nie mogą zostać usunięte.");
+        }
 
         if (string.Equals(
                 profile.Login,
