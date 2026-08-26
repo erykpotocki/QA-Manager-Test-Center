@@ -1,3 +1,4 @@
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -11,6 +12,13 @@ public partial class ConfirmDeleteWindow : Window
     private TextBlock? _titleTextBlock;
     private TextBlock? _messageTextBlock;
     private Button? _confirmButton;
+    private StackPanel? _pinPanel;
+    private TextBox? _pinTextBox;
+    private TextBlock? _pinLabelTextBlock;
+    private TextBlock? _pinValidationTextBlock;
+
+    public string EnteredPin =>
+        _pinTextBox?.Text?.Trim() ?? string.Empty;
 
     public ConfirmDeleteWindow()
     {
@@ -44,6 +52,24 @@ public partial class ConfirmDeleteWindow : Window
         }
     }
 
+    public void RequirePin(
+        string label = "PIN ADMINISTRATORA")
+    {
+        if (_pinPanel is not null)
+        {
+            _pinPanel.IsVisible = true;
+        }
+
+        if (_pinLabelTextBlock is not null)
+        {
+            _pinLabelTextBlock.Text = label;
+        }
+
+        Height = 455;
+        MinHeight = 455;
+        _pinTextBox?.Focus();
+    }
+
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(
@@ -63,6 +89,11 @@ public partial class ConfirmDeleteWindow : Window
         _confirmButton =
             this.FindControl<Button>(
                 "ConfirmButton");
+
+        _pinPanel = this.FindControl<StackPanel>("PinPanel");
+        _pinTextBox = this.FindControl<TextBox>("PinTextBox");
+        _pinLabelTextBlock = this.FindControl<TextBlock>("PinLabelTextBlock");
+        _pinValidationTextBlock = this.FindControl<TextBlock>("PinValidationTextBlock");
     }
 
     private void CancelButton_OnClick(
@@ -77,8 +108,32 @@ public partial class ConfirmDeleteWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        if (!CanConfirm())
+        {
+            return;
+        }
+
         Close(
             true);
+    }
+
+    private bool CanConfirm()
+    {
+        if (_pinPanel?.IsVisible != true)
+        {
+            return true;
+        }
+
+        var valid =
+            EnteredPin.Length == 6 &&
+            EnteredPin.All(char.IsDigit);
+
+        if (_pinValidationTextBlock is not null)
+        {
+            _pinValidationTextBlock.IsVisible = !valid;
+        }
+
+        return valid;
     }
 
     protected override void OnKeyDown(
@@ -89,6 +144,12 @@ public partial class ConfirmDeleteWindow : Window
 
         if (e.Key == Key.Enter)
         {
+            if (!CanConfirm())
+            {
+                e.Handled = true;
+                return;
+            }
+
             Close(
                 true);
 

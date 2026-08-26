@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="QARegressionManager.Views.ProjectManagementWindow" Title="Zarządzanie projektami"
+        Width="680" Height="700" MinWidth="600" MinHeight="620"
+        WindowStartupLocation="CenterOwner" Background="{DynamicResource AppBackgroundBrush}">
+    <Border Margin="20" Padding="26" Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="20">
+        <StackPanel Spacing="14">
+            <TextBlock Text="Zarządzanie projektami" FontSize="{DynamicResource AppFontSize27}" FontWeight="Bold" />
+            <TextBlock Text="Twórz projekty i usuwaj te, które nie są już potrzebne. Usunięty projekt zostanie również odłączony od wszystkich ról."
+                       TextWrapping="Wrap" Foreground="{DynamicResource SecondaryTextBrush}" />
+            <Border Padding="16" Background="{DynamicResource IconBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="12">
+                <StackPanel Spacing="9">
+                    <TextBlock Text="ISTNIEJĄCE PROJEKTY" FontWeight="Bold" />
+                    <ComboBox Name="ProjectComboBox" Height="42" SelectionChanged="ProjectComboBox_OnSelectionChanged" />
+                    <StackPanel Name="SelectedProjectPanel" Spacing="8" IsVisible="False">
+                        <TextBlock Name="SelectedProjectNameTextBlock" FontSize="{DynamicResource AppFontSize16}" FontWeight="SemiBold" />
+                        <Border Height="1" Margin="0,2" Background="{DynamicResource CardBorderBrush}" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="ROLE Z DOSTĘPEM DO PROJEKTU" VerticalAlignment="Center" FontWeight="Bold" />
+                            <CheckBox Name="SelectAllRolesCheckBox" Grid.Column="1" Content="Zaznacz wszystkie" />
+                        </Grid>
+                        <Border Padding="10" Background="{DynamicResource InputBackgroundBrush}"
+                                BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1" CornerRadius="8">
+                            <ScrollViewer MaxHeight="120" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel Name="ProjectRolesPanel" Spacing="5" />
+                            </ScrollViewer>
+                        </Border>
+                        <Button Height="38" Padding="16,0" HorizontalAlignment="Left"
+                                Content="ZAPISZ DOSTĘP RÓL" Click="SaveProjectRolesButton_OnClick" />
+                        <Button Height="42" Padding="18,0" HorizontalAlignment="Left" Background="#DC4C56" Foreground="White"
+                                Content="USUŃ PROJEKT" Click="DeleteProjectButton_OnClick" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <Border Padding="16" Background="{DynamicResource IconBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="12">
+                <StackPanel Spacing="9">
+                    <TextBlock Text="UTWÓRZ NOWY PROJEKT" FontWeight="Bold" />
+                    <Button Name="ShowCreationButton" Height="42" Padding="18,0" HorizontalAlignment="Left"
+                            Content="+ UTWÓRZ PROJEKT" Click="ShowCreationButton_OnClick" />
+                    <Grid Name="CreationPanel" ColumnDefinitions="*,10,Auto,10,Auto" IsVisible="False">
+                        <TextBox Name="NewProjectNameTextBox" Height="42" PlaceholderText="Nazwa projektu" />
+                        <Button Grid.Column="2" Height="42" Padding="18,0" Content="ZAPISZ" Click="CreateProjectButton_OnClick" />
+                        <Button Grid.Column="4" Height="42" Padding="18,0" Content="ANULUJ" Click="CancelCreationButton_OnClick" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Name="ResultTextBlock" VerticalAlignment="Center" TextWrapping="Wrap" IsVisible="False" />
+                <Button Grid.Column="1" Height="42" Padding="20,0" Content="ZAMKNIJ" Click="CloseButton_OnClick" />
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

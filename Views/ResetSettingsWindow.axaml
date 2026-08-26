@@ -1,0 +1,82 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="QARegressionManager.Views.ResetSettingsWindow"
+        Title="Resetowanie ustawień" Width="600" Height="620"
+        MinWidth="560" MinHeight="590" CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Arial" FontSize="12" FontWeight="Normal"
+        Background="{DynamicResource AppBackgroundBrush}">
+    <Border Margin="12" Padding="16" Background="{DynamicResource CardBackgroundBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="20">
+            <StackPanel Spacing="7">
+                <TextBlock Text="Resetowanie ustawień" FontSize="22" />
+                <TextBlock Text="Wybierz zakres resetu. Każda operacja wymaga osobnego potwierdzenia."
+                           TextWrapping="Wrap" Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                <Border Classes="ResetCard"><StackPanel Spacing="3">
+                    <TextBlock Text="RESET PIN-ÓW WSZYSTKICH PROFILI" Classes="ResetTitle" />
+                    <TextBlock Text="Ustawia PIN 000000 wszystkim użytkownikom." TextWrapping="Wrap" />
+                    <Button Classes="ResetButton" Content="RESETUJ PIN-Y" Click="ResetAllPinsButton_OnClick" />
+                </StackPanel></Border>
+
+                <Border Classes="ResetCard"><StackPanel Spacing="3">
+                    <TextBlock Text="ZEROWANIE PRZYPISAŃ TESTÓW" Classes="ResetTitle" />
+                    <TextBlock Text="Wycofuje przypisania; historia i raporty pozostają bez zmian." TextWrapping="Wrap" />
+                    <Button Classes="ResetButton" Content="ZERUJ PRZYPISANIA" Click="ResetAssignmentsButton_OnClick" />
+                </StackPanel></Border>
+
+                <Border Classes="ResetCard"><StackPanel Spacing="3">
+                    <TextBlock Text="RESET POSTĘPU WYKONANIA TESTÓW" Classes="ResetTitle" />
+                    <TextBlock Text="Usuwa przypisania, sesje i powiadomienia oraz zeruje statusy." TextWrapping="Wrap" />
+                    <Button Classes="ResetButton" Content="ZRESETUJ POSTĘP TESTÓW" Click="ResetProgressButton_OnClick" />
+                </StackPanel></Border>
+
+                <Border Classes="ResetCard Important"><StackPanel Spacing="3">
+                    <TextBlock Text="GLOBALNY RESET TESTOWY" Classes="ResetTitle" />
+                    <TextBlock Text="Zachowuje konta, role i przypadki; resetuje PIN-y, wygląd, sesje, statusy i komentarze." TextWrapping="Wrap" />
+                    <TextBlock Text="PIN ZALOGOWANEGO UŻYTKOWNIKA" FontSize="11" />
+                    <TextBox Name="GlobalResetPinTextBox" Height="32" MaxLength="6" PasswordChar="●" PlaceholderText="6 cyfr" />
+                    <Button Classes="ResetButton" Content="WYKONAJ GLOBALNY RESET" Click="GlobalResetButton_OnClick" />
+                </StackPanel></Border>
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Name="ResultTextBlock" VerticalAlignment="Center" TextWrapping="Wrap" IsVisible="False" />
+                    <Button Grid.Column="1" Height="30" Padding="14,0" Content="ZAMKNIJ" Click="CloseButton_OnClick" />
+                </Grid>
+            </StackPanel>
+        </Border>
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
+        <Style Selector="Border.ResetCard">
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="Background" Value="#18DC4C56" />
+            <Setter Property="BorderBrush" Value="#55DC4C56" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+        </Style>
+        <Style Selector="Border.ResetCard.Important">
+            <Setter Property="BorderBrush" Value="#AADC4C56" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+        <Style Selector="TextBlock.ResetTitle">
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Foreground" Value="#DC4C56" />
+        </Style>
+        <Style Selector="Button.ResetButton">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Background" Value="#DC4C56" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+</Window>
