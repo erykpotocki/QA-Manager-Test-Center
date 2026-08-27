@@ -46,15 +46,15 @@
                                    FontWeight="SemiBold" />
                     </Button>
                     <Border Width="58" Height="58"
-                            Background="#162E86D1"
-                            BorderBrush="#6EA8DE"
+                            Background="{DynamicResource AccentSoftBrush}"
+                            BorderBrush="{DynamicResource AccentMutedBrush}"
                             BorderThickness="1"
                             CornerRadius="18">
                         <Path Width="30" Height="30"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               Stretch="Uniform"
-                              Stroke="#2E86D1"
+                              Stroke="{DynamicResource AccentPrimaryBrush}"
                               StrokeThickness="1.7"
                               StrokeLineCap="Round"
                               StrokeJoin="Round"
@@ -146,12 +146,12 @@
 
             <Grid Name="ManagerNavigationPanel" Grid.Row="3" Margin="0,8,0,0"
                   ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto,8,Auto,8,Auto" IsVisible="False">
-                <Button Name="ActiveSessionsButton" Grid.Column="0" Height="38" Padding="16,0"
+                <Button Name="ActiveSessionsButton" Grid.Column="0" Classes="DashboardTab active" Height="38" Padding="16,0"
                         Content="{DynamicResource Dashboard.Active}" Click="ActiveSessionsButton_OnClick"
-                        Background="#2E86D1" Foreground="White" BorderBrush="#2E86D1" />
-                <Button Name="HistorySessionsButton" Grid.Column="2" Height="38" Padding="16,0"
+                        />
+                <Button Name="HistorySessionsButton" Grid.Column="2" Classes="DashboardTab" Height="38" Padding="16,0"
                         Content="{DynamicResource Dashboard.History}" Click="HistorySessionsButton_OnClick" />
-                <Button Name="ArchiveSessionsButton" Grid.Column="4" Height="38" Padding="16,0"
+                <Button Name="ArchiveSessionsButton" Grid.Column="4" Classes="DashboardTab" Height="38" Padding="16,0"
                         Content="{DynamicResource Dashboard.Archive}" Click="ArchiveSessionsButton_OnClick" />
                 <Button Name="StopSelectedSessionsButton" Grid.Column="6" Height="38" Padding="16,0"
                         Content="{DynamicResource Dashboard.StopSelected}" Click="StopSelectedSessionsButton_OnClick"
@@ -159,7 +159,8 @@
                         IsEnabled="False" />
                 <Button Name="RestoreArchivedSessionsButton" Grid.Column="8" Height="38" Padding="16,0"
                         Content="{DynamicResource Dashboard.RestoreSelected}" Click="RestoreArchivedSessionsButton_OnClick"
-                        Background="#2E86D1" Foreground="White" BorderBrush="#2E86D1"
+                        Background="{DynamicResource AccentPrimaryBrush}" Foreground="White"
+                        BorderBrush="{DynamicResource AccentPrimaryBrush}"
                         IsVisible="False" IsEnabled="False" />
                 <Button Name="DeleteAllArchivedSessionsButton" Grid.Column="10" Height="38" Padding="16,0"
                         Content="{DynamicResource Dashboard.DeleteAll}" Click="DeleteAllArchivedSessionsButton_OnClick"
@@ -206,7 +207,8 @@
             <Grid Grid.Row="5" ColumnDefinitions="*,Auto,10,Auto">
                 <Button Name="GenerateTeamReportButton" Grid.Column="1"
                         Height="44" Padding="22,0"
-                        Background="#4D91D1" BorderBrush="#75A9D8"
+                        Background="{DynamicResource AccentPrimaryBrush}"
+                        BorderBrush="{DynamicResource AccentPrimaryBrush}"
                         Foreground="White" FontWeight="Bold"
                         Content="{DynamicResource Dashboard.GenerateReport}" IsVisible="False"
                         Click="GenerateTeamReportButton_OnClick" />

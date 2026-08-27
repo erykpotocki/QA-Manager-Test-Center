@@ -870,12 +870,9 @@ public partial class ProgressDashboardWindow : Window
         var active = _dashboardSection == DashboardSection.Active;
         var history = _dashboardSection == DashboardSection.History;
         var archive = _dashboardSection == DashboardSection.Archive;
-        ActiveSessionsButton.Background = new SolidColorBrush(Color.Parse(active ? "#2E86D1" : "#00000000"));
-        ActiveSessionsButton.Foreground = active ? Brushes.White : Brushes.Gray;
-        HistorySessionsButton.Background = new SolidColorBrush(Color.Parse(history ? "#2E86D1" : "#00000000"));
-        HistorySessionsButton.Foreground = history ? Brushes.White : Brushes.Gray;
-        ArchiveSessionsButton.Background = new SolidColorBrush(Color.Parse(archive ? "#2E86D1" : "#00000000"));
-        ArchiveSessionsButton.Foreground = archive ? Brushes.White : Brushes.Gray;
+        ActiveSessionsButton.Classes.Set("active", active);
+        HistorySessionsButton.Classes.Set("active", history);
+        ArchiveSessionsButton.Classes.Set("active", archive);
         StopSelectedSessionsButton.IsVisible = true;
         StopSelectedSessionsButton.Content = archive
             ? LocalizationService.T("Dashboard.DeleteSelected")

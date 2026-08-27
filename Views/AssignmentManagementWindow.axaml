@@ -222,7 +222,9 @@
                         <Button Grid.Column="2" Classes="assignmentAction"
                                 Content="{DynamicResource Assignment.BackToEdit}" Click="BackToEditorButton_OnClick" />
                         <Button Name="SendAssignmentsButton" Grid.Column="3" Classes="assignmentAction"
-                                Content="{DynamicResource Assignment.Send}" Background="#1F6FBF"
+                                Content="{DynamicResource Assignment.Send}"
+                                Background="{DynamicResource AccentPrimaryBrush}"
+                                BorderBrush="{DynamicResource AccentPrimaryBrush}"
                                 Foreground="White" Click="SendAssignmentsButton_OnClick" />
                     </Grid>
                 </Grid>

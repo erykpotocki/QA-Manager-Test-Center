@@ -2,6 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:QARegressionManager"
+    xmlns:services="using:QARegressionManager.Services"
     x:Class="QARegressionManager.App"
     RequestedThemeVariant="Light">
 
@@ -227,6 +228,7 @@
             <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
             <Setter Property="FontSize" Value="{DynamicResource AppBaseFontSize}" />
             <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+            <Setter Property="services:NativeWindowAccentBehavior.IsEnabled" Value="True" />
         </Style>
 
         <Style Selector="TextBlock">
@@ -296,6 +298,18 @@
             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.DashboardTab">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+        </Style>
+
+        <Style Selector="Button.DashboardTab.active">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
         </Style>
 
         <Style Selector="Button.DangerAction">
