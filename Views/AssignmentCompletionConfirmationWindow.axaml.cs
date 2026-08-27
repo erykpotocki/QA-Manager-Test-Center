@@ -12,9 +12,6 @@ public partial class AssignmentCompletionConfirmationWindow : Window
         KeyDown += OnWindowKeyDown;
     }
 
-    public bool DontShowAgain =>
-        DontShowAgainCheckBox.IsChecked == true;
-
     private void FinishButton_OnClick(object? sender, RoutedEventArgs e) =>
         Close(AssignmentCompletionChoice.FinishWithoutReport);
 

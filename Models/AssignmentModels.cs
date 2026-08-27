@@ -18,6 +18,9 @@ public sealed class TestAssignmentModel
     public string ProjectName { get; set; } =
         string.Empty;
 
+    public string SessionName { get; set; } =
+        string.Empty;
+
     public string ApplicationVersion { get; set; } =
         string.Empty;
 
@@ -135,6 +138,7 @@ public sealed record AssignmentSaveRequest(
     Guid? AssignmentId,
     string ProjectKey,
     string ProjectName,
+    string SessionName,
     string ApplicationVersion,
     string RecipientLogin,
     string AssignedByLogin,

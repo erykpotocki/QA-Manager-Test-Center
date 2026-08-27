@@ -35,12 +35,16 @@ public partial class AssignmentManagementWindow : Window
         new();
     private readonly List<AssignmentDraft> _drafts =
         new();
+    private readonly AssignmentInputPresets _inputPresets =
+        AssignmentInputPresetService.Load();
 
     private TestAssignmentModel[] _activeAssignments =
         Array.Empty<TestAssignmentModel>();
     private bool _synchronizingCheckBoxes;
     private bool _loadingData;
     private bool _sendingAssignments;
+    private Control? _inlineContent;
+    private Func<Task>? _inlineCloseAction;
 
     public bool DataChanged { get; private set; }
 
@@ -96,6 +100,36 @@ public partial class AssignmentManagementWindow : Window
             (_, _) =>
                 BuildCases();
 
+        VersionPresetComboBox.SelectionChanged +=
+            (_, _) =>
+                Dispatcher.UIThread.Post(
+                    UpdatePresetDeleteButtons,
+                    DispatcherPriority.Background);
+
+        SessionNamePresetComboBox.SelectionChanged +=
+            (_, _) =>
+                Dispatcher.UIThread.Post(
+                    UpdatePresetDeleteButtons,
+                    DispatcherPriority.Background);
+
+        VersionPresetComboBox.LostFocus +=
+            (_, _) =>
+                UpdatePresetDeleteButtons();
+
+        SessionNamePresetComboBox.LostFocus +=
+            (_, _) =>
+                UpdatePresetDeleteButtons();
+
+        RememberVersionCheckBox.Click +=
+            (_, _) =>
+                SaveCheckedPresets();
+
+        RememberSessionNameCheckBox.Click +=
+            (_, _) =>
+                SaveCheckedPresets();
+
+        RefreshPresetItems();
+
         SelectAllCheckBox.Click +=
             (_, _) =>
             {
@@ -120,6 +154,29 @@ public partial class AssignmentManagementWindow : Window
         Opened +=
             async (_, _) =>
                 await LoadDataAsync();
+    }
+
+    public async Task<Control?> TakeInlineContentAsync(
+        Func<Task> closeAction)
+    {
+        if (Content is not Control content)
+        {
+            return null;
+        }
+
+        Content = null;
+        _inlineContent = content;
+        _inlineCloseAction = closeAction;
+
+        await LoadDataAsync();
+
+        return content;
+    }
+
+    public void ReleaseInlineContent()
+    {
+        _inlineContent = null;
+        _inlineCloseAction = null;
     }
 
     private async Task LoadDataAsync()
@@ -187,7 +244,9 @@ public partial class AssignmentManagementWindow : Window
                     {
                         Content = LocalizationService.Format(
                             "Assignment.SessionListItem",
-                            assignment.RecipientLogin,
+                            string.IsNullOrWhiteSpace(assignment.SessionName)
+                                ? assignment.RecipientLogin
+                                : assignment.SessionName,
                             assignment.ApplicationVersion,
                             assignment.TestCaseIds.Count),
                         Tag = assignment
@@ -688,7 +747,10 @@ public partial class AssignmentManagementWindow : Window
 
         if (assignment is null)
         {
-            VersionTextBox.Text =
+            VersionPresetComboBox.Text =
+                string.Empty;
+
+            SessionNamePresetComboBox.Text =
                 string.Empty;
 
             TestTypeComboBox.SelectedIndex =
@@ -696,7 +758,10 @@ public partial class AssignmentManagementWindow : Window
         }
         else
         {
-            VersionTextBox.Text =
+            SessionNamePresetComboBox.Text =
+                assignment.SessionName;
+
+            VersionPresetComboBox.Text =
                 assignment.ApplicationVersion;
 
             SelectRecipient(
@@ -793,7 +858,10 @@ public partial class AssignmentManagementWindow : Window
                 ?.ToString();
 
         var version =
-            VersionTextBox.Text?.Trim();
+            VersionPresetComboBox.Text?.Trim();
+
+        var sessionName =
+            SessionNamePresetComboBox.Text?.Trim();
 
         var selectedIds =
             _selectedCaseIds
@@ -822,10 +890,19 @@ public partial class AssignmentManagementWindow : Window
                 LocalizationService.T("Assignment.VersionRequired"),
                 false);
 
-            VersionTextBox.Focus();
+            VersionPresetComboBox.Focus();
 
             return;
         }
+
+        sessionName =
+            string.IsNullOrWhiteSpace(sessionName)
+                ? $"{_projectName} — v{version}"
+                : sessionName;
+
+        SaveCheckedPresets(
+            sessionName,
+            version);
 
         if (selectedIds.Length == 0)
         {
@@ -863,6 +940,10 @@ public partial class AssignmentManagementWindow : Window
                         string.Equals(
                             draft.ApplicationVersion,
                             version,
+                            StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(
+                            draft.SessionName,
+                            sessionName,
                             StringComparison.OrdinalIgnoreCase));
 
             if (matchingDraftIndex >= 0)
@@ -891,6 +972,7 @@ public partial class AssignmentManagementWindow : Window
                     new AssignmentDraft(
                         null,
                         recipient,
+                        sessionName,
                         version,
                         selectedIds));
             }
@@ -901,6 +983,7 @@ public partial class AssignmentManagementWindow : Window
                 new AssignmentDraft(
                     selectedAssignment.Id,
                     recipient,
+                    sessionName,
                     version,
                     selectedIds));
         }
@@ -919,6 +1002,9 @@ public partial class AssignmentManagementWindow : Window
 
         AssignmentComboBox.SelectedIndex =
             0;
+
+        SessionNamePresetComboBox.Text =
+            sessionName;
 
         _loadingData =
             false;
@@ -1027,7 +1113,7 @@ public partial class AssignmentManagementWindow : Window
             textPanel.Children.Add(
                 new TextBlock
                 {
-                    Text = LocalizationService.Format("Assignment.DraftSummary", draft.RecipientLogin, draft.ApplicationVersion, draft.TestCaseIds.Length),
+                    Text = LocalizationService.Format("Assignment.DraftSummary", draft.SessionName, draft.RecipientLogin, draft.ApplicationVersion, draft.TestCaseIds.Length),
                     FontSize = 14,
                     FontWeight = FontWeight.SemiBold
                 });
@@ -1182,6 +1268,7 @@ public partial class AssignmentManagementWindow : Window
                             draft.AssignmentId,
                             _projectKey,
                             _projectName,
+                            draft.SessionName,
                             draft.ApplicationVersion,
                             draft.RecipientLogin,
                             _assignedByLogin,
@@ -1209,7 +1296,7 @@ public partial class AssignmentManagementWindow : Window
             DataChanged =
                 true;
 
-            Close(true);
+            await CompleteInlineOrCloseAsync();
         }
         catch (Exception exception)
         {
@@ -1255,7 +1342,7 @@ public partial class AssignmentManagementWindow : Window
                 LocalizationService.T("Assignment.CancelAll"));
 
         if (!await confirmation.ShowDialog<bool>(
-                this))
+                GetDialogOwner()))
         {
             return;
         }
@@ -1317,7 +1404,7 @@ public partial class AssignmentManagementWindow : Window
                 LocalizationService.T("Assignment.CancelAssignment"));
 
         if (!await confirmation.ShowDialog<bool>(
-                this))
+                GetDialogOwner()))
         {
             return;
         }
@@ -1357,12 +1444,200 @@ public partial class AssignmentManagementWindow : Window
             true;
     }
 
-    private void CloseButton_OnClick(
+    private void RefreshPresetItems()
+    {
+        var sessionName =
+            SessionNamePresetComboBox.Text;
+        var version =
+            VersionPresetComboBox.Text;
+
+        SessionNamePresetComboBox.ItemsSource =
+            _inputPresets.SessionNames.ToArray();
+        VersionPresetComboBox.ItemsSource =
+            _inputPresets.Versions.ToArray();
+
+        SessionNamePresetComboBox.Text =
+            sessionName;
+        VersionPresetComboBox.Text =
+            version;
+
+        UpdatePresetDeleteButtons();
+    }
+
+    private void UpdatePresetDeleteButtons()
+    {
+        DeleteSavedSessionNameButton.IsEnabled =
+            ContainsPreset(
+                _inputPresets.SessionNames,
+                SessionNamePresetComboBox.Text);
+
+        DeleteSavedVersionButton.IsEnabled =
+            ContainsPreset(
+                _inputPresets.Versions,
+                VersionPresetComboBox.Text);
+    }
+
+    private void SaveCheckedPresets(
+        string? sessionName = null,
+        string? version = null)
+    {
+        var changed =
+            false;
+
+        if (RememberSessionNameCheckBox.IsChecked == true)
+        {
+            changed |=
+                AddPreset(
+                    _inputPresets.SessionNames,
+                    sessionName ?? SessionNamePresetComboBox.Text);
+        }
+
+        if (RememberVersionCheckBox.IsChecked == true)
+        {
+            changed |=
+                AddPreset(
+                    _inputPresets.Versions,
+                    version ?? VersionPresetComboBox.Text);
+        }
+
+        if (!changed)
+        {
+            UpdatePresetDeleteButtons();
+            return;
+        }
+
+        AssignmentInputPresetService.Save(
+            _inputPresets);
+        RefreshPresetItems();
+    }
+
+    private static bool AddPreset(
+        List<string> presets,
+        string? value)
+    {
+        var normalized =
+            value?.Trim();
+
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return false;
+        }
+
+        var existingIndex =
+            presets.FindIndex(
+                item =>
+                    string.Equals(
+                        item,
+                        normalized,
+                        StringComparison.OrdinalIgnoreCase));
+
+        if (existingIndex == 0)
+        {
+            return false;
+        }
+
+        if (existingIndex > 0)
+        {
+            presets.RemoveAt(
+                existingIndex);
+        }
+
+        presets.Insert(
+            0,
+            normalized);
+
+        return true;
+    }
+
+    private static bool ContainsPreset(
+        IEnumerable<string> presets,
+        string? value)
+    {
+        var normalized =
+            value?.Trim();
+
+        return !string.IsNullOrWhiteSpace(normalized) &&
+               presets.Any(
+                   item =>
+                       string.Equals(
+                           item,
+                           normalized,
+                           StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void DeleteSavedSessionNameButton_OnClick(
         object? sender,
         RoutedEventArgs e)
     {
-        Close(
-            DataChanged);
+        DeletePreset(
+            _inputPresets.SessionNames,
+            SessionNamePresetComboBox.Text);
+    }
+
+    private void DeleteSavedVersionButton_OnClick(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        DeletePreset(
+            _inputPresets.Versions,
+            VersionPresetComboBox.Text);
+    }
+
+    private void DeletePreset(
+        List<string> presets,
+        string? value)
+    {
+        var removed =
+            presets.RemoveAll(
+                item =>
+                    string.Equals(
+                        item,
+                        value?.Trim(),
+                        StringComparison.OrdinalIgnoreCase)) > 0;
+
+        if (!removed)
+        {
+            UpdatePresetDeleteButtons();
+            return;
+        }
+
+        AssignmentInputPresetService.Save(
+            _inputPresets);
+        RefreshPresetItems();
+
+        ShowResult(
+            LocalizationService.T("Assignment.SavedValueRemoved"),
+            true);
+    }
+
+    private async void CloseButton_OnClick(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        await CompleteInlineOrCloseAsync();
+    }
+
+    private Window GetDialogOwner()
+    {
+        if (_inlineContent is not null &&
+            TopLevel.GetTopLevel(_inlineContent) is Window inlineOwner)
+        {
+            return inlineOwner;
+        }
+
+        return this;
+    }
+
+    private async Task CompleteInlineOrCloseAsync()
+    {
+        if (_inlineCloseAction is not null)
+        {
+            var closeAction = _inlineCloseAction;
+            await closeAction();
+            return;
+        }
+
+        Close(DataChanged);
     }
 
     protected override void OnKeyDown(
@@ -1378,8 +1653,7 @@ public partial class AssignmentManagementWindow : Window
             }
             else
             {
-                Close(
-                    DataChanged);
+                _ = CompleteInlineOrCloseAsync();
             }
 
             e.Handled =
@@ -1390,6 +1664,7 @@ public partial class AssignmentManagementWindow : Window
     private sealed record AssignmentDraft(
         Guid? AssignmentId,
         string RecipientLogin,
+        string SessionName,
         string ApplicationVersion,
         Guid[] TestCaseIds);
 }

@@ -361,6 +361,7 @@ public sealed class AssignmentService
                         assignmentId,
                         projectKey,
                         projectName,
+                        string.Empty,
                         applicationVersion,
                         recipientLogin,
                         assignedByLogin,
@@ -489,6 +490,11 @@ public sealed class AssignmentService
 
         assignment.ApplicationVersion =
             request.ApplicationVersion.Trim();
+
+        assignment.SessionName =
+            string.IsNullOrWhiteSpace(request.SessionName)
+                ? $"{request.ProjectName} — v{request.ApplicationVersion.Trim()}"
+                : request.SessionName.Trim();
 
         assignment.RecipientLogin =
             request.RecipientLogin.Trim();

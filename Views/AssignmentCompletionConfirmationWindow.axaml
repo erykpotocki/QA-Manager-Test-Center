@@ -24,9 +24,6 @@
                        Text="{DynamicResource Assignment.CompletionInfo}"
                        TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize14}"
                        Foreground="{DynamicResource SecondaryTextBrush}" />
-            <CheckBox Grid.Row="3" Name="DontShowAgainCheckBox"
-                      Margin="0,22,0,0" VerticalAlignment="Top"
-                      Content="{DynamicResource Assignment.DoNotShowAgain}" />
             <StackPanel Grid.Row="4" Margin="0,26,0,0" Orientation="Horizontal"
                         HorizontalAlignment="Right" Spacing="10">
                 <Button Height="44" MinWidth="130" Padding="18,0" CornerRadius="11"
