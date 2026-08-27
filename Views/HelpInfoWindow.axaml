@@ -78,6 +78,15 @@
                 <StackPanel Spacing="14">
                     <Border Classes="SectionCard">
                         <StackPanel Spacing="10">
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.LatestTitle}" />
+                            <TextBlock
+                                Classes="BodyText"
+                                Text="{DynamicResource Help.LatestBody}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="SectionCard">
+                        <StackPanel Spacing="10">
                             <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.CoreTitle}" />
                             <TextBlock
                                 Classes="BodyText"
@@ -132,19 +141,10 @@
 
                     <Border Classes="SectionCard">
                         <StackPanel Spacing="10">
-                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.Update02Title}" />
+                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.FirstRunTitle}" />
                             <TextBlock
                                 Classes="BodyText"
-                                Text="{DynamicResource Help.Update02Body}" />
-                        </StackPanel>
-                    </Border>
-
-                    <Border Classes="SectionCard">
-                        <StackPanel Spacing="10">
-                            <TextBlock Classes="SectionTitle" Text="{DynamicResource Help.Update01Title}" />
-                            <TextBlock
-                                Classes="BodyText"
-                                Text="{DynamicResource Help.Update01Body}" />
+                                Text="{DynamicResource Help.FirstRunBody}" />
                         </StackPanel>
                     </Border>
                 </StackPanel>
