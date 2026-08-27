@@ -1,12 +1,11 @@
 using System;
-using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 using QARegressionManager.Services;
 
 namespace QARegressionManager.Views;
@@ -22,9 +21,24 @@ public partial class ApplicationSettingsWindow : Window
     private Border? _previewBorder;
     private TextBlock? _previewTitleTextBlock;
     private TextBlock? _previewBodyTextBlock;
+    private TextBlock? _previewPolishCharactersTextBlock;
+    private Button? _saveButton;
+    private TextBlock? _saveButtonText;
+    private StackPanel? _savingIndicatorPanel;
+    private TextBlock? _savingSpinner;
+    private StackPanel? _savedConfirmationPanel;
+    private StackPanel? _languageChangeIndicatorPanel;
+    private TextBlock? _languageChangeSpinner;
+    private readonly DispatcherTimer _languageChangeSpinnerTimer =
+        new()
+        {
+            Interval = TimeSpan.FromMilliseconds(28)
+        };
+    private double _languageChangeSpinnerAngle;
+    private int _appearanceChangeVersion;
     private bool _isInitializing = true;
     private bool _settingsSaved;
-    private readonly string _savedLanguage = LocalizationService.CurrentLanguage;
+    private string _savedLanguage = LocalizationService.CurrentLanguage;
 
     public ApplicationSettingsWindow()
     {
@@ -49,6 +63,35 @@ public partial class ApplicationSettingsWindow : Window
             this.FindControl<TextBlock>("PreviewTitleTextBlock");
         _previewBodyTextBlock =
             this.FindControl<TextBlock>("PreviewBodyTextBlock");
+        _previewPolishCharactersTextBlock =
+            this.FindControl<TextBlock>("PreviewPolishCharactersTextBlock");
+        _saveButton =
+            this.FindControl<Button>("SaveButton");
+        _saveButtonText =
+            this.FindControl<TextBlock>("SaveButtonText");
+        _savingIndicatorPanel =
+            this.FindControl<StackPanel>("SavingIndicatorPanel");
+        _savingSpinner =
+            this.FindControl<TextBlock>("SavingSpinner");
+        _savedConfirmationPanel =
+            this.FindControl<StackPanel>("SavedConfirmationPanel");
+        _languageChangeIndicatorPanel =
+            this.FindControl<StackPanel>("LanguageChangeIndicatorPanel");
+        _languageChangeSpinner =
+            this.FindControl<TextBlock>("LanguageChangeSpinner");
+
+        _languageChangeSpinnerTimer.Tick +=
+            (_, _) =>
+            {
+                _languageChangeSpinnerAngle =
+                    (_languageChangeSpinnerAngle + 18) % 360;
+
+                if (_languageChangeSpinner?.RenderTransform is RotateTransform transform)
+                {
+                    transform.Angle =
+                        _languageChangeSpinnerAngle;
+                }
+            };
 
         SelectByTag(
             _themeComboBox,
@@ -72,25 +115,93 @@ public partial class ApplicationSettingsWindow : Window
             LocalizationService.CurrentLanguage);
         SubscribeToPreviewChanges();
         _isInitializing = false;
-        RefreshComboBoxTextColors(
-            GetSelectedSettings());
         UpdatePreview(
             GetSelectedSettings());
     }
 
-    private void SaveButton_OnClick(
+    private async void SaveButton_OnClick(
         object? sender,
         RoutedEventArgs e)
     {
+        SetSavingState(
+            true);
+
+        var spinnerAngle = 0d;
+        var spinnerTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(28)
+        };
+        spinnerTimer.Tick += (_, _) =>
+        {
+            spinnerAngle =
+                (spinnerAngle + 18) % 360;
+
+            if (_savingSpinner?.RenderTransform is RotateTransform transform)
+            {
+                transform.Angle =
+                    spinnerAngle;
+            }
+        };
+        spinnerTimer.Start();
+
+        // Pozwala wyrenderować stan zapisywania przed operacją plikową i
+        // utrzymuje go na tyle długo, aby potwierdzenie było zauważalne.
+        await Task.Delay(80);
+
         ApplicationAppearanceService.SaveAndApply(
             GetSelectedSettings());
         LocalizationService.SaveAndApply(
             GetSelectedTag(_languageComboBox, LocalizationService.English));
 
+        _savedLanguage =
+            LocalizationService.CurrentLanguage;
+
         _settingsSaved = true;
 
-        Close(
-            true);
+        await Task.Delay(420);
+
+        spinnerTimer.Stop();
+        SetSavingState(
+            false);
+
+        if (_savedConfirmationPanel is not null)
+        {
+            _savedConfirmationPanel.IsVisible =
+                true;
+        }
+    }
+
+    private void SetSavingState(
+        bool isSaving)
+    {
+        if (_saveButton is not null)
+        {
+            _saveButton.IsEnabled =
+                !isSaving;
+        }
+
+        if (_saveButtonText is not null)
+        {
+            _saveButtonText.IsVisible =
+                !isSaving;
+        }
+
+        if (_savingIndicatorPanel is not null)
+        {
+            _savingIndicatorPanel.IsVisible =
+                isSaving;
+        }
+    }
+
+    private void MarkSettingsAsChanged()
+    {
+        _settingsSaved = false;
+
+        if (_savedConfirmationPanel is not null)
+        {
+            _savedConfirmationPanel.IsVisible =
+                false;
+        }
     }
 
     private void CancelButton_OnClick(
@@ -106,6 +217,8 @@ public partial class ApplicationSettingsWindow : Window
     protected override void OnClosed(
         EventArgs e)
     {
+        _languageChangeSpinnerTimer.Stop();
+
         if (!_settingsSaved)
         {
             RestoreSavedAppearance();
@@ -156,11 +269,27 @@ public partial class ApplicationSettingsWindow : Window
         }
     }
 
-    private void AppearanceComboBox_OnSelectionChanged(
+    private async void AppearanceComboBox_OnSelectionChanged(
         object? sender,
         SelectionChangedEventArgs e)
     {
         if (_isInitializing)
+        {
+            return;
+        }
+
+        MarkSettingsAsChanged();
+
+        var changeVersion =
+            ++_appearanceChangeVersion;
+
+        ShowAppearanceChangeIndicator();
+
+        // Najpierw pozwalamy interfejsowi narysować wskaźnik pracy. Zmiana
+        // wariantu motywu przebudowuje zasoby wszystkich otwartych okien.
+        await Task.Delay(55);
+
+        if (changeVersion != _appearanceChangeVersion)
         {
             return;
         }
@@ -171,31 +300,15 @@ public partial class ApplicationSettingsWindow : Window
         ApplicationAppearanceService.ApplyPreview(
             settings);
 
-        RecreateComboBoxSelectionPresenters();
-
-        RefreshComboBoxTextColors(
-            settings);
-
-        // SelectedItem bywa renderowany ponownie chwilę po zmianie wariantu
-        // motywu. Drugi przebieg po renderze zapobiega zachowaniu koloru
-        // tekstu z poprzedniego motywu w obu kierunkach Light/Dark.
-        Dispatcher.UIThread.Post(
-            () =>
-            {
-                RecreateComboBoxSelectionPresenters();
-                RefreshComboBoxTextColors(settings);
-                Dispatcher.UIThread.Post(
-                    () =>
-                    {
-                        RecreateComboBoxSelectionPresenters();
-                        RefreshComboBoxTextColors(settings);
-                    },
-                    DispatcherPriority.Background);
-            },
-            DispatcherPriority.Render);
-
         UpdatePreview(
             settings);
+
+        await Task.Delay(180);
+
+        if (changeVersion == _appearanceChangeVersion)
+        {
+            HideAppearanceChangeIndicator();
+        }
     }
 
     private ApplicationAppearanceSettings GetSelectedSettings() =>
@@ -204,7 +317,7 @@ public partial class ApplicationSettingsWindow : Window
             Theme = GetSelectedTag(_themeComboBox, "Light"),
             AccentColor = GetSelectedTag(_accentColorComboBox, "Blue"),
             TextSize = GetSelectedTag(_textSizeComboBox, "Standard"),
-            FontFamily = GetSelectedTag(_fontFamilyComboBox, "Inter"),
+            FontFamily = GetSelectedTag(_fontFamilyComboBox, "Calibri"),
             UseSemiBoldText = string.Equals(
                 GetSelectedTag(_fontWeightComboBox, "Normal"),
                 "SemiBold",
@@ -304,63 +417,95 @@ public partial class ApplicationSettingsWindow : Window
                     : FontWeight.Normal;
             _previewBodyTextBlock.Foreground = secondaryText;
         }
-    }
 
-    private void RefreshComboBoxTextColors(
-        ApplicationAppearanceSettings settings)
-    {
-        var foreground = new SolidColorBrush(
-            Color.Parse(
-                string.Equals(settings.Theme, "Dark", StringComparison.OrdinalIgnoreCase)
-                    ? "#F2F7F3"
-                    : "#17221B"));
-
-        foreach (var comboBox in new[]
-                 {
-                     _themeComboBox,
-                     _textSizeComboBox,
-                     _fontFamilyComboBox,
-                     _fontWeightComboBox,
-                     _accentColorComboBox,
-                     _languageComboBox
-                 })
+        if (_previewPolishCharactersTextBlock is not null)
         {
-            if (comboBox is null)
-            {
-                continue;
-            }
-
-            comboBox.Foreground = foreground;
-
-            // Zaznaczona pozycja jest przez Avalonię prezentowana jako
-            // osobne drzewo wizualne, niezależne od Content ComboBoxItem.
-            // Aktualizujemy więc również faktycznie renderowane etykiety.
-            foreach (var textBlock in comboBox
-                         .GetVisualDescendants()
-                         .OfType<TextBlock>())
-            {
-                textBlock.Foreground = foreground;
-            }
-
-            foreach (var item in comboBox.Items.OfType<ComboBoxItem>())
-            {
-                item.Foreground = foreground;
-
-                if (item.Content is Control content)
-                {
-                    SetTextForeground(content, foreground);
-                }
-            }
+            _previewPolishCharactersTextBlock.FontFamily = fontFamily;
+            _previewPolishCharactersTextBlock.FontSize = bodySize;
+            _previewPolishCharactersTextBlock.FontWeight =
+                settings.UseSemiBoldText
+                    ? FontWeight.SemiBold
+                    : FontWeight.Normal;
+            _previewPolishCharactersTextBlock.Foreground = secondaryText;
         }
     }
 
-    private void RecreateComboBoxSelectionPresenters()
+    private void RestoreSavedAppearance()
+    {
+        ApplicationAppearanceService.ApplyPreview(
+            ApplicationAppearanceService.Current);
+        LocalizationService.Apply(
+            _savedLanguage);
+    }
+
+    private async void LanguageComboBox_OnSelectionChanged(
+        object? sender,
+        SelectionChangedEventArgs e)
+    {
+        if (_isInitializing)
+        {
+            return;
+        }
+
+        MarkSettingsAsChanged();
+
+        var changeVersion =
+            ++_appearanceChangeVersion;
+
+        ShowAppearanceChangeIndicator();
+
+        // Najpierw renderujemy informację o pracy, dopiero potem przebudowujemy
+        // zasoby językowe i prezentery zaznaczonych pozycji.
+        await Task.Delay(70);
+
+        if (changeVersion != _appearanceChangeVersion)
+        {
+            return;
+        }
+
+        LocalizationService.Apply(
+            GetSelectedTag(_languageComboBox, LocalizationService.English));
+
+        RefreshLocalizedComboBoxPresenters();
+
+        await Task.Delay(260);
+
+        if (changeVersion != _appearanceChangeVersion)
+        {
+            return;
+        }
+
+        HideAppearanceChangeIndicator();
+    }
+
+    private void ShowAppearanceChangeIndicator()
+    {
+        if (_languageChangeIndicatorPanel is not null)
+        {
+            _languageChangeIndicatorPanel.IsVisible =
+                true;
+        }
+
+        _languageChangeSpinnerTimer.Start();
+    }
+
+    private void HideAppearanceChangeIndicator()
+    {
+        _languageChangeSpinnerTimer.Stop();
+
+        if (_languageChangeIndicatorPanel is not null)
+        {
+            _languageChangeIndicatorPanel.IsVisible =
+                false;
+        }
+    }
+
+    private void RefreshLocalizedComboBoxPresenters()
     {
         var wasInitializing =
             _isInitializing;
 
-        _isInitializing =
-            true;
+        _isInitializing = true;
 
         try
         {
@@ -383,10 +528,11 @@ public partial class ApplicationSettingsWindow : Window
                 var selectedIndex =
                     comboBox.SelectedIndex;
 
-                comboBox.SelectedIndex =
-                    -1;
-                comboBox.SelectedIndex =
-                    selectedIndex;
+                // Avalonia kopiuje zawartość zaznaczonego ComboBoxItem do
+                // osobnego presentera. Ponowny wybór tworzy go z aktualnych
+                // zasobów językowych, nie zmieniając faktycznej wartości pola.
+                comboBox.SelectedIndex = -1;
+                comboBox.SelectedIndex = selectedIndex;
             }
         }
         finally
@@ -394,49 +540,6 @@ public partial class ApplicationSettingsWindow : Window
             _isInitializing =
                 wasInitializing;
         }
-    }
-
-    private static void SetTextForeground(
-        Control control,
-        IBrush foreground)
-    {
-        if (control is TextBlock textBlock)
-        {
-            textBlock.Foreground = foreground;
-        }
-
-        if (control is Panel panel)
-        {
-            foreach (var child in panel.Children)
-            {
-                SetTextForeground(child, foreground);
-            }
-        }
-        else if (control is Decorator { Child: Control child })
-        {
-            SetTextForeground(child, foreground);
-        }
-    }
-
-    private void RestoreSavedAppearance()
-    {
-        ApplicationAppearanceService.ApplyPreview(
-            ApplicationAppearanceService.Current);
-        LocalizationService.Apply(
-            _savedLanguage);
-    }
-
-    private void LanguageComboBox_OnSelectionChanged(
-        object? sender,
-        SelectionChangedEventArgs e)
-    {
-        if (_isInitializing)
-        {
-            return;
-        }
-
-        LocalizationService.Apply(
-            GetSelectedTag(_languageComboBox, LocalizationService.English));
     }
 
     private static string GetSelectedTag(

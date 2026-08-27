@@ -42,8 +42,30 @@ public partial class App : Application
         loginWindow.Authenticated +=
             profile =>
             {
+                var loginTheme =
+                    loginWindow.SelectedTheme;
+
+                var keepLoginTheme =
+                    loginWindow.ThemeWasChangedByUser;
+
                 ApplicationAppearanceService.LoadAndApplyForProfile(
                     profile.Login);
+
+                if (keepLoginTheme)
+                {
+                    var profileAppearance =
+                        ApplicationAppearanceService.Current;
+
+                    ApplicationAppearanceService.SaveAndApply(
+                        new ApplicationAppearanceSettings
+                        {
+                            Theme = loginTheme,
+                            AccentColor = profileAppearance.AccentColor,
+                            FontFamily = profileAppearance.FontFamily,
+                            TextSize = profileAppearance.TextSize,
+                            UseSemiBoldText = profileAppearance.UseSemiBoldText
+                        });
+                }
 
                 var mainWindow =
                     new MainWindow(
@@ -61,6 +83,9 @@ public partial class App : Application
                 WindowPlacementService.PlaceNearPreviousWindow(
                     loginWindow,
                     mainWindow);
+
+                mainWindow.WindowState =
+                    WindowState.Maximized;
 
                 mainWindow.Show();
                 loginWindow.Close();

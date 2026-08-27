@@ -22,6 +22,11 @@ public partial class LoginWindow : Window
     private bool _legacyTestProfilesCleaned;
     private bool _isBusy;
 
+    public bool ThemeWasChangedByUser { get; private set; }
+
+    public string SelectedTheme =>
+        ApplicationAppearanceService.Current.Theme;
+
     public event Action<UserProfileModel>? Authenticated;
 
     public LoginWindow()
@@ -56,12 +61,14 @@ public partial class LoginWindow : Window
     private void ThemeToggleButton_OnClick(object? sender, RoutedEventArgs e)
     {
         var current = ApplicationAppearanceService.Current;
+        ThemeWasChangedByUser = true;
         ApplicationAppearanceService.SaveAndApply(
             new ApplicationAppearanceSettings
             {
                 Theme = string.Equals(current.Theme, "Dark", StringComparison.OrdinalIgnoreCase)
                     ? "Light"
                     : "Dark",
+                AccentColor = current.AccentColor,
                 FontFamily = current.FontFamily,
                 TextSize = current.TextSize,
                 UseSemiBoldText = current.UseSemiBoldText
@@ -104,6 +111,9 @@ public partial class LoginWindow : Window
         object? sender,
         EventArgs e)
     {
+        ApplicationAppearanceService.RefreshNativeWindowAccent(
+            this);
+
         Dispatcher.UIThread.Post(
             FocusLoginInput,
             DispatcherPriority.Loaded);
@@ -404,6 +414,9 @@ public partial class LoginWindow : Window
 
     private void ShowChangePinPanel()
     {
+        ApplicationAppearanceService.RefreshNativeWindowAccent(
+            this);
+
         LoginPanel.IsVisible =
             false;
 

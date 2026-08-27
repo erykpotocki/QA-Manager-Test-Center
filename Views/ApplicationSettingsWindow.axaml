@@ -20,11 +20,22 @@
             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
             <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
             <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+            <Setter Property="Padding" Value="16,0,12,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style Selector="ComboBoxItem">
             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
             <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
             <Setter Property="FontWeight" Value="{DynamicResource AppFontWeight}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="ComboBox TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="ComboBox Ellipse">
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </Window.Styles>
 
@@ -49,17 +60,39 @@
                                FontSize="{DynamicResource AppFontSize12}"
                                FontWeight="Bold"
                                Foreground="{DynamicResource SecondaryTextBrush}" />
-                    <ComboBox Name="LanguageComboBox"
-                              Height="44"
-                              SelectedIndex="0"
-                              SelectionChanged="LanguageComboBox_OnSelectionChanged">
-                        <ComboBoxItem Tag="pl">
-                            <TextBlock Text="{DynamicResource Language.Polish}" />
-                        </ComboBoxItem>
-                        <ComboBoxItem Tag="en">
-                            <TextBlock Text="{DynamicResource Language.English}" />
-                        </ComboBoxItem>
-                    </ComboBox>
+                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="12">
+                        <ComboBox Name="LanguageComboBox"
+                                  Grid.Column="0"
+                                  Height="44"
+                                  SelectedIndex="0"
+                                  SelectionChanged="LanguageComboBox_OnSelectionChanged">
+                            <ComboBoxItem Tag="pl">
+                                <TextBlock Text="{DynamicResource Language.Polish}" />
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="en">
+                                <TextBlock Text="{DynamicResource Language.English}" />
+                            </ComboBoxItem>
+                        </ComboBox>
+                        <StackPanel Name="LanguageChangeIndicatorPanel"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Spacing="7"
+                                    VerticalAlignment="Center"
+                                    IsVisible="False">
+                            <TextBlock Name="LanguageChangeSpinner"
+                                       Text="◌"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       RenderTransformOrigin="50%,50%">
+                                <TextBlock.RenderTransform>
+                                    <RotateTransform />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                            <TextBlock Text="{DynamicResource AppSettings.ApplyingLanguage}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                        </StackPanel>
+                    </Grid>
                 </StackPanel>
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="18">
                     <StackPanel Grid.Column="0" Spacing="7">
@@ -69,13 +102,13 @@
                             <ComboBoxItem Tag="Light">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="{DynamicResource Theme.Light}" />
-                                    <TextBlock Grid.Column="1" Text="☀" FontSize="18" />
+                                    <TextBlock Grid.Column="1" Text="☀" FontSize="18" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                             <ComboBoxItem Tag="Dark">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="{DynamicResource Theme.Dark}" />
-                                    <TextBlock Grid.Column="1" Text="☾" FontSize="18" />
+                                    <TextBlock Grid.Column="1" Text="☾" FontSize="18" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                         </ComboBox>
@@ -88,19 +121,19 @@
                             <ComboBoxItem Tag="Compact">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="{DynamicResource TextSize.Small}" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontSize="12" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontSize="12" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                             <ComboBoxItem Tag="Standard">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="{DynamicResource TextSize.Medium}" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontSize="15" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontSize="15" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                             <ComboBoxItem Tag="Large">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="{DynamicResource TextSize.Large}" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontSize="18" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontSize="18" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                         </ComboBox>
@@ -115,37 +148,61 @@
                             <ComboBoxItem Tag="Inter">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="Inter" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Inter" FontSize="16" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Inter" FontSize="16" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                             <ComboBoxItem Tag="Segoe UI">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="Segoe UI" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Segoe UI" FontSize="16" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Segoe UI" FontSize="16" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                             <ComboBoxItem Tag="Arial">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="Arial" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Arial" FontSize="16" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Arial" FontSize="16" Margin="0,0,12,0" />
+                                </Grid>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Calibri">
+                                <Grid ColumnDefinitions="*,Auto" MinWidth="215">
+                                    <TextBlock Text="Calibri" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Calibri" FontSize="16" Margin="0,0,12,0" />
+                                </Grid>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Cambria">
+                                <Grid ColumnDefinitions="*,Auto" MinWidth="215">
+                                    <TextBlock Text="Cambria" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Cambria" FontSize="16" Margin="0,0,12,0" />
+                                </Grid>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Georgia">
+                                <Grid ColumnDefinitions="*,Auto" MinWidth="215">
+                                    <TextBlock Text="Georgia" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Georgia" FontSize="16" Margin="0,0,12,0" />
+                                </Grid>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Comic Sans MS">
+                                <Grid ColumnDefinitions="*,Auto" MinWidth="215">
+                                    <TextBlock Text="Comic Sans MS" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Comic Sans MS" FontSize="16" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                             <ComboBoxItem Tag="Tahoma">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="Tahoma" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Tahoma" FontSize="16" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Tahoma" FontSize="16" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                             <ComboBoxItem Tag="Trebuchet MS">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="Trebuchet MS" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Trebuchet MS" FontSize="16" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Trebuchet MS" FontSize="16" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                             <ComboBoxItem Tag="Verdana">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="Verdana" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Verdana" FontSize="16" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontFamily="Verdana" FontSize="16" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                         </ComboBox>
@@ -158,13 +215,13 @@
                             <ComboBoxItem Tag="Normal">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="{DynamicResource TextWeight.Regular}" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontWeight="Normal" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontWeight="Normal" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                             <ComboBoxItem Tag="SemiBold">
                                 <Grid ColumnDefinitions="*,Auto" MinWidth="215">
                                     <TextBlock Text="{DynamicResource TextWeight.SemiBold}" />
-                                    <TextBlock Grid.Column="1" Text="Aa" FontWeight="SemiBold" />
+                                    <TextBlock Grid.Column="1" Text="Aa" FontWeight="SemiBold" Margin="0,0,12,0" />
                                 </Grid>
                             </ComboBoxItem>
                         </ComboBox>
@@ -180,31 +237,31 @@
                         <ComboBoxItem Tag="Blue">
                             <Grid ColumnDefinitions="*,Auto" MinWidth="500">
                                 <TextBlock Text="{DynamicResource Accent.Blue}" />
-                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#347FC4" />
+                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#347FC4" Margin="0,0,12,0" />
                             </Grid>
                         </ComboBoxItem>
                         <ComboBoxItem Tag="Green">
                             <Grid ColumnDefinitions="*,Auto" MinWidth="500">
                                 <TextBlock Text="{DynamicResource Accent.Green}" />
-                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#527C61" />
+                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#527C61" Margin="0,0,12,0" />
                             </Grid>
                         </ComboBoxItem>
                         <ComboBoxItem Tag="Yellow">
                             <Grid ColumnDefinitions="*,Auto" MinWidth="500">
                                 <TextBlock Text="{DynamicResource Accent.Yellow}" />
-                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#A97810" />
+                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#A97810" Margin="0,0,12,0" />
                             </Grid>
                         </ComboBoxItem>
                         <ComboBoxItem Tag="Purple">
                             <Grid ColumnDefinitions="*,Auto" MinWidth="500">
                                 <TextBlock Text="{DynamicResource Accent.Purple}" />
-                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#7154B8" />
+                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#7154B8" Margin="0,0,12,0" />
                             </Grid>
                         </ComboBoxItem>
                         <ComboBoxItem Tag="Pink">
                             <Grid ColumnDefinitions="*,Auto" MinWidth="500">
                                 <TextBlock Text="{DynamicResource Accent.Pink}" />
-                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#B24F7A" />
+                                <Ellipse Grid.Column="1" Width="18" Height="18" Fill="#B24F7A" Margin="0,0,12,0" />
                             </Grid>
                         </ComboBoxItem>
                     </ComboBox>
@@ -217,16 +274,59 @@
                         <TextBlock Name="PreviewBodyTextBlock"
                                    Text="{DynamicResource AppSettings.PreviewBody}"
                                    TextWrapping="Wrap" />
+                        <TextBlock Name="PreviewPolishCharactersTextBlock"
+                                   Text="{DynamicResource AppSettings.PreviewPolishCharacters}"
+                                   TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
             </StackPanel>
 
-            <Grid Grid.Row="3" Margin="0,25,0,0" ColumnDefinitions="*,Auto,Auto">
+            <Grid Grid.Row="3" Margin="0,25,0,0" ColumnDefinitions="*,Auto,Auto,Auto">
+                <StackPanel Name="SavedConfirmationPanel"
+                            Grid.Column="0"
+                            Margin="0,0,16,0"
+                            Orientation="Horizontal"
+                            Spacing="7"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            IsVisible="False">
+                    <TextBlock Text="✓"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#19944D" />
+                    <TextBlock Text="{DynamicResource Common.Saved}"
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"
+                               Foreground="#19944D" />
+                </StackPanel>
                 <Button Grid.Column="1" Classes="SecondaryAction" MinWidth="125"
                         Margin="0,0,10,0" Content="{DynamicResource Common.Cancel}"
                         Click="CancelButton_OnClick" />
-                <Button Grid.Column="2" Classes="PrimaryAction" MinWidth="145"
-                        Content="{DynamicResource Common.Save}" Click="SaveButton_OnClick" />
+                <Button Name="SaveButton" Grid.Column="2" Classes="PrimaryAction" MinWidth="145"
+                        Click="SaveButton_OnClick">
+                    <Grid>
+                        <TextBlock Name="SaveButtonText"
+                                   Text="{DynamicResource Common.Save}"
+                                   HorizontalAlignment="Center" />
+                        <StackPanel Name="SavingIndicatorPanel"
+                                    Orientation="Horizontal"
+                                    Spacing="8"
+                                    HorizontalAlignment="Center"
+                                    IsVisible="False">
+                            <TextBlock Name="SavingSpinner"
+                                       Text="◌"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       RenderTransformOrigin="50%,50%">
+                                <TextBlock.RenderTransform>
+                                    <RotateTransform />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                            <TextBlock Text="{DynamicResource Common.Saving}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+                </Button>
             </Grid>
         </Grid>
     </Border>
