@@ -1849,7 +1849,7 @@ public partial class AdminTestMenuWindow : Window
 
         var confirmation = new ConfirmDeleteWindow(
             "Wykonać globalny reset testowy?",
-            "To operacja nieodwracalna. Wszystkie PIN-y zostaną ustawione na 000000, a przypisania, powiadomienia, sesje, statusy i komentarze zostaną wyzerowane. Konta, role i struktura przypadków pozostaną.",
+            "To operacja nieodwracalna. Wszystkie PIN-y zostaną ustawione na 000000, a przypisania, powiadomienia, sesje, statusy, komentarze i zapisane wartości formularzy zostaną wyzerowane. Język wróci do angielskiego, a wygląd do ustawień domyślnych. Konta, role i struktura przypadków pozostaną.",
             "RESETUJ ŚRODOWISKO");
 
         if (!await confirmation.ShowDialog<bool>(this))
@@ -1873,6 +1873,8 @@ public partial class AdminTestMenuWindow : Window
                 await _storageService.SaveAsync(testData);
                 await _profileService.ResetAllProfilesForTestAsync();
                 SessionManager.DeleteAllLocalSessions();
+                AssignmentInputPresetService.Reset();
+                LocalizationService.ResetToDefault();
                 ApplicationAppearanceService.ResetAllProfilesToTestDefaults();
             });
 

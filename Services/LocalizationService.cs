@@ -524,6 +524,16 @@ public static class LocalizationService
         Apply(normalized);
     }
 
+    public static void ResetToDefault()
+    {
+        if (File.Exists(SettingsPath))
+        {
+            File.Delete(SettingsPath);
+        }
+
+        Apply(English);
+    }
+
     public static void Apply(string? language)
     {
         CurrentLanguage = Normalize(language);

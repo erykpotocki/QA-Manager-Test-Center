@@ -25,6 +25,7 @@ inspect-*.png
 *.db-wal
 *.sqlite
 assignments.json
+assignment-input-presets*.json
 profiles.json
 project-data.json
 TestCases.json

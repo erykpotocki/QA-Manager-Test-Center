@@ -87,6 +87,22 @@ public static class AssignmentInputPresetService
             true);
     }
 
+    public static void Reset()
+    {
+        if (File.Exists(SettingsPath))
+        {
+            File.Delete(SettingsPath);
+        }
+
+        var temporaryPath =
+            SettingsPath + ".tmp";
+
+        if (File.Exists(temporaryPath))
+        {
+            File.Delete(temporaryPath);
+        }
+    }
+
     private static List<string> Normalize(
         IEnumerable<string>? values)
     {
