@@ -32,6 +32,7 @@ public partial class ProgressDashboardWindow : Window
 
     private readonly string _login;
     private readonly IReadOnlyList<string> _systemRoles;
+    private readonly Func<Task>? _assignTestsAction;
     private readonly AssignmentService _assignmentService =
         new();
     private readonly JsonStorageService _storageService =
@@ -43,6 +44,11 @@ public partial class ProgressDashboardWindow : Window
         Array.Empty<TestAssignmentModel>();
     private AssignmentProgressRow[] _completedRows =
         Array.Empty<AssignmentProgressRow>();
+    private AssignmentProgressRow[] _teamOverviewRows =
+        Array.Empty<AssignmentProgressRow>();
+    private Guid? _selectedOverviewBatchId;
+    private string? _selectedOverviewLogin;
+    private bool _updatingOverviewFilters;
     private readonly Dictionary<Guid, CheckBox> _activeSessionSelection =
         new();
     private DashboardSection _dashboardSection =
@@ -54,6 +60,8 @@ public partial class ProgressDashboardWindow : Window
         };
     private string? _renderedDataSignature;
     private bool _backgroundRefreshInProgress;
+    private Control? _inlineContent;
+    private bool _isInline;
 
     public ProgressDashboardWindow()
         : this(
@@ -67,7 +75,8 @@ public partial class ProgressDashboardWindow : Window
 
     public ProgressDashboardWindow(
         string login,
-        IReadOnlyList<string> systemRoles)
+        IReadOnlyList<string> systemRoles,
+        Func<Task>? assignTestsAction = null)
     {
         InitializeComponent();
 
@@ -76,6 +85,14 @@ public partial class ProgressDashboardWindow : Window
 
         _systemRoles =
             systemRoles;
+
+        _assignTestsAction =
+            assignTestsAction;
+
+        AssignTestsFromDashboardButton.IsVisible =
+            _assignTestsAction is not null;
+        QuickAssignTestsButton.IsVisible =
+            _assignTestsAction is not null;
 
         Opened +=
             async (_, _) =>
@@ -104,6 +121,42 @@ public partial class ProgressDashboardWindow : Window
                     role,
                     SystemRoleService.LeaderRole,
                     StringComparison.OrdinalIgnoreCase));
+
+    public async Task<Control?> TakeInlineContentAsync()
+    {
+        if (Content is not Control content)
+        {
+            return null;
+        }
+
+        _isInline = true;
+        Content = null;
+        _inlineContent = content;
+
+        CloseDashboardButton.IsVisible = false;
+
+        await LoadDashboardAsync();
+        _refreshTimer.Start();
+        return content;
+    }
+
+    public void ReleaseInlineContent()
+    {
+        _refreshTimer.Stop();
+        _inlineContent = null;
+    }
+
+    private Window GetDialogOwner()
+    {
+        if (_isInline &&
+            _inlineContent is not null &&
+            TopLevel.GetTopLevel(_inlineContent) is Window inlineOwner)
+        {
+            return inlineOwner;
+        }
+
+        return this;
+    }
 
     private async Task LoadDashboardAsync()
     {
@@ -172,18 +225,11 @@ public partial class ProgressDashboardWindow : Window
                 progressRows,
                 _dashboardSection);
 
-        SessionsCountTextBlock.Text =
-            currentRows
-                .Select(row => GetBatchId(row.Assignment))
-                .Distinct()
-                .Count()
-                .ToString();
+        _teamOverviewRows =
+            currentRows;
 
-        CompletedCountTextBlock.Text =
-            currentRows.Sum(row => row.Completed).ToString();
-
-        RemainingCountTextBlock.Text =
-            currentRows.Sum(row => row.Remaining).ToString();
+        PopulateTeamOverviewFilters(
+            currentRows);
 
         GenerateTeamReportButton.IsVisible =
             _dashboardSection != DashboardSection.Archive &&
@@ -194,9 +240,10 @@ public partial class ProgressDashboardWindow : Window
                 ? LocalizationService.T("Dashboard.GenerateReport")
                 : LocalizationService.T("Dashboard.CombinedReport");
 
-        BuildTeamOverview(currentRows);
+        ApplyTeamOverviewFilters();
 
         AssignmentsPanel.Children.Clear();
+        DashboardEmptyStatePanel.IsVisible = false;
         _activeSessionSelection.Clear();
 
         var displayedRows =
@@ -212,18 +259,14 @@ public partial class ProgressDashboardWindow : Window
 
         if (displayedRows.Length == 0)
         {
-            AssignmentsPanel.Children.Add(
-                new TextBlock
-                {
-                    Text = _dashboardSection == DashboardSection.Archive
-                        ? LocalizationService.T("Dashboard.EmptyArchive")
-                        : _dashboardSection == DashboardSection.Active
-                        ? LocalizationService.T("Dashboard.EmptyActive")
-                        : LocalizationService.T("Dashboard.EmptyHistory"),
-                    Margin = new Thickness(0, 28),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    Foreground = Brushes.Gray
-                });
+            DashboardEmptyStateTextBlock.Text =
+                _dashboardSection == DashboardSection.Archive
+                    ? LocalizationService.T("Dashboard.EmptyArchive")
+                    : _dashboardSection == DashboardSection.Active
+                    ? LocalizationService.T("Dashboard.EmptyActive")
+                    : LocalizationService.T("Dashboard.EmptyHistory");
+
+            DashboardEmptyStatePanel.IsVisible = true;
 
             return;
         }
@@ -234,6 +277,18 @@ public partial class ProgressDashboardWindow : Window
         {
             AssignmentsPanel.Children.Add(
                 CreateBatchCard(batch.ToArray()));
+        }
+    }
+
+    private async void AssignTestsFromDashboardButton_OnClick(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        if (_assignTestsAction is not null)
+        {
+            await _assignTestsAction();
+            _renderedDataSignature = null;
+            await LoadDashboardAsync();
         }
     }
 
@@ -284,7 +339,9 @@ public partial class ProgressDashboardWindow : Window
                             {
                                 new TextBlock
                                 {
-                                    Text = $"{first.ProjectName}  •  v{first.Version}",
+                                    Text = string.IsNullOrWhiteSpace(first.Assignment.SessionName)
+                                        ? $"{first.ProjectName}  •  v{first.Version}"
+                                        : $"{first.Assignment.SessionName}  •  {first.ProjectName}  •  v{first.Version}",
                                     FontWeight = FontWeight.SemiBold,
                                     FontSize = 14
                                 },
@@ -586,7 +643,7 @@ public partial class ProgressDashboardWindow : Window
                 LocalizationService.Format("Dashboard.ArchiveRowDescription", row.RecipientLogin, row.ProjectName, row.Version),
                 LocalizationService.T("Dashboard.ArchiveAction"));
 
-        if (!await confirmation.ShowDialog<bool>(this))
+        if (!await confirmation.ShowDialog<bool>(GetDialogOwner()))
         {
             return;
         }
@@ -661,7 +718,7 @@ public partial class ProgressDashboardWindow : Window
                 LocalizationService.T("Dashboard.RestoreDescription"),
                 LocalizationService.T("Dashboard.RestoreAction"));
 
-        if (!await confirmation.ShowDialog<bool>(this))
+        if (!await confirmation.ShowDialog<bool>(GetDialogOwner()))
         {
             return;
         }
@@ -684,7 +741,7 @@ public partial class ProgressDashboardWindow : Window
                 LocalizationService.T("Dashboard.ArchiveSelectedDescription"),
                 LocalizationService.T("Dashboard.MoveAction"));
 
-        if (!await confirmation.ShowDialog<bool>(this))
+        if (!await confirmation.ShowDialog<bool>(GetDialogOwner()))
         {
             return;
         }
@@ -720,7 +777,7 @@ public partial class ProgressDashboardWindow : Window
                 LocalizationService.T("Dashboard.DeleteArchiveDescription"),
                 LocalizationService.T("Dashboard.DeleteAll"));
 
-        if (!await confirmation.ShowDialog<bool>(this))
+        if (!await confirmation.ShowDialog<bool>(GetDialogOwner()))
         {
             return;
         }
@@ -743,7 +800,7 @@ public partial class ProgressDashboardWindow : Window
                 LocalizationService.Format("Dashboard.DeleteSelectedDescription", assignmentIds.Count),
                 LocalizationService.T("Dashboard.DeletePermanently"));
 
-        if (!await confirmation.ShowDialog<bool>(this))
+        if (!await confirmation.ShowDialog<bool>(GetDialogOwner()))
         {
             return;
         }
@@ -781,7 +838,7 @@ public partial class ProgressDashboardWindow : Window
                 details,
                 LocalizationService.T("Dashboard.StopAction"));
 
-        if (!await confirmation.ShowDialog<bool>(this))
+        if (!await confirmation.ShowDialog<bool>(GetDialogOwner()))
         {
             return;
         }
@@ -831,6 +888,190 @@ public partial class ProgressDashboardWindow : Window
         DeleteAllArchivedSessionsButton.IsEnabled =
             archive && _visibleAssignments.Length > 0;
         StopSelectedSessionsButton.IsEnabled = false;
+    }
+
+    private void PopulateTeamOverviewFilters(
+        IReadOnlyCollection<AssignmentProgressRow> rows)
+    {
+        _updatingOverviewFilters = true;
+
+        try
+        {
+            var sessionOptions =
+                new List<DashboardFilterOption>
+                {
+                    new(
+                        string.Empty,
+                        LocalizationService.T("Dashboard.AllSessions"))
+                };
+
+            foreach (var batch in rows
+                         .GroupBy(row => GetBatchId(row.Assignment))
+                         .OrderByDescending(group => group.Max(row => row.Assignment.CreatedAt)))
+            {
+                var first = batch.First();
+                sessionOptions.Add(
+                    new DashboardFilterOption(
+                        batch.Key.ToString("N"),
+                        LocalizationService.Format(
+                            "Dashboard.SessionFilterItem",
+                            string.IsNullOrWhiteSpace(first.Assignment.SessionName)
+                                ? first.ProjectName
+                                : first.Assignment.SessionName,
+                            first.Version,
+                            first.Assignment.CreatedAt.LocalDateTime.ToString("g"))));
+            }
+
+            var selectedSessionKey =
+                _selectedOverviewBatchId?.ToString("N") ??
+                string.Empty;
+
+            if (!sessionOptions.Any(option =>
+                    string.Equals(option.Key, selectedSessionKey, StringComparison.OrdinalIgnoreCase)))
+            {
+                _selectedOverviewBatchId = null;
+                selectedSessionKey = string.Empty;
+            }
+
+            TeamSessionFilterComboBox.ItemsSource =
+                sessionOptions;
+
+            TeamSessionFilterComboBox.SelectedItem =
+                sessionOptions.First(option =>
+                    string.Equals(option.Key, selectedSessionKey, StringComparison.OrdinalIgnoreCase));
+
+            PopulateTeamTesterFilter(rows);
+        }
+        finally
+        {
+            _updatingOverviewFilters = false;
+        }
+    }
+
+    private void PopulateTeamTesterFilter(
+        IReadOnlyCollection<AssignmentProgressRow> rows)
+    {
+        var rowsForSession =
+            _selectedOverviewBatchId.HasValue
+                ? rows
+                    .Where(row =>
+                        GetBatchId(row.Assignment) ==
+                        _selectedOverviewBatchId.Value)
+                    .ToArray()
+                : rows.ToArray();
+
+        var testerOptions =
+            new List<DashboardFilterOption>
+            {
+                new(
+                    string.Empty,
+                    LocalizationService.T("Dashboard.AllTesters"))
+            };
+
+        testerOptions.AddRange(
+            rowsForSession
+                .Select(row => row.RecipientLogin)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(login => login, StringComparer.OrdinalIgnoreCase)
+                .Select(login => new DashboardFilterOption(login, login)));
+
+        var selectedTesterKey =
+            _selectedOverviewLogin ??
+            string.Empty;
+
+        if (!testerOptions.Any(option =>
+                string.Equals(option.Key, selectedTesterKey, StringComparison.OrdinalIgnoreCase)))
+        {
+            _selectedOverviewLogin = null;
+            selectedTesterKey = string.Empty;
+        }
+
+        TeamTesterFilterComboBox.ItemsSource =
+            testerOptions;
+
+        TeamTesterFilterComboBox.SelectedItem =
+            testerOptions.First(option =>
+                string.Equals(option.Key, selectedTesterKey, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void TeamSessionFilterComboBox_OnSelectionChanged(
+        object? sender,
+        SelectionChangedEventArgs e)
+    {
+        if (_updatingOverviewFilters ||
+            TeamSessionFilterComboBox.SelectedItem is not DashboardFilterOption option)
+        {
+            return;
+        }
+
+        _selectedOverviewBatchId =
+            Guid.TryParse(option.Key, out var batchId)
+                ? batchId
+                : null;
+
+        _updatingOverviewFilters = true;
+
+        try
+        {
+            PopulateTeamTesterFilter(
+                _teamOverviewRows);
+        }
+        finally
+        {
+            _updatingOverviewFilters = false;
+        }
+
+        ApplyTeamOverviewFilters();
+    }
+
+    private void TeamTesterFilterComboBox_OnSelectionChanged(
+        object? sender,
+        SelectionChangedEventArgs e)
+    {
+        if (_updatingOverviewFilters ||
+            TeamTesterFilterComboBox.SelectedItem is not DashboardFilterOption option)
+        {
+            return;
+        }
+
+        _selectedOverviewLogin =
+            string.IsNullOrWhiteSpace(option.Key)
+                ? null
+                : option.Key;
+
+        ApplyTeamOverviewFilters();
+    }
+
+    private void ApplyTeamOverviewFilters()
+    {
+        var filteredRows =
+            _teamOverviewRows
+                .Where(row =>
+                    !_selectedOverviewBatchId.HasValue ||
+                    GetBatchId(row.Assignment) ==
+                    _selectedOverviewBatchId.Value)
+                .Where(row =>
+                    string.IsNullOrWhiteSpace(_selectedOverviewLogin) ||
+                    string.Equals(
+                        row.RecipientLogin,
+                        _selectedOverviewLogin,
+                        StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+        SessionsCountTextBlock.Text =
+            filteredRows
+                .Select(row => GetBatchId(row.Assignment))
+                .Distinct()
+                .Count()
+                .ToString();
+
+        CompletedCountTextBlock.Text =
+            filteredRows.Sum(row => row.Completed).ToString();
+
+        RemainingCountTextBlock.Text =
+            filteredRows.Sum(row => row.Remaining).ToString();
+
+        BuildTeamOverview(filteredRows);
     }
 
     private void BuildTeamOverview(
@@ -1134,7 +1375,7 @@ public partial class ProgressDashboardWindow : Window
                 $"RAPORT_ZBIORCZY_{DateTime.Now:yyyyMMdd_HHmm}");
 
         var request =
-            await dialog.ShowDialog<ReportExportRequest?>(this);
+            await dialog.ShowDialog<ReportExportRequest?>(GetDialogOwner());
 
         if (request is null)
         {
@@ -1162,7 +1403,7 @@ public partial class ProgressDashboardWindow : Window
                         false,
                         LocalizationService.T("Dashboard.ReportFailedTitle"),
                         LocalizationService.T("Dashboard.ReportFailedDescription"))
-                    .ShowDialog(this);
+                    .ShowDialog(GetDialogOwner());
                 return;
             }
 
@@ -1174,7 +1415,7 @@ public partial class ProgressDashboardWindow : Window
                     true,
                     LocalizationService.T("Dashboard.ReportSavedTitle"),
                     LocalizationService.Format("Dashboard.ReportSavedDescription", path))
-                .ShowDialog(this);
+                .ShowDialog(GetDialogOwner());
 
             await LoadDashboardAsync();
         }
@@ -1314,6 +1555,14 @@ public partial class ProgressDashboardWindow : Window
         Active,
         History,
         Archive
+    }
+
+    private sealed record DashboardFilterOption(
+        string Key,
+        string Label)
+    {
+        public override string ToString() =>
+            Label;
     }
 
     private sealed record AssignmentProgressRow(

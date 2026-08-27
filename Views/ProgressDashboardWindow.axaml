@@ -30,6 +30,21 @@
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal"
                             VerticalAlignment="Center" Spacing="10">
+                    <Button Name="QuickAssignTestsButton"
+                            Width="58" Height="58"
+                            Padding="0"
+                            CornerRadius="18"
+                            Background="{DynamicResource AccentPrimaryBrush}"
+                            BorderBrush="{DynamicResource AccentPrimaryBrush}"
+                            Foreground="White"
+                            ToolTip.Tip="{DynamicResource Assignment.AssignTests}"
+                            Click="AssignTestsFromDashboardButton_OnClick">
+                        <TextBlock Text="+"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="30"
+                                   FontWeight="SemiBold" />
+                    </Button>
                     <Border Width="58" Height="58"
                             Background="#162E86D1"
                             BorderBrush="#6EA8DE"
@@ -79,7 +94,31 @@
                     <Canvas Name="TeamPieChartCanvas" Width="150" Height="150"
                             HorizontalAlignment="Center" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Spacing="6">
-                        <TextBlock Text="{DynamicResource Dashboard.TeamProgress}" FontSize="{DynamicResource AppFontSize17}" FontWeight="Bold" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <TextBlock Text="{DynamicResource Dashboard.TeamProgress}"
+                                       FontSize="{DynamicResource AppFontSize17}" FontWeight="Bold"
+                                       VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="{DynamicResource Dashboard.SessionFilter}"
+                                               FontSize="{DynamicResource AppFontSize10}" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <ComboBox Name="TeamSessionFilterComboBox"
+                                              Width="230" Height="34" Padding="10,0"
+                                              VerticalContentAlignment="Center"
+                                              SelectionChanged="TeamSessionFilterComboBox_OnSelectionChanged" />
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="{DynamicResource Dashboard.TesterFilter}"
+                                               FontSize="{DynamicResource AppFontSize10}" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <ComboBox Name="TeamTesterFilterComboBox"
+                                              Width="150" Height="34" Padding="10,0"
+                                              VerticalContentAlignment="Center"
+                                              SelectionChanged="TeamTesterFilterComboBox_OnSelectionChanged" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
                         <TextBlock Text="{DynamicResource Dashboard.TeamProgressDescription}"
                                    TextWrapping="Wrap" FontSize="{DynamicResource AppFontSize12}"
                                    Foreground="{DynamicResource SecondaryTextBrush}" />
@@ -128,9 +167,41 @@
                         IsVisible="False" />
             </Grid>
 
-            <ScrollViewer Grid.Row="4" Margin="0,8,0,10" VerticalScrollBarVisibility="Auto">
-                <StackPanel Name="AssignmentsPanel" Spacing="7" />
-            </ScrollViewer>
+            <Grid Grid.Row="4" Margin="0,8,0,10">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Name="AssignmentsPanel" Spacing="7" />
+                </ScrollViewer>
+
+                <StackPanel Name="DashboardEmptyStatePanel"
+                            IsVisible="False"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="16">
+                    <TextBlock Name="DashboardEmptyStateTextBlock"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <Button Name="AssignTestsFromDashboardButton"
+                            Width="230"
+                            Height="82"
+                            Padding="18,10"
+                            HorizontalAlignment="Center"
+                            Background="{DynamicResource AccentPrimaryBrush}"
+                            BorderBrush="{DynamicResource AccentPrimaryBrush}"
+                            Foreground="White"
+                            Click="AssignTestsFromDashboardButton_OnClick">
+                        <StackPanel HorizontalAlignment="Center" Spacing="3">
+                            <TextBlock Text="+"
+                                       HorizontalAlignment="Center"
+                                       FontSize="30"
+                                       FontWeight="SemiBold" />
+                            <TextBlock Text="{DynamicResource Assignment.AssignTests}"
+                                       HorizontalAlignment="Center"
+                                       FontWeight="Bold" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
 
             <Grid Grid.Row="5" ColumnDefinitions="*,Auto,10,Auto">
                 <Button Name="GenerateTeamReportButton" Grid.Column="1"
@@ -139,7 +210,7 @@
                         Foreground="White" FontWeight="Bold"
                         Content="{DynamicResource Dashboard.GenerateReport}" IsVisible="False"
                         Click="GenerateTeamReportButton_OnClick" />
-                <Button Grid.Column="3" HorizontalAlignment="Right" Height="44" Padding="24,0"
+                <Button Name="CloseDashboardButton" Grid.Column="3" HorizontalAlignment="Right" Height="44" Padding="24,0"
                         Background="{DynamicResource AccentPrimaryBrush}" Foreground="White" FontWeight="Bold"
                         Content="{DynamicResource Common.Close}" Click="CloseButton_OnClick" />
             </Grid>

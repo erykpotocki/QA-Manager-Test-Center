@@ -17,6 +17,8 @@ namespace QARegressionManager.Views;
 
 public partial class MainWindow : Window
 {
+    private WindowState _windowStateBeforeFullScreen =
+        WindowState.Maximized;
     public event Action? LogoutRequested;
 
     private readonly SessionManager _sessionManager;
@@ -27,7 +29,16 @@ public partial class MainWindow : Window
     private readonly string _highestSystemRole;
     private readonly IReadOnlyList<string> _systemRoles;
     private readonly IReadOnlyList<string> _projectRoles;
+    private readonly Control? _projectSelectionContent;
     private readonly Dictionary<string, string> _projectRoleColors =
+        new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _projectRoleBackgroundColors =
+        new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _projectRoleTextColors =
+        new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _professionalRoleNames =
+        new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, HashSet<string>> _roleProjectKeys =
         new(StringComparer.OrdinalIgnoreCase);
 
     private SessionStateModel _sessionState =
@@ -44,6 +55,12 @@ public partial class MainWindow : Window
             Interval = TimeSpan.FromMilliseconds(1600)
         };
     private bool _assignmentGlowBright;
+    private readonly DispatcherTimer _roleScrollHintTimer =
+        new()
+        {
+            Interval = TimeSpan.FromMilliseconds(70)
+        };
+    private double _roleScrollHintPhase;
     private bool _isRefreshing;
     private double _refreshIndicatorAngle;
     private readonly RotateTransform _refreshIndicatorRotateTransform = new();
@@ -85,6 +102,7 @@ public partial class MainWindow : Window
         IEnumerable<string>? projectRoles)
     {
         InitializeComponent();
+        _projectSelectionContent = Content as Control;
 
         RefreshIndicatorIcon.RenderTransform =
             _refreshIndicatorRotateTransform;
@@ -136,10 +154,27 @@ public partial class MainWindow : Window
 
         Closed +=
             (_, _) =>
+            {
                 LocalizationService.LanguageChanged -=
                     LocalizationService_OnLanguageChanged;
+                _roleScrollHintTimer.Stop();
+            };
 
         BuildRoleBadges();
+
+        ProjectComboBox.SelectionChanged +=
+            (_, _) => RefreshRoleBadges();
+
+        _roleScrollHintTimer.Tick +=
+            (_, _) =>
+            {
+                _roleScrollHintPhase =
+                    (_roleScrollHintPhase + 0.045) % (Math.PI * 2);
+                RoleBadgesScrollHint.Opacity =
+                    0.68 +
+                    (Math.Sin(_roleScrollHintPhase) + 1) * 0.14;
+            };
+        _roleScrollHintTimer.Start();
 
         ProjectComboBox.Items.Clear();
         ProjectComboBox.IsEnabled = false;
@@ -194,6 +229,21 @@ public partial class MainWindow : Window
         object? sender,
         EventArgs e)
     {
+        // To okno powstaje dopiero po zalogowaniu, więc nie istnieje jeszcze,
+        // gdy akcent jest stosowany na ekranie logowania. Ustawiamy natywny
+        // pasek Windows jawnie po utworzeniu uchwytu okna.
+        ApplicationAppearanceService.RefreshNativeWindowAccent(
+            this);
+
+        // Windows potrafi ponownie nadać systemowy kolor podczas pierwszego
+        // maksymalizowania/renderowania okna. Powtórzenie po przebiegu układu
+        // utrwala akcent aplikacji także na ekranie wyboru projektu.
+        Dispatcher.UIThread.Post(
+            () =>
+                ApplicationAppearanceService.RefreshNativeWindowAccent(
+                    this),
+            DispatcherPriority.Loaded);
+
         await ConfigureAvailableProjectsAsync();
         await RefreshAssignmentAndNotificationStateAsync();
 
@@ -357,6 +407,14 @@ public partial class MainWindow : Window
         object? sender,
         KeyEventArgs e)
     {
+        if (e.Key == Key.Enter &&
+            e.KeyModifiers.HasFlag(KeyModifiers.Alt))
+        {
+            e.Handled = true;
+            ToggleFullScreen();
+            return;
+        }
+
         if (e.Key == Key.F5)
         {
             e.Handled = true;
@@ -419,6 +477,26 @@ public partial class MainWindow : Window
 
             await HandleEscapeShortcutAsync();
         }
+    }
+
+    private void ToggleFullScreen()
+    {
+        if (WindowState == WindowState.FullScreen)
+        {
+            WindowState =
+                _windowStateBeforeFullScreen == WindowState.FullScreen
+                    ? WindowState.Maximized
+                    : _windowStateBeforeFullScreen;
+
+            return;
+        }
+
+        _windowStateBeforeFullScreen =
+            WindowState == WindowState.Minimized
+                ? WindowState.Maximized
+                : WindowState;
+
+        WindowState = WindowState.FullScreen;
     }
 
     private async Task HandleEscapeShortcutAsync()
@@ -526,9 +604,29 @@ public partial class MainWindow : Window
         var profileService = new UserProfileService();
         var definitions = await profileService.GetRoleAndProjectDefinitionsAsync();
         _projectRoleColors.Clear();
+        _projectRoleBackgroundColors.Clear();
+        _projectRoleTextColors.Clear();
+        _professionalRoleNames.Clear();
+        _roleProjectKeys.Clear();
         foreach (var role in definitions.Roles)
         {
             _projectRoleColors[role.Name] = role.BorderColor;
+            if (!string.IsNullOrWhiteSpace(role.BackgroundColor))
+            {
+                _projectRoleBackgroundColors[role.Name] = role.BackgroundColor;
+            }
+            if (!string.IsNullOrWhiteSpace(role.TextColor))
+            {
+                _projectRoleTextColors[role.Name] = role.TextColor;
+            }
+            if (role.IsProfessionalRole)
+            {
+                _professionalRoleNames.Add(role.Name);
+            }
+
+            _roleProjectKeys[role.Name] =
+                role.ProjectKeys.ToHashSet(
+                    StringComparer.OrdinalIgnoreCase);
         }
         RefreshRoleBadges();
         var isAdministrator = _systemRoles.Contains(
@@ -621,7 +719,8 @@ public partial class MainWindow : Window
                 RequestLogout,
                 _highestSystemRole,
                 _systemRoles,
-                _projectRoles);
+                _projectRoles,
+                ReturnToProjectSelection);
     }
 
     private async Task ContinueSavedSessionAsync()
@@ -684,7 +783,8 @@ public partial class MainWindow : Window
             RequestLogout,
             _highestSystemRole,
                 _systemRoles,
-                _projectRoles);
+                _projectRoles,
+                ReturnToProjectSelection);
 
         Content =
             explorer;
@@ -781,6 +881,13 @@ public partial class MainWindow : Window
     {
         RefreshRoleBadges();
 
+        RoleBadgesScrollViewer.ScrollChanged +=
+            (_, _) =>
+                UpdateRoleBadgesScrollHint();
+        RoleBadgesScrollViewer.SizeChanged +=
+            (_, _) =>
+                UpdateRoleBadgesScrollHint();
+
         RoleBadgesScrollViewer.PointerWheelChanged +=
             (_, eventArgs) =>
             {
@@ -801,22 +908,56 @@ public partial class MainWindow : Window
 
         EnableRoleBadgeDragScrolling(
             RoleBadgesScrollViewer);
+
+        Dispatcher.UIThread.Post(
+            UpdateRoleBadgesScrollHint,
+            DispatcherPriority.Loaded);
     }
 
     private void RefreshRoleBadges()
     {
         RoleBadgesPanel.Children.Clear();
 
-        foreach (var role in
-                 SystemRoleService.GetOrderedDisplayRoles(
-                     _systemRoles,
-                     _projectRoles))
+        var selectedProjectKey =
+            (ProjectComboBox.SelectedItem as ComboBoxItem)?.Tag?.ToString();
+
+        var scopedProjectRoles =
+            string.IsNullOrWhiteSpace(selectedProjectKey)
+                ? Enumerable.Empty<string>()
+                : _projectRoles.Where(role =>
+                    _roleProjectKeys.TryGetValue(role, out var projectKeys) &&
+                    projectKeys.Contains(selectedProjectKey));
+
+        var orderedRoles = scopedProjectRoles
+            .Where(_professionalRoleNames.Contains)
+            .OrderBy(role => role, StringComparer.OrdinalIgnoreCase)
+            .Concat(scopedProjectRoles
+                .Where(role => !_professionalRoleNames.Contains(role))
+                .OrderBy(role => role, StringComparer.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var role in orderedRoles)
         {
             RoleBadgesPanel.Children.Add(
                 CreateRoleBadge(
                     role));
         }
 
+        Dispatcher.UIThread.Post(
+            UpdateRoleBadgesScrollHint,
+            DispatcherPriority.Loaded);
+
+    }
+
+    private void UpdateRoleBadgesScrollHint()
+    {
+        var remainingWidth =
+            RoleBadgesScrollViewer.Extent.Width -
+            RoleBadgesScrollViewer.Viewport.Width -
+            RoleBadgesScrollViewer.Offset.X;
+
+        RoleBadgesScrollHint.IsVisible =
+            remainingWidth > 2;
     }
 
     private static void EnableRoleBadgeDragScrolling(
@@ -970,12 +1111,28 @@ public partial class MainWindow : Window
                 RequestLogout,
                 _highestSystemRole,
                 _systemRoles,
-                _projectRoles);
+                _projectRoles,
+                ReturnToProjectSelection);
 
         Content =
             explorer;
 
         await explorer.ExecuteLatestAssignmentAsync();
+    }
+
+    private async void ReturnToProjectSelection()
+    {
+        if (_projectSelectionContent is null)
+        {
+            return;
+        }
+
+        Content =
+            _projectSelectionContent;
+
+        await ConfigureAvailableProjectsAsync();
+        await RefreshAssignmentAndNotificationStateAsync();
+        ApplicationAppearanceService.RefreshNativeWindowAccent(this);
     }
 
     private Border CreateRoleBadge(
@@ -994,7 +1151,7 @@ public partial class MainWindow : Window
                 (true, "Admin") =>
                     ("#3A2427", "#75434A", "#F2AAB0"),
 
-                (true, "Lider") =>
+                (true, "Przełożony") =>
                     ("#3A3220", "#746638", "#E8CD79"),
 
                 (true, _) =>
@@ -1003,7 +1160,7 @@ public partial class MainWindow : Window
                 (false, "Admin") =>
                     ("#FDEBEC", "#E9A8AC", "#B3262D"),
 
-                (false, "Lider") =>
+                (false, "Przełożony") =>
                     ("#FFF3D6", "#E4C36A", "#8A6200"),
 
                 _ =>
@@ -1015,14 +1172,27 @@ public partial class MainWindow : Window
             border = customBorderColor;
         }
 
-        return new Border
+        if (_projectRoleBackgroundColors.TryGetValue(role, out var customBackgroundColor))
         {
+            background = customBackgroundColor;
+        }
+
+        if (_projectRoleTextColors.TryGetValue(role, out var customTextColor))
+        {
+            foreground = customTextColor;
+        }
+
+        var badge = new Border
+        {
+            Width =
+                92,
+
             Height =
-                36,
+                32,
 
             Padding =
                 new Thickness(
-                    13,
+                    9,
                     0),
 
             Background =
@@ -1047,11 +1217,17 @@ public partial class MainWindow : Window
                     Text =
                         role,
 
+                    TextTrimming =
+                        TextTrimming.CharacterEllipsis,
+
+                    HorizontalAlignment =
+                        HorizontalAlignment.Center,
+
                     VerticalAlignment =
                         VerticalAlignment.Center,
 
                     FontSize =
-                        13,
+                        12,
 
                     FontWeight =
                         FontWeight.SemiBold,
@@ -1062,6 +1238,12 @@ public partial class MainWindow : Window
                                 foreground))
                 }
         };
+
+        ToolTip.SetTip(
+            badge,
+            role);
+
+        return badge;
     }
 
     private void UpdateThemeButton()

@@ -239,13 +239,13 @@
         </Style>
 
         <Style Selector="Button.StartButton:pointerover">
-            <Setter Property="Background" Value="#3AD47A" />
-            <Setter Property="BorderBrush" Value="#3AD47A" />
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryHoverBrush}" />
         </Style>
 
         <Style Selector="Button.StartButton:pressed">
-            <Setter Property="Background" Value="#169B50" />
-            <Setter Property="BorderBrush" Value="#169B50" />
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryHoverBrush}" />
         </Style>
 
         <!-- PRZYCISK MOTYWU -->
@@ -693,20 +693,43 @@
 
                 </Border>
 
-                <ScrollViewer
-                    Name="RoleBadgesScrollViewer"
-                    Margin="0,8,0,0"
-                    MaxWidth="440"
-                    HorizontalAlignment="Left"
-                    HorizontalScrollBarVisibility="Hidden"
-                    VerticalScrollBarVisibility="Disabled">
+                <Grid Margin="0,8,0,0"
+                      MaxWidth="440"
+                      HorizontalAlignment="Left">
+                    <ScrollViewer
+                        Name="RoleBadgesScrollViewer"
+                        HorizontalScrollBarVisibility="Hidden"
+                        VerticalScrollBarVisibility="Disabled">
 
-                    <StackPanel
-                        Name="RoleBadgesPanel"
-                        Orientation="Horizontal"
-                        Spacing="6" />
+                        <StackPanel
+                            Name="RoleBadgesPanel"
+                            Orientation="Horizontal"
+                            Spacing="6" />
 
-                </ScrollViewer>
+                    </ScrollViewer>
+
+                    <Border Name="RoleBadgesScrollHint"
+                            Width="42"
+                            HorizontalAlignment="Right"
+                            Background="{DynamicResource CardBackgroundBrush}"
+                            IsHitTestVisible="False"
+                            IsVisible="False">
+                        <Border.OpacityMask>
+                            <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+                                <GradientStop Offset="0" Color="Transparent" />
+                                <GradientStop Offset="0.55" Color="Black" />
+                                <GradientStop Offset="1" Color="Black" />
+                            </LinearGradientBrush>
+                        </Border.OpacityMask>
+                        <TextBlock Text="›"
+                                   Margin="13,0,5,0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryTextBrush}" />
+                    </Border>
+                </Grid>
 
                 <TextBlock
                     Text="{DynamicResource Main.Project}"
@@ -719,9 +742,7 @@
                     Name="ProjectComboBox"
                     SelectedIndex="0">
 
-                    <ComboBoxItem Content="TEST PROJECT — ENGLISH" />
-                    <ComboBoxItem Content="TEST PROJECT — POLISH" />
-
+                    <ComboBoxItem Content="ENGLISH.COM" />
                 </ComboBox>
 
                 <TextBlock Name="NoProjectMessageTextBlock" Margin="0,8,0,0"
