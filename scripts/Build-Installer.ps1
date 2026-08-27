@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.2.3",
+    [string]$Version = "0.2.4",
     [string]$Runtime = "win-x64"
 )
 
@@ -37,6 +37,17 @@ dotnet publish (Join-Path $projectRoot "QARegressionManager.csproj") `
 
 if ($LASTEXITCODE -ne 0) {
     throw "Publikowanie aplikacji nie powiodło się."
+}
+
+$forbiddenReleaseFiles = Get-ChildItem -LiteralPath $publishDirectory -Recurse -File |
+    Where-Object {
+        $_.Name -match '^(assignments|assignment-input-presets.*|profiles|application-settings.*|language-settings|network-sync.*|session.*|project-data|TestCases.*)\.json$' -or
+        $_.Extension -match '^\.(pfx|p12|pem|key|db|sqlite)$'
+    }
+
+if ($forbiddenReleaseFiles) {
+    $names = $forbiddenReleaseFiles.FullName -join [Environment]::NewLine
+    throw "Publikacja zawiera lokalne lub poufne pliki i nie może zostać spakowana:$([Environment]::NewLine)$names"
 }
 
 # Symbole debugowania nie są potrzebne w paczce użytkownika ani instalatorze.

@@ -2,7 +2,7 @@
 #define MyAppPublisher "Eryk Potocki"
 #define MyAppExeName "QAManager.exe"
 #ifndef MyAppVersion
-  #define MyAppVersion "0.2.3"
+  #define MyAppVersion "0.2.4"
 #endif
 #ifndef PublishDir
   #define PublishDir "..\artifacts\publish\win-x64"

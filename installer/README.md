@@ -5,7 +5,7 @@ Konfiguracja tworzy instalator Windows dla bieżącej wersji aplikacji. Instalat
 Installpack należy generować wyłącznie na wyraźne żądanie użytkownika:
 
 ```powershell
-.\scripts\Build-Installer.ps1 -Version 0.2.3
+.\scripts\Build-Installer.ps1 -Version 0.2.4
 ```
 
-Do kompilacji instalatora wymagany jest Inno Setup 6. Samo istnienie tej konfiguracji nie zmienia zwykłej kompilacji aplikacji i nie generuje żadnej paczki.
+Do kompilacji instalatora wymagany jest Inno Setup 6. Skrypt przed utworzeniem instalatora sprawdza katalog publikacji i przerywa pracę, jeśli znajdzie lokalne profile, PIN-y, przypisania, ustawienia, dane synchronizacji, certyfikaty lub bazy danych. Samo istnienie tej konfiguracji nie zmienia zwykłej kompilacji aplikacji i nie generuje żadnej paczki.
