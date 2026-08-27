@@ -202,8 +202,8 @@
         </Style>
 
         <Style Selector="Button.NavigationButton.NextButton:pressed">
-            <Setter Property="Background" Value="#169B50" />
-            <Setter Property="BorderBrush" Value="#169B50" />
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryHoverBrush}" />
         </Style>
 
         <Style Selector="Button.NavigationButton:disabled">
@@ -246,22 +246,22 @@
         <!-- DRZEWO -->
 
         <Style Selector="TreeViewItem">
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="Foreground"
                     Value="{DynamicResource PrimaryTextBrush}" />
-            <Setter Property="Margin" Value="0,2" />
+            <Setter Property="Margin" Value="0,1" />
         </Style>
 
         <Style Selector="Border.CompactTreePanel TreeViewItem">
-            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontSize" Value="11" />
         </Style>
 
         <Style Selector="Border.CompactTreePanel TextBlock.ProjectTreeLabel">
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="12" />
         </Style>
 
         <Style Selector="Border.CompactTreePanel TextBlock.TestTypeTreeLabel">
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="12" />
         </Style>
 
         <Style Selector="Button.PanelToggleButton">
@@ -292,7 +292,7 @@
             <Setter Property="Background" Value="{DynamicResource HoverItemBrush}" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Margin" Value="0,0,0,5" />
-            <Setter Property="Padding" Value="7,7" />
+            <Setter Property="Padding" Value="4,5" />
         </Style>
 
         <Style Selector="TextBlock.ProjectTreeLabel">
@@ -302,19 +302,19 @@
         <Style Selector="Border.TestTypeTreeHeader">
             <Setter Property="Background" Value="{DynamicResource IconBackgroundBrush}" />
             <Setter Property="CornerRadius" Value="8" />
-            <Setter Property="Margin" Value="0,8,0,3" />
-            <Setter Property="Padding" Value="7,6" />
+            <Setter Property="Margin" Value="0,5,0,2" />
+            <Setter Property="Padding" Value="4,4" />
         </Style>
 
         <Style Selector="TextBlock.TestTypeTreeLabel">
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="13" />
         </Style>
 
         <!-- STATUS SEKCJI W DRZEWIE -->
 
         <Style Selector="Border.TreeProgressRow">
-            <Setter Property="Padding" Value="7,5" />
+            <Setter Property="Padding" Value="4,3" />
             <Setter Property="CornerRadius" Value="7" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="Transparent" />
@@ -445,7 +445,7 @@
                 <StackPanel
                     Grid.Column="0"
                     VerticalAlignment="Center"
-                    Spacing="2">
+                    Spacing="4">
 
                     <TextBlock
                         Text="QA Manager"
@@ -453,11 +453,20 @@
                         FontWeight="Bold"
                         Foreground="{DynamicResource PrimaryTextBrush}" />
 
-                    <TextBlock
-                        Name="ProjectInfoTextBlock"
-                        Text="TEST PROJECT — ENGLISH"
-                        FontSize="{DynamicResource AppFontSize13}"
-                        Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <Border
+                        HorizontalAlignment="Left"
+                        Padding="9,3"
+                        Background="{DynamicResource IconBackgroundBrush}"
+                        BorderBrush="{DynamicResource AccentPrimaryBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <TextBlock
+                            Name="ProjectInfoTextBlock"
+                            Text="ENGLISH.COM"
+                            FontSize="{DynamicResource AppFontSize14}"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource AccentPrimaryBrush}" />
+                    </Border>
 
                 </StackPanel>
 
@@ -469,10 +478,6 @@
                     VerticalAlignment="Center"
                     Spacing="6"
                     ClipToBounds="True">
-
-                    <Button Name="AssignTestsButton" Classes="AssignmentButton"
-                            Content="{DynamicResource Assignment.AssignTests}" IsVisible="False"
-                            Click="AssignTestsButton_OnClick" />
 
                     <Button Name="ExecuteAssignedTestsButton" Classes="AssignmentButton"
                             IsVisible="False" ClipToBounds="False"
@@ -634,10 +639,30 @@
                     Spacing="6">
 
                     <Button
+                        Name="HomeButton"
+                        Classes="ThemeButton"
+                        Width="42"
+                        Padding="0"
+                        ToolTip.Tip="{DynamicResource Common.Home}"
+                        Click="HomeButton_OnClick">
+                        <Path
+                            Width="22"
+                            Height="22"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource PrimaryTextBrush}"
+                            StrokeThickness="1.8"
+                            StrokeLineCap="Round"
+                            StrokeJoin="Round"
+                            Fill="Transparent"
+                            Data="M 3,11 L 12,3 L 21,11 M 5,10 L 5,21 L 19,21 L 19,10 M 9,21 L 9,14 L 15,14 L 15,21" />
+                    </Button>
+
+                    <Button
                         Name="NotificationCenterButton"
                         Classes="ThemeButton"
-                        ClipToBounds="False"
-                        Click="NotificationCenterButton_OnClick">
+                        ClipToBounds="False">
 
                         <Grid Width="42" Height="42" ClipToBounds="False">
                             <TextBlock Text="🔔" FontSize="{DynamicResource AppFontSize18}"
@@ -652,6 +677,90 @@
                                            FontSize="{DynamicResource AppFontSize10}" FontWeight="Bold" Foreground="White" />
                             </Border>
                         </Grid>
+
+                        <Button.Flyout>
+                            <Flyout
+                                Placement="BottomEdgeAlignedRight"
+                                Opened="NotificationFlyout_OnOpened">
+                                <Border
+                                    Width="420"
+                                    Padding="16"
+                                    Background="{DynamicResource CardBackgroundBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="16">
+                                    <Grid RowDefinitions="Auto,*,Auto">
+                                        <StackPanel Grid.Row="0" Spacing="4">
+                                            <TextBlock
+                                                Text="{DynamicResource Notifications.Title}"
+                                                FontSize="{DynamicResource AppFontSize22}"
+                                                FontWeight="Bold" />
+                                            <TextBlock
+                                                Text="{DynamicResource Notifications.Description}"
+                                                FontSize="{DynamicResource AppFontSize12}"
+                                                Foreground="{DynamicResource SecondaryTextBrush}"
+                                                TextWrapping="Wrap" />
+                                        </StackPanel>
+
+                                        <ScrollViewer
+                                            Grid.Row="1"
+                                            Margin="0,14,0,12"
+                                            MaxHeight="500"
+                                            MinHeight="130"
+                                            HorizontalScrollBarVisibility="Disabled"
+                                            VerticalScrollBarVisibility="Auto">
+                                            <StackPanel
+                                                Name="NotificationFlyoutItemsPanel"
+                                                Spacing="8" />
+                                        </ScrollViewer>
+
+                                        <StackPanel Grid.Row="2" Spacing="8">
+                                            <Button
+                                                Name="NotificationFlyoutClearButton"
+                                                HorizontalAlignment="Left"
+                                                Height="38"
+                                                Padding="16,0"
+                                                Background="#DC4C56"
+                                                BorderBrush="#DC4C56"
+                                                Foreground="White"
+                                                FontWeight="SemiBold"
+                                                Content="{DynamicResource Notifications.Clear}"
+                                                IsEnabled="False"
+                                                Click="NotificationFlyoutClearButton_OnClick" />
+
+                                            <Grid
+                                                Name="NotificationFlyoutClearConfirmation"
+                                                ColumnDefinitions="*,Auto,Auto"
+                                                IsVisible="False">
+                                                <TextBlock
+                                                    Grid.Column="0"
+                                                    Margin="0,0,10,0"
+                                                    VerticalAlignment="Center"
+                                                    Text="{DynamicResource Notifications.ClearQuestion}"
+                                                    TextWrapping="Wrap"
+                                                    FontSize="{DynamicResource AppFontSize12}" />
+                                                <Button
+                                                    Grid.Column="1"
+                                                    Margin="0,0,6,0"
+                                                    Height="34"
+                                                    Padding="12,0"
+                                                    Content="{DynamicResource Common.Cancel}"
+                                                    Click="NotificationFlyoutCancelClearButton_OnClick" />
+                                                <Button
+                                                    Grid.Column="2"
+                                                    Height="34"
+                                                    Padding="12,0"
+                                                    Background="#DC4C56"
+                                                    BorderBrush="#DC4C56"
+                                                    Foreground="White"
+                                                    Content="{DynamicResource Notifications.ClearAction}"
+                                                    Click="NotificationFlyoutConfirmClearButton_OnClick" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </Flyout>
+                        </Button.Flyout>
 
                     </Button>
 
@@ -715,7 +824,12 @@
                                     BorderThickness="1"
                                     CornerRadius="16">
 
-                                    <StackPanel Spacing="6">
+                                    <ScrollViewer
+                                        MaxHeight="720"
+                                        HorizontalScrollBarVisibility="Disabled"
+                                        VerticalScrollBarVisibility="Auto">
+
+                                    <StackPanel Spacing="6" Margin="0,0,4,0">
 
                                         <TextBlock
                                             Text="{DynamicResource Common.SettingsArea}"
@@ -756,6 +870,33 @@
                                             </Grid>
 
                                         </Button>
+
+                                        <Button Classes="SettingsMenuItem"
+                                                Click="AdvancedSettingsButton_OnClick">
+                                            <Grid ColumnDefinitions="42,*,Auto">
+                                                <Border Grid.Column="0" Width="36" Height="36"
+                                                        Background="{DynamicResource IconBackgroundBrush}"
+                                                        CornerRadius="10">
+                                                    <TextBlock Text="⋯" HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize20}"
+                                                               Foreground="#2878D0" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="10,0,0,0"
+                                                            VerticalAlignment="Center" Spacing="2">
+                                                    <TextBlock Text="{DynamicResource Common.MoreSettings}"
+                                                               FontSize="{DynamicResource AppFontSize14}" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                                    <TextBlock Text="{DynamicResource Common.MoreSettingsDescription}"
+                                                               FontSize="{DynamicResource AppFontSize12}"
+                                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                </StackPanel>
+                                                <TextBlock Name="AdvancedSettingsChevronTextBlock" Grid.Column="2" Text="⌄"
+                                                           VerticalAlignment="Center" FontSize="18" />
+                                            </Grid>
+                                        </Button>
+
+                                        <StackPanel Name="AdvancedSettingsPanel" Margin="16,0,0,0"
+                                                    Spacing="4" IsVisible="False">
 
                                         <Button
                                             Classes="SettingsMenuItem"
@@ -877,6 +1018,8 @@
 
                                         </Button>
 
+                                        </StackPanel>
+
                                         <Button
                                             Classes="SettingsMenuItem"
                                             Click="HelpInfoButton_OnClick">
@@ -997,6 +1140,27 @@
 
                                             </Button>
 
+                                            <Button Classes="SettingsMenuItem"
+                                                    Click="ResetSettingsButton_OnClick">
+                                                <Grid ColumnDefinitions="42,*">
+                                                    <Border Grid.Column="0" Width="36" Height="36"
+                                                            Background="#18DC4C56" CornerRadius="10">
+                                                        <TextBlock Text="!" HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center" FontSize="{DynamicResource AppFontSize20}"
+                                                                   FontWeight="Bold" Foreground="#DC4C56" />
+                                                    </Border>
+                                                    <StackPanel Grid.Column="1" Margin="10,0,0,0"
+                                                                VerticalAlignment="Center" Spacing="2">
+                                                        <TextBlock Text="{DynamicResource Common.ResetSettings}"
+                                                                   FontSize="{DynamicResource AppFontSize14}" FontWeight="SemiBold"
+                                                                   Foreground="#DC4C56" />
+                                                        <TextBlock Text="{DynamicResource Common.ResetSettingsDescription}"
+                                                                   FontSize="{DynamicResource AppFontSize12}"
+                                                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Button>
+
                                         </StackPanel>
 
                                         <Border Height="1" Margin="6,8,6,5"
@@ -1029,6 +1193,8 @@
                                         </Button>
 
                                     </StackPanel>
+
+                                    </ScrollViewer>
 
                                 </Border>
 
@@ -1095,7 +1261,7 @@
                             Name="TestTreeView"
                             MinWidth="190"
                             HorizontalAlignment="Stretch"
-                            Margin="0,0,2,6" />
+                            Margin="-10,0,2,6" />
 
                     </ScrollViewer>
 
@@ -1532,47 +1698,51 @@
 
                                 <Grid
                                     Margin="0,34,0,0"
-                                    ColumnDefinitions="*,*,*,*,*,*">
+                                    Width="740"
+                                    Height="72"
+                                    HorizontalAlignment="Center"
+                                    ColumnDefinitions="*,*,*,*,*,*"
+                                    ColumnSpacing="10">
 
-                                    <Border Grid.Column="0" Margin="0,0,5,0" Padding="12" CornerRadius="11" Background="#E8F7ED">
-                                        <StackPanel>
+                                    <Border Grid.Column="0" Padding="12" CornerRadius="11" Background="#E8F7ED">
+                                        <StackPanel VerticalAlignment="Center">
                                             <TextBlock Name="SummarySuccessCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#18894A" />
                                             <TextBlock Text="{DynamicResource Status.Success}" FontSize="{DynamicResource AppFontSize11}" Foreground="#18894A" />
                                         </StackPanel>
                                     </Border>
 
-                                    <Border Grid.Column="1" Margin="5,0" Padding="12" CornerRadius="11" Background="#E8F2FF">
-                                        <StackPanel>
+                                    <Border Grid.Column="1" Padding="12" CornerRadius="11" Background="#E8F2FF">
+                                        <StackPanel VerticalAlignment="Center">
                                             <TextBlock Name="SummaryInProgressCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#2878D0" />
                                             <TextBlock Text="{DynamicResource Status.InProgress}" FontSize="{DynamicResource AppFontSize11}" Foreground="#2878D0" />
                                         </StackPanel>
                                     </Border>
 
-                                    <Border Grid.Column="2" Margin="5,0" Padding="12" CornerRadius="11" Background="#FDEBEC">
-                                        <StackPanel>
+                                    <Border Grid.Column="2" Padding="12" CornerRadius="11" Background="#FDEBEC">
+                                        <StackPanel VerticalAlignment="Center">
                                             <TextBlock Name="SummaryFailedCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#C43D45" />
                                             <TextBlock Text="{DynamicResource Status.Failed}" FontSize="{DynamicResource AppFontSize11}" Foreground="#C43D45" />
                                         </StackPanel>
                                     </Border>
 
-                                    <Border Grid.Column="3" Margin="5,0" Padding="12" CornerRadius="11" Background="#FFF7D8">
-                                        <StackPanel>
+                                    <Border Grid.Column="3" Padding="12" CornerRadius="11" Background="#FFF7D8">
+                                        <StackPanel VerticalAlignment="Center">
                                             <TextBlock Name="SummaryNaCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#A67C00" />
                                             <TextBlock Text="{DynamicResource Status.NotApplicable}" FontSize="{DynamicResource AppFontSize11}" Foreground="#A67C00" />
                                         </StackPanel>
                                     </Border>
 
-                                    <Border Grid.Column="4" Margin="5,0" Padding="12" CornerRadius="11" Background="#FFF0DE">
-                                        <StackPanel>
+                                    <Border Grid.Column="4" Padding="12" CornerRadius="11" Background="#FFF0DE">
+                                        <StackPanel VerticalAlignment="Center">
                                             <TextBlock Name="SummaryBlockedCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="#B86816" />
                                             <TextBlock Text="{DynamicResource Status.Blocked}" FontSize="{DynamicResource AppFontSize11}" Foreground="#B86816" />
                                         </StackPanel>
                                     </Border>
 
-                                    <Border Grid.Column="5" Margin="5,0,0,0" Padding="12" CornerRadius="11" Background="{DynamicResource IconBackgroundBrush}">
-                                        <StackPanel>
+                                    <Border Grid.Column="5" Padding="12" CornerRadius="11" Background="{DynamicResource IconBackgroundBrush}">
+                                        <StackPanel VerticalAlignment="Center">
                                             <TextBlock Name="SummaryRemainingCountTextBlock" Text="0" FontSize="{DynamicResource AppFontSize20}" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
-                                            <TextBlock Text="{DynamicResource Explorer.Remaining}" FontSize="{DynamicResource AppFontSize11}" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Text="{DynamicResource Status.Pending}" FontSize="{DynamicResource AppFontSize11}" Foreground="{DynamicResource SecondaryTextBrush}" />
                                         </StackPanel>
                                     </Border>
 
@@ -1716,6 +1886,14 @@
                         </Border>
 
                     </Grid>
+
+                    <!-- Dashboard is displayed in the main workspace. The test tree
+                         remains visible and selecting a collection returns to tests. -->
+                    <ContentControl
+                        Name="InlineDashboardHost"
+                        IsVisible="False"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" />
 
                 </Grid>
 

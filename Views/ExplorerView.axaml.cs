@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -43,9 +44,16 @@ public partial class ExplorerView : UserControl
     private readonly string _loggedInLogin;
     private readonly string _highestSystemRole;
     private readonly IReadOnlyList<string> _systemRoles;
-    private readonly IReadOnlyList<string> _projectRoles;
+    private IReadOnlyList<string> _projectRoles;
     private readonly Dictionary<string, string> _projectRoleColors =
         new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _projectRoleBackgroundColors =
+        new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _projectRoleTextColors =
+        new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _currentProjectRoleNames =
+        new(StringComparer.OrdinalIgnoreCase);
+    private bool _projectRoleScopeLoaded;
 
     private readonly JsonStorageService _jsonStorageService;
     private readonly UserTestCaseService _userTestCaseService;
@@ -60,6 +68,7 @@ public partial class ExplorerView : UserControl
     private readonly SessionManager? _sessionManager;
     private readonly SessionStateModel? _sessionState;
     private readonly Action? _logoutAction;
+    private readonly Action? _returnToStartAction;
     private readonly string? _savedTestTypeKey;
     private readonly string? _savedCollectionKey;
 
@@ -88,7 +97,6 @@ public partial class ExplorerView : UserControl
     private Button? _notificationCenterButton;
     private Border? _notificationBadgeBorder;
     private TextBlock? _notificationBadgeTextBlock;
-    private Button? _assignTestsButton;
     private Button? _executeAssignedTestsButton;
     private Button? _restartAssignedTestsButton;
     private Button? _finishEarlyButton;
@@ -96,11 +104,12 @@ public partial class ExplorerView : UserControl
     private Border? _executeAssignmentPendingDot;
     private Button? _progressDashboardButton;
     private Border? _dashboardPendingReportDot;
+    private string _dashboardPendingReportSignature = string.Empty;
+    private string _acknowledgedDashboardReportSignature = string.Empty;
     private StackPanel? _adminTestMenuPanel;
     private TreeView? _testTreeView;
     private TextBox? _testTreeSearchTextBox;
     private string _testTreeSearchText = string.Empty;
-    private bool _testTreeInitialized;
     private TextBlock? _testTreeTitleTextBlock;
     private ScrollViewer? _testTreeScrollViewer;
     private Grid? _explorerBodyGrid;
@@ -114,6 +123,9 @@ public partial class ExplorerView : UserControl
         TreePanelState.Full;
     private bool _isCompactTreeTypography;
     private Grid? _contentAreaGrid;
+    private ContentControl? _inlineDashboardHost;
+    private ProgressDashboardWindow? _inlineDashboardController;
+    private AssignmentManagementWindow? _inlineAssignmentController;
     private StackPanel? _welcomePanel;
     private TextBlock? _welcomeTitleTextBlock;
     private TextBlock? _welcomeDescriptionTextBlock;
@@ -186,6 +198,7 @@ public partial class ExplorerView : UserControl
                 TimeSpan.FromSeconds(3)
         };
     private bool _checkingAssignmentValidity;
+    private bool _isFinishingAssignedTests;
     private bool _assignmentGlowBright;
     private int _assignmentDotAnimationVersion;
     private bool _isRefreshing;
@@ -199,8 +212,6 @@ public partial class ExplorerView : UserControl
     private RotateTransform? _refreshIndicatorRotateTransform;
     private string? _lastClickedFolderKey;
     private long _lastFolderClickTimestamp;
-    private string? _lastClickedCollectionKey;
-    private long _lastCollectionClickTimestamp;
 
     public ExplorerView()
         : this(
@@ -249,7 +260,8 @@ public partial class ExplorerView : UserControl
         Action? logoutAction = null,
         string? highestSystemRole = null,
         IEnumerable<string>? systemRoles = null,
-        IEnumerable<string>? projectRoles = null)
+        IEnumerable<string>? projectRoles = null,
+        Action? returnToStartAction = null)
     {
         _projectName =
             projectName;
@@ -298,6 +310,9 @@ public partial class ExplorerView : UserControl
 
         _logoutAction =
             logoutAction;
+
+        _returnToStartAction =
+            returnToStartAction;
 
         _savedTestTypeKey =
             sessionState?.LastOpenedTestType;
@@ -388,8 +403,12 @@ public partial class ExplorerView : UserControl
 
         DetachedFromVisualTree +=
             (_, _) =>
+            {
                 LocalizationService.LanguageChanged -=
                     LocalizationService_OnLanguageChanged;
+
+                HideInlineDashboard();
+            };
 
         _folders =
             CreateSystemFolders();
@@ -487,14 +506,14 @@ public partial class ExplorerView : UserControl
 
         collection ??=
             GetCollectionsForTestType(
-                    FunctionalTestTypeKey)
+                    RegressionTestTypeKey)
                 .FirstOrDefault(
                     item => item.Cases.Any(
                         IsCaseVisibleForActiveAssignment));
 
         collection ??=
             GetCollectionsForTestType(
-                    RegressionTestTypeKey)
+                    FunctionalTestTypeKey)
                 .FirstOrDefault(
                     item => item.Cases.Any(
                         IsCaseVisibleForActiveAssignment));
@@ -503,7 +522,8 @@ public partial class ExplorerView : UserControl
         {
             SelectCollection(
                 collection,
-                revealInTree: true);
+                revealInTree: false,
+                expandPath: false);
         }
     }
 
@@ -633,10 +653,6 @@ public partial class ExplorerView : UserControl
             this.FindControl<TextBlock>(
                 "NotificationBadgeTextBlock");
 
-        _assignTestsButton =
-            this.FindControl<Button>(
-                "AssignTestsButton");
-
         _executeAssignedTestsButton =
             this.FindControl<Button>(
                 "ExecuteAssignedTestsButton");
@@ -753,6 +769,10 @@ public partial class ExplorerView : UserControl
         _contentAreaGrid =
             this.FindControl<Grid>(
                 "ContentAreaGrid");
+
+        _inlineDashboardHost =
+            this.FindControl<ContentControl>(
+                "InlineDashboardHost");
 
         _welcomePanel =
             this.FindControl<StackPanel>(
@@ -1669,8 +1689,6 @@ public partial class ExplorerView : UserControl
                 collection);
         }
 
-        _testTreeInitialized =
-            false;
         BuildTestTree();
         UpdateSessionSummary();
 
@@ -1700,9 +1718,6 @@ public partial class ExplorerView : UserControl
                         folder.Key)
                 .ToHashSet(
                     StringComparer.OrdinalIgnoreCase);
-
-        var expandAllByDefault =
-            !_testTreeInitialized;
 
         var activeCollectionKey =
             _currentCollectionIndex >= 0 &&
@@ -1739,15 +1754,11 @@ public partial class ExplorerView : UserControl
 
             folder.TreeItem.IsExpanded =
                 folder.Key == ProjectRootKey ||
-                expandAllByDefault ||
                 !string.IsNullOrWhiteSpace(
                     _testTreeSearchText) ||
                 expandedFolderKeys.Contains(
                     folder.Key);
         }
-
-        _testTreeInitialized =
-            true;
 
         if (!string.IsNullOrWhiteSpace(
                 activeCollectionKey))
@@ -1888,6 +1899,57 @@ public partial class ExplorerView : UserControl
                     VerticalAlignment.Center
             };
 
+        Control folderHeaderContent =
+            folderLabel;
+
+        if (folder.Key == ProjectRootKey)
+        {
+            var isAssignedSession =
+                string.Equals(
+                    _sessionState?.SessionMode,
+                    "Assigned",
+                    StringComparison.OrdinalIgnoreCase);
+
+            var modeIcon =
+                new TextBlock
+                {
+                    Text =
+                        isAssignedSession
+                            ? "⇥"
+                            : "⚡",
+                    FontSize = 11,
+                    FontWeight = FontWeight.Bold,
+                    Foreground =
+                        new SolidColorBrush(
+                            Color.Parse(
+                                isAssignedSession
+                                    ? "#2878D0"
+                                    : "#C98C00")),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+            ToolTip.SetTip(
+                modeIcon,
+                isAssignedSession
+                    ? (LocalizationService.IsPolish
+                        ? "Powrót do testów przypisanych"
+                        : "Return to assigned tests")
+                    : "ad-hoc");
+
+            folderHeaderContent =
+                new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 6,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Children =
+                    {
+                        folderLabel,
+                        modeIcon
+                    }
+                };
+        }
+
         var headerBorder =
             new Border
             {
@@ -1903,7 +1965,7 @@ public partial class ExplorerView : UserControl
                         5),
 
                 Child =
-                    folderLabel
+                    folderHeaderContent
             };
 
         if (folder.Key == ProjectRootKey)
@@ -2276,7 +2338,7 @@ public partial class ExplorerView : UserControl
                     new Thickness(
                         0,
                         2,
-                        8,
+                        4,
                         2)
             };
 
@@ -2287,7 +2349,7 @@ public partial class ExplorerView : UserControl
                     "○",
 
                 Width =
-                    20,
+                    14,
 
                 VerticalAlignment =
                     VerticalAlignment.Center
@@ -2302,6 +2364,9 @@ public partial class ExplorerView : UserControl
                 TextTrimming =
                     TextTrimming.CharacterEllipsis,
 
+                FontSize =
+                    12,
+
                 VerticalAlignment =
                     VerticalAlignment.Center
             };
@@ -2314,13 +2379,19 @@ public partial class ExplorerView : UserControl
 
                 Margin =
                     new Thickness(
-                        6,
+                        4,
                         0,
-                        6,
+                        2,
                         0),
 
                 MinWidth =
-                    34,
+                    30,
+
+                FontSize =
+                    11,
+
+                FontWeight =
+                    FontWeight.SemiBold,
 
                 TextAlignment =
                     TextAlignment.Right,
@@ -2375,7 +2446,7 @@ public partial class ExplorerView : UserControl
                     headerGrid,
 
                 MinWidth =
-                    180,
+                    0,
 
                 Padding =
                     new Thickness(
@@ -2578,7 +2649,7 @@ public partial class ExplorerView : UserControl
 
         item.AddHandler(
             PointerPressedEvent,
-            async (
+            (
                 _,
                 eventArgs) =>
             {
@@ -2607,35 +2678,6 @@ public partial class ExplorerView : UserControl
 
                 SelectCollectionForCommands(
                     collection);
-
-                var clickTimestamp =
-                    Environment.TickCount64;
-
-                var isDoubleClick =
-                    string.Equals(
-                        _lastClickedCollectionKey,
-                        collection.Key,
-                        StringComparison.OrdinalIgnoreCase) &&
-                    clickTimestamp -
-                    _lastCollectionClickTimestamp <=
-                    550;
-
-                _lastClickedCollectionKey =
-                    isDoubleClick
-                        ? null
-                        : collection.Key;
-
-                _lastCollectionClickTimestamp =
-                    isDoubleClick
-                        ? 0
-                        : clickTimestamp;
-
-                if (isDoubleClick &&
-                    CanModifyCollection(collection))
-                {
-                    await RenameCollectionAsync(
-                        collection);
-                }
 
                 eventArgs.Handled =
                     true;
@@ -6114,8 +6156,11 @@ public partial class ExplorerView : UserControl
 
     private void SelectCollection(
         TestCollectionData collection,
-        bool revealInTree = false)
+        bool revealInTree = false,
+        bool expandPath = true)
     {
+        HideInlineDashboard();
+
         var index =
             _collections.IndexOf(
                 collection);
@@ -6155,8 +6200,11 @@ public partial class ExplorerView : UserControl
         UpdateCurrentCollectionProgress();
         UpdateNavigationButtons();
         UpdateSessionSummary();
-        ExpandPathToCollection(
-            collection.Key);
+        if (expandPath)
+        {
+            ExpandPathToCollection(
+                collection.Key);
+        }
         UpdateActiveCollectionHighlight();
 
         if (revealInTree)
@@ -6696,13 +6744,6 @@ public partial class ExplorerView : UserControl
             return;
         }
 
-        // Pierwszy ukończony przypadek pozostaje na ekranie. Dopiero
-        // ukończenie kolejnego przesuwa listę o jeden wiersz.
-        if (completedIndex == 0)
-        {
-            return;
-        }
-
         if (orderedCases
                 .Take(
                     completedIndex)
@@ -6841,9 +6882,6 @@ public partial class ExplorerView : UserControl
                   completedPosition.Value.Y
                 : completedRow.Bounds.Height;
 
-        // Przesuwamy najwyżej o jeden rzeczywisty odstęp między
-        // sąsiednimi wierszami. Nie dodajemy już sztucznego zapasu,
-        // który na części skal DPI dawał wrażenie przeskoku o 2 pozycje.
         var scrollDistance =
             Math.Clamp(
                 oneRowStep,
@@ -6852,20 +6890,62 @@ public partial class ExplorerView : UserControl
                     1,
                     completedRow.Bounds.Height));
 
-        var maximumOffset =
+        EnsureSequentialScrollTailSpace(
+            scrollDistance);
+
+        // Margin rozszerzający koniec listy wpływa na Extent dopiero po
+        // kolejnym przebiegu layoutu. Dopiero wtedy wyliczamy cel animacji.
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                if (_testCasesScrollViewer is null)
+                {
+                    return;
+                }
+
+                var maximumOffset =
+                    Math.Max(
+                        0,
+                        _testCasesScrollViewer.Extent.Height -
+                        _testCasesScrollViewer.Viewport.Height);
+
+                var targetOffset =
+                    Math.Min(
+                        maximumOffset,
+                        currentOffset + scrollDistance);
+
+                AnimateTestCaseScroll(
+                    currentOffset,
+                    targetOffset);
+            },
+            DispatcherPriority.Loaded);
+    }
+
+    private void EnsureSequentialScrollTailSpace(
+        double rowStep)
+    {
+        if (_testCasesScrollViewer is null ||
+            _testCasesStackPanel is null)
+        {
+            return;
+        }
+
+        // Pozwala przedostatniemu wierszowi dojść do górnej pozycji, dzięki
+        // czemu ostatni przypadek zajmuje dokładnie miejsce kolejnego
+        // dwukliku. Po ostatnim przypadku przewijanie nie jest już wywołane.
+        var requiredBottomSpace =
             Math.Max(
                 0,
-                _testCasesScrollViewer.Extent.Height -
-                _testCasesScrollViewer.Viewport.Height);
+                _testCasesScrollViewer.Viewport.Height -
+                Math.Max(1, rowStep) * 2 -
+                12);
 
-        var targetOffset =
-            Math.Min(
-                maximumOffset,
-                currentOffset + scrollDistance);
-
-        AnimateTestCaseScroll(
-            currentOffset,
-            targetOffset);
+        _testCasesStackPanel.Margin =
+            new Thickness(
+                0,
+                0,
+                8,
+                requiredBottomSpace);
     }
 
     private async void AnimateTestCaseScroll(
@@ -8012,6 +8092,8 @@ public partial class ExplorerView : UserControl
             return;
         }
 
+        UpdateTreeCollectionRowWidths();
+
         var useCompactTypography =
             false;
 
@@ -8040,6 +8122,63 @@ public partial class ExplorerView : UserControl
         {
             _testTreePanelBorder.Classes.Add(
                 "CompactTreePanel");
+        }
+    }
+
+    private void UpdateTreeCollectionRowWidths()
+    {
+        var treeScrollViewer =
+            _testTreeScrollViewer;
+
+        if (treeScrollViewer is null)
+        {
+            return;
+        }
+
+        var viewportWidth =
+            treeScrollViewer.Bounds.Width;
+
+        if (viewportWidth < 120)
+        {
+            return;
+        }
+
+        foreach (var collection in _collections)
+        {
+            if (collection.HeaderBorder is null)
+            {
+                continue;
+            }
+
+            var rowPosition =
+                collection.HeaderBorder.TranslatePoint(
+                    new Point(),
+                    treeScrollViewer);
+
+            if (!rowPosition.HasValue)
+            {
+                continue;
+            }
+
+            // Liczymy szerokość od faktycznej pozycji wiersza w viewportcie.
+            // Wcięcia TreeView zależą od motywu i DPI, więc szacowanie ich na
+            // podstawie głębokości potrafiło nadal wypchnąć licznik poza panel.
+            var availableRowWidth =
+                Math.Max(
+                    90,
+                    viewportWidth -
+                    rowPosition.Value.X -
+                    12);
+
+            if (double.IsNaN(
+                    collection.HeaderBorder.Width) ||
+                Math.Abs(
+                    collection.HeaderBorder.Width -
+                    availableRowWidth) > 0.5)
+            {
+                collection.HeaderBorder.Width =
+                    availableRowWidth;
+            }
         }
     }
 
@@ -8962,6 +9101,36 @@ public partial class ExplorerView : UserControl
         bool allowUnfinished = false,
         bool skipCompletionDialog = false)
     {
+        if (!_activeAssignmentId.HasValue ||
+            _isFinishingAssignedTests)
+        {
+            return;
+        }
+
+        _isFinishingAssignedTests = true;
+        _assignmentValidityTimer.Stop();
+
+        try
+        {
+            await FinishAssignedTestsCoreAsync(
+                allowUnfinished,
+                skipCompletionDialog);
+        }
+        finally
+        {
+            _isFinishingAssignedTests = false;
+
+            if (_activeAssignmentCaseIds is not null)
+            {
+                _assignmentValidityTimer.Start();
+            }
+        }
+    }
+
+    private async Task FinishAssignedTestsCoreAsync(
+        bool allowUnfinished,
+        bool skipCompletionDialog)
+    {
         if (!_activeAssignmentId.HasValue)
         {
             return;
@@ -8988,13 +9157,7 @@ public partial class ExplorerView : UserControl
         var completionChoice =
             AssignmentCompletionChoice.FinishWithoutReport;
 
-        var suppressConfirmation =
-            await _userProfileService
-                .GetSuppressAssignmentCompletionConfirmationAsync(
-                    _loggedInLogin);
-
-        if (!skipCompletionDialog &&
-            !suppressConfirmation)
+        if (!skipCompletionDialog)
         {
             var dialog =
                 new AssignmentCompletionConfirmationWindow();
@@ -9009,13 +9172,6 @@ public partial class ExplorerView : UserControl
                 return;
             }
 
-            if (dialog.DontShowAgain)
-            {
-                await _userProfileService
-                    .SetSuppressAssignmentCompletionConfirmationAsync(
-                        _loggedInLogin,
-                        true);
-            }
         }
 
         if (completionChoice ==
@@ -9329,7 +9485,8 @@ public partial class ExplorerView : UserControl
 
     private async Task CheckActiveAssignmentValidityAsync()
     {
-        if (_checkingAssignmentValidity ||
+        if (_isFinishingAssignedTests ||
+            _checkingAssignmentValidity ||
             _activeAssignmentCaseIds is null ||
             _activeAssignments.Length == 0)
         {
@@ -9449,6 +9606,14 @@ public partial class ExplorerView : UserControl
 
         if (currentAssignments.Length == 0)
         {
+            // Ukończone przypisanie znika z kolejki aktywnej testera.
+            // W trakcie finalizacji jest to oczekiwane i nie oznacza
+            // wstrzymania ani wycofania sesji przez managera.
+            if (_isFinishingAssignedTests)
+            {
+                return true;
+            }
+
             var unavailableIds =
                 previousAssignmentIds.Count > 0
                     ? previousAssignmentIds
@@ -10780,12 +10945,6 @@ public partial class ExplorerView : UserControl
 
     private async Task RefreshAssignmentAndNotificationStateAsync()
     {
-        if (_assignTestsButton is not null)
-        {
-            _assignTestsButton.IsVisible =
-                CanAssignTests;
-        }
-
         _activeAssignments =
             (await _assignmentService.GetActiveAssignmentsForUserAsync(
                 _loggedInLogin))
@@ -10852,14 +11011,13 @@ public partial class ExplorerView : UserControl
                             StringComparison.OrdinalIgnoreCase))
                 .ToArray();
 
-            _dashboardPendingReportDot.IsVisible =
-                CanAssignTests &&
+            var pendingReportAssignments =
                 dashboardAssignments
                     .GroupBy(
                         assignment =>
                             assignment.ApplicationVersion,
                         StringComparer.OrdinalIgnoreCase)
-                    .Any(
+                    .Where(
                         versionGroup =>
                             versionGroup.Any(
                                 assignment =>
@@ -10868,7 +11026,40 @@ public partial class ExplorerView : UserControl
                             !versionGroup.Any(
                                 assignment =>
                                     assignment.IsActive &&
-                                    !assignment.CompletedAt.HasValue));
+                                    !assignment.CompletedAt.HasValue))
+                    .SelectMany(
+                        versionGroup =>
+                            versionGroup.Where(
+                                assignment =>
+                                    assignment.CompletedAt.HasValue &&
+                                    !assignment.ReportGeneratedAt.HasValue))
+                    .OrderBy(
+                        assignment =>
+                            assignment.Id)
+                    .ToArray();
+
+            _dashboardPendingReportSignature =
+                string.Join(
+                    ";",
+                    pendingReportAssignments.Select(
+                        assignment =>
+                            assignment.Id.ToString("N")));
+
+            if (string.IsNullOrEmpty(
+                    _dashboardPendingReportSignature))
+            {
+                _acknowledgedDashboardReportSignature =
+                    string.Empty;
+            }
+
+            _dashboardPendingReportDot.IsVisible =
+                CanAssignTests &&
+                !string.IsNullOrEmpty(
+                    _dashboardPendingReportSignature) &&
+                !string.Equals(
+                    _dashboardPendingReportSignature,
+                    _acknowledgedDashboardReportSignature,
+                    StringComparison.Ordinal);
         }
 
         var unreadCount =
@@ -10903,31 +11094,445 @@ public partial class ExplorerView : UserControl
         await dialog.ShowDialog(ownerWindow);
     }
 
-    private async void NotificationCenterButton_OnClick(
+    private async void NotificationFlyout_OnOpened(
         object? sender,
-        RoutedEventArgs e)
+        EventArgs e)
     {
-        var ownerWindow =
-            TopLevel.GetTopLevel(this)
-            as Window;
-
-        if (ownerWindow is null)
+        if (sender is not Flyout flyout ||
+            flyout.Content is not Control content)
         {
             return;
         }
 
-        var dialog =
-            new NotificationCenterWindow(
+        var itemsPanel =
+            FindNotificationFlyoutControl<StackPanel>(
+                content,
+                "NotificationFlyoutItemsPanel");
+
+        var clearButton =
+            FindNotificationFlyoutControl<Button>(
+                content,
+                "NotificationFlyoutClearButton");
+
+        var confirmation =
+            FindNotificationFlyoutControl<Grid>(
+                content,
+                "NotificationFlyoutClearConfirmation");
+
+        if (itemsPanel is null ||
+            clearButton is null)
+        {
+            return;
+        }
+
+        if (confirmation is not null)
+        {
+            confirmation.IsVisible = false;
+        }
+
+        clearButton.IsVisible = true;
+        itemsPanel.Children.Clear();
+        itemsPanel.Children.Add(
+            new TextBlock
+            {
+                Text = LocalizationService.T("Common.Loading"),
+                Margin = new Thickness(0, 18),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = Brushes.Gray
+            });
+
+        var notifications =
+            await _assignmentService.GetNotificationsForUserAsync(
                 _loggedInLogin);
 
-        dialog.AssignedTestsHighlightRequested +=
-            async () =>
-                await HighlightAssignedTestsButtonAsync();
+        var activeAssignmentIds =
+            (await _assignmentService.GetActiveAssignmentsForUserAsync(
+                _loggedInLogin))
+            .Select(
+                assignment =>
+                    assignment.Id)
+            .ToHashSet();
 
-        await dialog.ShowDialog(
-            ownerWindow);
+        var newestActiveAssignmentNotificationId =
+            notifications
+                .Where(
+                    notification =>
+                        notification.AssignmentId.HasValue &&
+                        activeAssignmentIds.Contains(
+                            notification.AssignmentId.Value))
+                .OrderByDescending(
+                    notification =>
+                        notification.CreatedAt)
+                .Select(
+                    notification =>
+                        (Guid?)notification.Id)
+                .FirstOrDefault();
+
+        itemsPanel.Children.Clear();
+        clearButton.IsEnabled =
+            notifications.Length > 0;
+
+        if (notifications.Length == 0)
+        {
+            AddEmptyNotificationFlyoutState(
+                itemsPanel);
+        }
+
+        foreach (var notification in notifications)
+        {
+            itemsPanel.Children.Add(
+                await CreateNotificationFlyoutItemAsync(
+                    notification,
+                    newestActiveAssignmentNotificationId));
+        }
+
+        await _assignmentService.MarkAllNotificationsReadAsync(
+            _loggedInLogin);
 
         await RefreshAssignmentAndNotificationStateAsync();
+    }
+
+    private async Task<Border> CreateNotificationFlyoutItemAsync(
+        UserNotificationModel notification,
+        Guid? newestActiveAssignmentNotificationId)
+    {
+        var contentPanel =
+            new StackPanel
+            {
+                Spacing = 4,
+                Children =
+                {
+                    new TextBlock
+                    {
+                        Text = GetNotificationDisplayTitle(
+                            notification.Title),
+                        FontSize = 14,
+                        FontWeight = FontWeight.Bold
+                    },
+                    new TextBlock
+                    {
+                        Text = GetNotificationDisplayMessage(
+                            notification.Message),
+                        TextWrapping = TextWrapping.Wrap,
+                        FontSize = 13
+                    },
+                    new TextBlock
+                    {
+                        Text = notification.CreatedAt.LocalDateTime
+                            .ToString("dd.MM.yyyy HH:mm"),
+                        FontSize = 11,
+                        Foreground = Brushes.Gray
+                    }
+                }
+            };
+
+        var notificationBorder =
+            new Border
+            {
+                Padding = new Thickness(12),
+                Background = notification.IsRead
+                    ? new SolidColorBrush(
+                        Color.Parse("#0A68726B"))
+                    : new SolidColorBrush(
+                        Color.Parse("#1828C76F")),
+                BorderBrush = new SolidColorBrush(
+                    Color.Parse("#4068726B")),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(12),
+                Child = contentPanel
+            };
+
+        if (notification.StructureChangeRequestId is Guid requestId)
+        {
+            var request =
+                await _assignmentService.GetStructureChangeRequestAsync(
+                    requestId);
+
+            if (request?.Status == "Pending")
+            {
+                var approveButton =
+                    new Button
+                    {
+                        Content = LocalizationService.T(
+                            "Notifications.ApproveDeletion"),
+                        Classes = { "PrimaryAction" }
+                    };
+
+                var rejectButton =
+                    new Button
+                    {
+                        Content = LocalizationService.T(
+                            "Notifications.Reject"),
+                        Classes = { "SecondaryAction" }
+                    };
+
+                var actions =
+                    new StackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        Spacing = 8,
+                        Margin = new Thickness(0, 8, 0, 0),
+                        Children =
+                        {
+                            rejectButton,
+                            approveButton
+                        }
+                    };
+
+                async void Resolve(bool approve)
+                {
+                    var resolved =
+                        await _assignmentService.ResolveStructureDeletionAsync(
+                            requestId,
+                            _loggedInLogin,
+                            approve);
+
+                    if (!resolved)
+                    {
+                        return;
+                    }
+
+                    approveButton.IsEnabled = false;
+                    rejectButton.IsEnabled = false;
+                    approveButton.Content = LocalizationService.T(
+                        approve
+                            ? "Notifications.Approved"
+                            : "Notifications.Rejected");
+                }
+
+                approveButton.Click +=
+                    (_, _) =>
+                        Resolve(true);
+
+                rejectButton.Click +=
+                    (_, _) =>
+                        Resolve(false);
+
+                contentPanel.Children.Add(
+                    actions);
+            }
+        }
+
+        if (newestActiveAssignmentNotificationId ==
+            notification.Id)
+        {
+            notificationBorder.Cursor =
+                new Cursor(
+                    StandardCursorType.Hand);
+
+            ToolTip.SetTip(
+                notificationBorder,
+                LocalizationService.T(
+                    "Notifications.ShowExecuteTip"));
+
+            notificationBorder.PointerPressed +=
+                async (_, eventArgs) =>
+                {
+                    if (!eventArgs
+                            .GetCurrentPoint(
+                                notificationBorder)
+                            .Properties
+                            .IsLeftButtonPressed)
+                    {
+                        return;
+                    }
+
+                    _notificationCenterButton?.Flyout?.Hide();
+                    await HighlightAssignedTestsButtonAsync();
+                };
+        }
+
+        return notificationBorder;
+    }
+
+    private void NotificationFlyoutClearButton_OnClick(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        if (sender is not Button button)
+        {
+            return;
+        }
+
+        var confirmation =
+            FindNotificationFlyoutControl<Grid>(
+                button,
+                "NotificationFlyoutClearConfirmation");
+
+        if (confirmation is null)
+        {
+            return;
+        }
+
+        button.IsVisible = false;
+        confirmation.IsVisible = true;
+    }
+
+    private void NotificationFlyoutCancelClearButton_OnClick(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        if (sender is not Button button)
+        {
+            return;
+        }
+
+        var confirmation =
+            FindNotificationFlyoutControl<Grid>(
+                button,
+                "NotificationFlyoutClearConfirmation");
+
+        var clearButton =
+            FindNotificationFlyoutControl<Button>(
+                button,
+                "NotificationFlyoutClearButton");
+
+        if (confirmation is not null)
+        {
+            confirmation.IsVisible = false;
+        }
+
+        if (clearButton is not null)
+        {
+            clearButton.IsVisible = true;
+        }
+    }
+
+    private async void NotificationFlyoutConfirmClearButton_OnClick(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        if (sender is not Button button)
+        {
+            return;
+        }
+
+        var itemsPanel =
+            FindNotificationFlyoutControl<StackPanel>(
+                button,
+                "NotificationFlyoutItemsPanel");
+
+        var confirmation =
+            FindNotificationFlyoutControl<Grid>(
+                button,
+                "NotificationFlyoutClearConfirmation");
+
+        var clearButton =
+            FindNotificationFlyoutControl<Button>(
+                button,
+                "NotificationFlyoutClearButton");
+
+        if (itemsPanel is null)
+        {
+            return;
+        }
+
+        await _assignmentService.ClearNotificationsForUserAsync(
+            _loggedInLogin);
+
+        itemsPanel.Children.Clear();
+        AddEmptyNotificationFlyoutState(
+            itemsPanel);
+
+        if (confirmation is not null)
+        {
+            confirmation.IsVisible = false;
+        }
+
+        if (clearButton is not null)
+        {
+            clearButton.IsVisible = true;
+            clearButton.IsEnabled = false;
+        }
+
+        await RefreshAssignmentAndNotificationStateAsync();
+    }
+
+    private static void AddEmptyNotificationFlyoutState(
+        StackPanel itemsPanel)
+    {
+        itemsPanel.Children.Add(
+            new TextBlock
+            {
+                Text = LocalizationService.T("Notifications.Empty"),
+                Margin = new Thickness(0, 18),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = Brushes.Gray
+            });
+    }
+
+    private static T? FindNotificationFlyoutControl<T>(
+        Control source,
+        string name)
+        where T : Control
+    {
+        if (source is T typedSource &&
+            string.Equals(
+                typedSource.Name,
+                name,
+                StringComparison.Ordinal))
+        {
+            return typedSource;
+        }
+
+        return source
+            .GetVisualAncestors()
+            .Prepend(source)
+            .SelectMany(
+                ancestor =>
+                    ancestor.GetVisualDescendants())
+            .OfType<T>()
+            .FirstOrDefault(
+                control =>
+                    string.Equals(
+                        control.Name,
+                        name,
+                        StringComparison.Ordinal));
+    }
+
+    private static string GetNotificationDisplayTitle(
+        string title)
+    {
+        if (LocalizationService.IsPolish)
+        {
+            return title;
+        }
+
+        return title switch
+        {
+            "Nowe testy do wykonania" => LocalizationService.T("Notifications.NewTestsTitle"),
+            "Zmieniono przypisane testy" => LocalizationService.T("Notifications.AssignmentChangedTitle"),
+            "Wycofano przypisane testy" => LocalizationService.T("Notifications.AssignmentWithdrawnTitle"),
+            "Przypisanie ukończone" => LocalizationService.T("Notifications.CompletedTitle"),
+            "Przypisanie zostało przeniesione" => LocalizationService.T("Notifications.AssignmentMovedTitle"),
+            "Prośba o usunięcie dużej gałęzi" => LocalizationService.T("Notifications.DeletionRequestTitle"),
+            "Usunięcie zatwierdzone" => LocalizationService.T("Notifications.DeletionApprovedTitle"),
+            "Usunięcie odrzucone" => LocalizationService.T("Notifications.DeletionRejectedTitle"),
+            _ => title
+        };
+    }
+
+    private static string GetNotificationDisplayMessage(
+        string message)
+    {
+        if (LocalizationService.IsPolish)
+        {
+            return message;
+        }
+
+        var assignment =
+            Regex.Match(
+                message,
+                @"^(?<by>.+) przypisał sesję projektu (?<project>.+), wersja (?<version>.+) \((?<count>\d+) przypadków\)\.$");
+
+        return assignment.Success
+            ? LocalizationService.Format(
+                "Notifications.NewTestsMessage",
+                assignment.Groups["by"].Value,
+                assignment.Groups["project"].Value,
+                assignment.Groups["version"].Value,
+                assignment.Groups["count"].Value)
+            : message;
     }
 
     private async Task HighlightAssignedTestsButtonAsync()
@@ -10987,20 +11592,14 @@ public partial class ExplorerView : UserControl
         scale.ScaleY = 1;
     }
 
-    private async void AssignTestsButton_OnClick(
-        object? sender,
-        RoutedEventArgs e)
+    private async Task OpenAssignmentManagementAsync()
     {
         if (!CanAssignTests)
         {
             return;
         }
 
-        var ownerWindow =
-            TopLevel.GetTopLevel(this)
-            as Window;
-
-        if (ownerWindow is null)
+        if (_inlineDashboardHost is null)
         {
             return;
         }
@@ -11023,7 +11622,7 @@ public partial class ExplorerView : UserControl
                                     testCase.Name)))
                 .ToArray();
 
-        var dialog =
+        var assignmentController =
             new AssignmentManagementWindow(
                 _projectKey,
                 _projectName,
@@ -11031,10 +11630,52 @@ public partial class ExplorerView : UserControl
                 options,
                 IsCurrentUserAdministrator);
 
-        await dialog.ShowDialog<bool>(
-            ownerWindow);
+        _inlineDashboardController?.ReleaseInlineContent();
+        _inlineDashboardController = null;
 
+        _inlineAssignmentController?.ReleaseInlineContent();
+        _inlineAssignmentController = assignmentController;
+
+        var assignmentContent =
+            await assignmentController.TakeInlineContentAsync(
+                ReturnFromInlineAssignmentAsync);
+
+        _inlineDashboardHost.Content = assignmentContent;
+        _inlineDashboardHost.IsVisible = assignmentContent is not null;
+    }
+
+    private async Task ReturnFromInlineAssignmentAsync()
+    {
         await RefreshAssignmentAndNotificationStateAsync();
+        await ShowInlineDashboardAsync();
+    }
+
+    private async Task ShowInlineDashboardAsync()
+    {
+        if (_inlineDashboardHost is null)
+        {
+            return;
+        }
+
+        HideWorkspacePanelsForDashboard();
+
+        _inlineAssignmentController?.ReleaseInlineContent();
+        _inlineAssignmentController = null;
+
+        _inlineDashboardController?.ReleaseInlineContent();
+        _inlineDashboardController =
+            new ProgressDashboardWindow(
+                _loggedInLogin,
+                _systemRoles,
+                CanAssignTests
+                    ? OpenAssignmentManagementAsync
+                    : null);
+
+        var dashboardContent =
+            await _inlineDashboardController.TakeInlineContentAsync();
+
+        _inlineDashboardHost.Content = dashboardContent;
+        _inlineDashboardHost.IsVisible = dashboardContent is not null;
     }
 
     private async void ExecuteAssignedTestsButton_OnClick(
@@ -11385,25 +12026,63 @@ public partial class ExplorerView : UserControl
         object? sender,
         RoutedEventArgs e)
     {
-        var ownerWindow =
-            TopLevel.GetTopLevel(
-                this)
-            as Window;
+        _acknowledgedDashboardReportSignature =
+            _dashboardPendingReportSignature;
 
-        if (ownerWindow is null)
+        if (_dashboardPendingReportDot is not null)
         {
-            return;
+            _dashboardPendingReportDot.IsVisible = false;
         }
 
-        var dialog =
-            new ProgressDashboardWindow(
-                _loggedInLogin,
-                _systemRoles);
+        await ShowInlineDashboardAsync();
+    }
 
-        await dialog.ShowDialog(
-            ownerWindow);
+    private void HomeButton_OnClick(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        HideInlineDashboard();
+        CloseSettingsFlyout();
+        _returnToStartAction?.Invoke();
+    }
 
-        await RefreshAssignmentAndNotificationStateAsync();
+    private void HideWorkspacePanelsForDashboard()
+    {
+        ClearFolderWorkspace();
+
+        if (_welcomePanel is not null)
+        {
+            _welcomePanel.IsVisible = false;
+        }
+
+        if (_testExecutionPanel is not null)
+        {
+            _testExecutionPanel.IsVisible = false;
+        }
+
+        if (_summaryPanel is not null)
+        {
+            _summaryPanel.IsVisible = false;
+        }
+
+        if (_emptyFolderBackButton is not null)
+        {
+            _emptyFolderBackButton.IsVisible = false;
+        }
+    }
+
+    private void HideInlineDashboard()
+    {
+        if (_inlineDashboardHost is not null)
+        {
+            _inlineDashboardHost.IsVisible = false;
+            _inlineDashboardHost.Content = null;
+        }
+
+        _inlineDashboardController?.ReleaseInlineContent();
+        _inlineDashboardController = null;
+        _inlineAssignmentController?.ReleaseInlineContent();
+        _inlineAssignmentController = null;
     }
 
     private async void AdminTestMenuButton_OnClick(
@@ -11434,6 +12113,85 @@ public partial class ExplorerView : UserControl
 
         await dialog.ShowDialog(
             ownerWindow);
+
+        if (dialog.GlobalResetCompleted)
+        {
+            _logoutAction?.Invoke();
+            return;
+        }
+
+        await ReloadRoleBadgesAsync();
+    }
+
+    private void AdvancedSettingsButton_OnClick(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        // Controls inside a Flyout live in its own namescope. The generated
+        // fields can therefore still be null even though the flyout is open.
+        // Resolve both controls from the button's currently materialized
+        // visual tree instead of relying on those generated fields.
+        if (sender is not Button button)
+        {
+            return;
+        }
+
+        var flyoutContent =
+            button.GetVisualAncestors()
+                .OfType<StackPanel>()
+                .FirstOrDefault(
+                    panel =>
+                        panel.GetVisualDescendants()
+                            .OfType<StackPanel>()
+                            .Any(child => child.Name == "AdvancedSettingsPanel"));
+
+        var advancedPanel =
+            flyoutContent?
+                .GetVisualDescendants()
+                .OfType<StackPanel>()
+                .FirstOrDefault(panel => panel.Name == "AdvancedSettingsPanel");
+
+        if (advancedPanel is null)
+        {
+            return;
+        }
+
+        advancedPanel.IsVisible =
+            !advancedPanel.IsVisible;
+
+        var chevron =
+            button.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .FirstOrDefault(
+                    textBlock =>
+                        textBlock.Name == "AdvancedSettingsChevronTextBlock");
+
+        if (chevron is not null)
+        {
+            chevron.Text =
+                advancedPanel.IsVisible
+                    ? "⌃"
+                    : "⌄";
+        }
+    }
+
+    private async void ResetSettingsButton_OnClick(
+        object? sender,
+        RoutedEventArgs e)
+    {
+        CloseSettingsFlyout();
+
+        if (!CanAssignTests ||
+            TopLevel.GetTopLevel(this) is not Window ownerWindow)
+        {
+            return;
+        }
+
+        var dialog =
+            new ResetSettingsWindow(
+                _loggedInLogin);
+
+        await dialog.ShowDialog(ownerWindow);
 
         if (dialog.GlobalResetCompleted)
         {
@@ -12660,18 +13418,22 @@ public partial class ExplorerView : UserControl
             return;
         }
 
-        var roles =
-            SystemRoleService.GetOrderedDisplayRoles(
-                    _systemRoles,
-                    _projectRoles)
-                .ToArray();
+        var scopedProjectRoles =
+            _projectRoleScopeLoaded
+                ? _projectRoles.Where(
+                    role =>
+                        _currentProjectRoleNames.Contains(role))
+                : Enumerable.Empty<string>();
+
+        var roles = scopedProjectRoles
+            .OrderBy(role => role, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
         // Nie chowaj ról na podstawie samej szerokości okna. Ilość miejsca
         // zajmowana przez akcje po lewej zmienia się zależnie od trybu pracy.
         var visibleHeaderActions =
             new[]
             {
-                _assignTestsButton,
                 _executeAssignedTestsButton,
                 _restartAssignedTestsButton
             }.Where(button => button?.IsVisible == true).ToArray();
@@ -12824,54 +13586,63 @@ public partial class ExplorerView : UserControl
     private Border CreateRoleBadge(
         string role)
     {
-        var isDarkMode =
-            Application.Current?.RequestedThemeVariant ==
-            ThemeVariant.Dark;
+        var isAdmin =
+            string.Equals(
+                role,
+                "Admin",
+                StringComparison.OrdinalIgnoreCase);
 
         var (
             background,
             border,
             foreground) =
-            (isDarkMode, role) switch
+            role switch
             {
-                (true, "Admin") =>
-                    ("#3A2427", "#75434A", "#F2AAB0"),
+                "Admin" =>
+                    ("#5B2530", "#D2A447", "#FFF2CC"),
 
-                (true, "Lider") =>
-                    ("#3A3220", "#746638", "#E8CD79"),
+                "Przełożony" =>
+                    ("#8C671C", "#6B4C0F", "#FFF0BD"),
 
-                (true, _) =>
-                    ("#223448", "#416887", "#A8CEF1"),
-
-                (false, "Admin") =>
-                    ("#FDEBEC", "#E9A8AC", "#B3262D"),
-
-                (false, "Lider") =>
-                    ("#FFF3D6", "#E4C36A", "#8A6200"),
+                "Pracownik" =>
+                    ("#315F86", "#1E4F78", "#E4F2FC"),
 
                 _ =>
-                    ("#E8F2FF", "#A8CCF1", "#1F6FBF")
+                    ("#315F86", "#1E4F78", "#E4F2FC")
             };
 
-        if (_projectRoleColors.TryGetValue(role, out var customBorderColor))
+        if (!isAdmin &&
+            _projectRoleColors.TryGetValue(role, out var customBorderColor))
         {
             border = customBorderColor;
         }
 
+        if (!isAdmin &&
+            _projectRoleBackgroundColors.TryGetValue(role, out var customBackgroundColor))
+        {
+            background = customBackgroundColor;
+        }
+
+        if (!isAdmin &&
+            _projectRoleTextColors.TryGetValue(role, out var customTextColor))
+        {
+            foreground = customTextColor;
+        }
+
         return new Border
         {
-            Height = 38,
-            Padding = new Thickness(13, 0),
+            Height = isAdmin ? 40 : 38,
+            Padding = new Thickness(isAdmin ? 15 : 13, 0),
             Background = new SolidColorBrush(Color.Parse(background)),
             BorderBrush = new SolidColorBrush(Color.Parse(border)),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(12),
+            BorderThickness = new Thickness(isAdmin ? 2 : 1),
+            CornerRadius = new CornerRadius(isAdmin ? 13 : 12),
             Child = new TextBlock
             {
-                Text = role,
+                Text = isAdmin ? "★  Admin" : role,
                 VerticalAlignment = VerticalAlignment.Center,
                 FontSize = 12,
-                FontWeight = FontWeight.SemiBold,
+                FontWeight = isAdmin ? FontWeight.Bold : FontWeight.SemiBold,
                 Foreground = new SolidColorBrush(Color.Parse(foreground))
             }
         };
@@ -12881,12 +13652,61 @@ public partial class ExplorerView : UserControl
     {
         var definitions = await _userProfileService.GetRoleAndProjectDefinitionsAsync();
         _projectRoleColors.Clear();
+        _projectRoleBackgroundColors.Clear();
+        _projectRoleTextColors.Clear();
+        _currentProjectRoleNames.Clear();
+
+        var currentProject =
+            definitions.Projects.FirstOrDefault(
+                project =>
+                    string.Equals(
+                        project.Name,
+                        _projectName,
+                        StringComparison.OrdinalIgnoreCase));
+
         foreach (var role in definitions.Roles)
         {
             _projectRoleColors[role.Name] = role.BorderColor;
+            if (!string.IsNullOrWhiteSpace(role.BackgroundColor))
+            {
+                _projectRoleBackgroundColors[role.Name] = role.BackgroundColor;
+            }
+            if (!string.IsNullOrWhiteSpace(role.TextColor))
+            {
+                _projectRoleTextColors[role.Name] = role.TextColor;
+            }
+
+            if (currentProject is not null &&
+                role.ProjectKeys.Contains(
+                    currentProject.Key,
+                    StringComparer.OrdinalIgnoreCase))
+            {
+                _currentProjectRoleNames.Add(role.Name);
+            }
         }
 
+        _projectRoleScopeLoaded = true;
         RefreshRoleBadges();
+    }
+
+    private async Task ReloadRoleBadgesAsync()
+    {
+        var profiles =
+            await _userProfileService.GetProfilesAsync();
+        var currentProfile = profiles.FirstOrDefault(profile =>
+            string.Equals(
+                profile.Login,
+                _loggedInLogin,
+                StringComparison.OrdinalIgnoreCase));
+
+        if (currentProfile is not null)
+        {
+            _projectRoles = currentProfile.ProjectRoles
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
+
+        await LoadProjectRoleColorsAsync();
     }
 
     private void UpdateThemeButton()

@@ -287,7 +287,13 @@ public partial class TestCaseRow : UserControl
                 e;
         }
 
-        if (e.ClickCount != 2)
+        // Po inteligentnym przewinięciu następny wiersz często trafia dokładnie
+        // pod kursor. Avalonia zachowuje wtedy systemową serię kliknięć i kolejny
+        // dwuklik zgłasza jako klik nr 3 oraz 4, zamiast ponownie jako 1 oraz 2.
+        // Obsługujemy każdą zakończoną parę, aby użytkownik nie musiał czekać na
+        // wyzerowanie systemowego czasu dwukliku.
+        if (e.ClickCount < 2 ||
+            e.ClickCount % 2 != 0)
         {
             return;
         }
