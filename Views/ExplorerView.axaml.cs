@@ -9704,13 +9704,22 @@ public partial class ExplorerView : UserControl
 
             if (assignedUnfinishedCount > 0)
             {
-                var sendAnyway =
-                    await ShowOperationConfirmationAsync(
+                var unfinishedChoice =
+                    await ShowUnfinishedAssignmentConfirmationAsync(
                         LocalizationService.T("Assignment.UnfinishedTitle"),
                         LocalizationService.Format("Assignment.UnfinishedDescription", assignedUnfinishedCount),
-                        LocalizationService.T("Assignment.SubmitAnyway"));
+                        LocalizationService.T("Assignment.SubmitAnyway"),
+                        LocalizationService.T("Assignment.PauseAndReturnLater"));
 
-                if (!sendAnyway)
+                if (unfinishedChoice ==
+                    OperationConfirmationChoice.Alternate)
+                {
+                    await ExitAssignedModeToAdHocAsync();
+                    return;
+                }
+
+                if (unfinishedChoice !=
+                    OperationConfirmationChoice.Confirm)
                 {
                     return;
                 }
@@ -9940,6 +9949,33 @@ public partial class ExplorerView : UserControl
                 confirmButtonText);
 
         return await dialog.ShowDialog<bool>(
+            ownerWindow);
+    }
+
+    private async Task<OperationConfirmationChoice> ShowUnfinishedAssignmentConfirmationAsync(
+        string title,
+        string message,
+        string confirmButtonText,
+        string alternateButtonText)
+    {
+        var ownerWindow =
+            TopLevel.GetTopLevel(
+                this)
+            as Window;
+
+        if (ownerWindow is null)
+        {
+            return OperationConfirmationChoice.Cancel;
+        }
+
+        var dialog =
+            new ConfirmDeleteWindow(
+                title,
+                message,
+                confirmButtonText,
+                alternateButtonText);
+
+        return await dialog.ShowDialog<OperationConfirmationChoice>(
             ownerWindow);
     }
 

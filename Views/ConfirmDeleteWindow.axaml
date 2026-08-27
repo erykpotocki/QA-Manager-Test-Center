@@ -54,6 +54,13 @@
             <Setter Property="BorderBrush" Value="#BE3540" />
         </Style>
 
+        <Style Selector="Button.DialogButton.Primary">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
     </Window.Styles>
 
     <Border
@@ -112,10 +119,18 @@
             <Grid
                 Grid.Row="4"
                 Margin="0,24,0,0"
-                ColumnDefinitions="*,Auto,Auto">
+                ColumnDefinitions="*,Auto,Auto,Auto">
 
                 <Button
+                    Name="AlternateButton"
                     Grid.Column="1"
+                    Classes="DialogButton Primary"
+                    Margin="0,0,10,0"
+                    IsVisible="False"
+                    Click="AlternateButton_OnClick" />
+
+                <Button
+                    Grid.Column="2"
                     Classes="DialogButton Secondary"
                     Margin="0,0,10,0"
                     Content="{DynamicResource Common.Cancel}"
@@ -123,7 +138,7 @@
 
                 <Button
                     Name="ConfirmButton"
-                    Grid.Column="2"
+                    Grid.Column="3"
                     Classes="DialogButton Danger"
                     Content="USUŃ"
                     Click="DeleteButton_OnClick" />
