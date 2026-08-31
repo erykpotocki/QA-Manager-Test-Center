@@ -382,6 +382,42 @@ public sealed class AssignmentService
             return Array.Empty<TestAssignmentModel>();
         }
 
+        var profileService =
+            new UserProfileService();
+        var eligibleRecipientsByProject =
+            new Dictionary<string, HashSet<string>>(
+                StringComparer.OrdinalIgnoreCase);
+
+        foreach (var projectKey in requestList
+                     .Select(request =>
+                         request.ProjectKey?.Trim() ?? string.Empty)
+                     .Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var eligibleProfiles =
+                await profileService.GetProfilesWithAccessToProjectAsync(
+                    projectKey);
+
+            eligibleRecipientsByProject[projectKey] = eligibleProfiles
+                .Select(profile => profile.Login)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        }
+
+        foreach (var request in requestList)
+        {
+            if (!eligibleRecipientsByProject.TryGetValue(
+                    request.ProjectKey?.Trim() ?? string.Empty,
+                    out var eligibleRecipients) ||
+                !eligibleRecipients.Contains(
+                    request.RecipientLogin?.Trim() ?? string.Empty))
+            {
+                throw new InvalidOperationException(
+                    LocalizationService.Format(
+                        "Assignment.RecipientNoProjectAccess",
+                        request.RecipientLogin,
+                        request.ProjectName));
+            }
+        }
+
         var data =
             await LoadAsync();
 

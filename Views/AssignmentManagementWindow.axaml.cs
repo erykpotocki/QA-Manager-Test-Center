@@ -187,7 +187,8 @@ public partial class AssignmentManagementWindow : Window
         try
         {
             var profiles =
-                await _profileService.GetProfilesAsync();
+                await _profileService.GetProfilesWithAccessToProjectAsync(
+                    _projectKey);
 
             RecipientComboBox.Items.Clear();
 
@@ -793,6 +794,17 @@ public partial class AssignmentManagementWindow : Window
         ResultTextBlock.IsVisible =
             false;
 
+        if (assignment is not null &&
+            RecipientComboBox.SelectedItem is null)
+        {
+            ShowResult(
+                LocalizationService.Format(
+                    "Assignment.RecipientNoProjectAccess",
+                    assignment.RecipientLogin,
+                    _projectName),
+                false);
+        }
+
         BuildCases();
     }
 
@@ -833,6 +845,9 @@ public partial class AssignmentManagementWindow : Window
     private void SelectRecipient(
         string login)
     {
+        RecipientComboBox.SelectedIndex =
+            -1;
+
         foreach (var item in RecipientComboBox.Items)
         {
             if (item is ComboBoxItem comboBoxItem &&
