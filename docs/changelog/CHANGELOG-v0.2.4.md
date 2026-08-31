@@ -10,5 +10,8 @@ Zmiany względem v0.2.3.
 - Poprawiono wielokrotne przełączanie motywu, kontrast tekstu, grubość i rozmiar czcionki oraz natychmiastowe stosowanie koloru dominującego.
 - Kolor dominujący obejmuje zakładki i akcje dashboardu, przycisk wysyłania przypisań oraz natywne paski wszystkich okien Windows.
 - Dodano możliwość przerwania nieukończonych testów, zachowania postępu i późniejszego wznowienia przypisania bez wysyłania wyników.
+- Dodano profil demonstracyjny `tester3` oraz stały, zróżnicowany dostęp profili demonstracyjnych do `TERMINALE.PL` i drugiego projektu.
+- Zablokowano przypisywanie testów profilom bez dostępu do danego projektu, zarówno na liście odbiorców, jak i podczas zapisu.
+- Licznik „Pozostało” obejmuje teraz również przypadki ze statusem „W trakcie”.
 - Globalny reset czyści PIN-y do wartości testowej `000000`, przypisania, sesje, powiadomienia, wyniki, komentarze i zapisane podpowiedzi formularzy; przywraca język angielski i domyślny wygląd.
 - Zabezpieczono proces wydania przed dołączeniem lokalnych profili, przypisań, ustawień, danych synchronizacji, certyfikatów i baz danych.

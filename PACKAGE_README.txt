@@ -6,8 +6,16 @@ Uruchom plik QAManager.exe.
 Instalacja środowiska .NET nie jest wymagana.
 
 Pierwsze logowanie
-Profile demonstracyjne: admin, leader, tester1 i tester2.
+Profile demonstracyjne: admin, leader, tester1, tester2 i tester3.
 Początkowy PIN każdego profilu to 000000. Przy pierwszym logowaniu aplikacja wymaga ustawienia własnego 6-cyfrowego PIN-u.
+
+Domyślny dostęp
+admin: wszystkie projekty demonstracyjne
+leader: TERMINALE.PL i OGRODY.PL
+tester1: TERMINALE.PL i POGODA.PL
+tester2: TERMINALE.PL i SAMOCHODY.PL
+tester3: TERMINALE.PL i SZPITAL.PL
+Testy można przypisać wyłącznie profilowi mającemu dostęp do danego projektu.
 
 Projekty demonstracyjne
 Świeża instalacja tworzy wyłącznie neutralne projekty: ENGLISH.COM, OGRODY.PL, POGODA.PL, E-URZĄD.PL, OWOCE.PL, TERMINALE.PL, SAMOCHODY.PL i SZPITAL.PL.
