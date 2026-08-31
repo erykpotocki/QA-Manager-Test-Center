@@ -21,6 +21,8 @@ public sealed class UserProfileService
         "professional-roles-v1";
     private const string DemoProjectAccessMigration =
         "demo-project-access-v1";
+    private const string DefaultDemoProfileProjectsMigration =
+        "default-demo-profile-projects-v1";
     private const string ExplicitRoleCategoriesMigration =
         "explicit-role-categories-v1";
     private const string ThematicDemoProjectsMigration =
@@ -331,7 +333,8 @@ public sealed class UserProfileService
                 (Login: "admin", DisplayName: "Admin", Role: SystemRoleService.AdministratorRole),
                 (Login: "leader", DisplayName: "Demo Leader", Role: SystemRoleService.LeaderRole),
                 (Login: "tester1", DisplayName: "Demo Tester 1", Role: SystemRoleService.TesterRole),
-                (Login: "tester2", DisplayName: "Demo Tester 2", Role: SystemRoleService.TesterRole)
+                (Login: "tester2", DisplayName: "Demo Tester 2", Role: SystemRoleService.TesterRole),
+                (Login: "tester3", DisplayName: "Demo Tester 3", Role: SystemRoleService.TesterRole)
             };
 
         data.AppliedDataMigrations ??=
@@ -344,6 +347,10 @@ public sealed class UserProfileService
             !data.AppliedDataMigrations.Contains(
                 DemoProjectAccessMigration,
                 StringComparer.OrdinalIgnoreCase);
+        var assignDefaultDemoProfileProjects =
+            !data.AppliedDataMigrations.Contains(
+                DefaultDemoProfileProjectsMigration,
+                StringComparer.OrdinalIgnoreCase);
         EnsureRoleAndProjectDefinitions(data);
 
         foreach (var demoProfile in demoProfiles)
@@ -355,6 +362,8 @@ public sealed class UserProfileService
                             item.Login,
                             demoProfile.Login,
                             StringComparison.OrdinalIgnoreCase));
+            var profileCreated =
+                profile is null;
 
             if (profile is null)
             {
@@ -404,6 +413,23 @@ public sealed class UserProfileService
                     _ => profile.ProjectRoles
                 };
             }
+
+            if (assignDefaultDemoProfileProjects ||
+                profileCreated)
+            {
+                profile.ProjectRoles = profile.Login.ToLowerInvariant() switch
+                {
+                    "admin" => data.ProjectRoleDefinitions
+                        .Select(role => role.Name)
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList(),
+                    "leader" => new() { "Specjalista systemów kasowych", "Botanik" },
+                    "tester1" => new() { "Tester QA", "Meteorolog" },
+                    "tester2" => new() { "Operator terminala", "Mechanik" },
+                    "tester3" => new() { "Kasjer", "Lekarz" },
+                    _ => profile.ProjectRoles
+                };
+            }
         }
 
         var ownerProfile =
@@ -423,6 +449,12 @@ public sealed class UserProfileService
         {
             data.AppliedDataMigrations.Add(
                 DemoProjectAccessMigration);
+        }
+
+        if (assignDefaultDemoProfileProjects)
+        {
+            data.AppliedDataMigrations.Add(
+                DefaultDemoProfileProjectsMigration);
         }
 
         await SaveAsync(
@@ -1074,6 +1106,76 @@ public sealed class UserProfileService
                     profile.Login,
                 StringComparer.OrdinalIgnoreCase)
             .ToArray();
+    }
+
+    public async Task<UserProfileModel[]> GetProfilesWithAccessToProjectAsync(
+        string projectKey)
+    {
+        if (string.IsNullOrWhiteSpace(projectKey))
+        {
+            return Array.Empty<UserProfileModel>();
+        }
+
+        var data =
+            await LoadAsync();
+        var normalizedProjectKey =
+            projectKey.Trim();
+        var rolesUpdated =
+            false;
+
+        foreach (var profile in data.Profiles)
+        {
+            rolesUpdated |=
+                EnsureDedicatedAdminRole(
+                    profile);
+        }
+
+        if (rolesUpdated)
+        {
+            await SaveAsync(
+                data);
+        }
+
+        return data.Profiles
+            .Where(profile =>
+                HasAccessToProject(
+                    profile,
+                    data.ProjectRoleDefinitions,
+                    normalizedProjectKey))
+            .OrderBy(profile =>
+                string.Equals(
+                    profile.Login,
+                    "epotocki",
+                    StringComparison.OrdinalIgnoreCase)
+                    ? 0
+                    : 1)
+            .ThenBy(
+                profile => profile.Login,
+                StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
+    private static bool HasAccessToProject(
+        UserProfileModel profile,
+        IEnumerable<ProjectRoleDefinitionModel> roleDefinitions,
+        string projectKey)
+    {
+        if (profile.SystemRoles?.Contains(
+                SystemRoleService.AdministratorRole,
+                StringComparer.OrdinalIgnoreCase) == true)
+        {
+            return true;
+        }
+
+        var profileRoleNames =
+            (profile.ProjectRoles ?? new List<string>()).ToHashSet(
+                StringComparer.OrdinalIgnoreCase);
+
+        return roleDefinitions.Any(role =>
+            profileRoleNames.Contains(role.Name) &&
+            role.ProjectKeys?.Contains(
+                projectKey,
+                StringComparer.OrdinalIgnoreCase) == true);
     }
 
     public async Task<bool> GetSuppressAssignmentCompletionConfirmationAsync(
