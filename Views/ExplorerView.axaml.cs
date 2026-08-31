@@ -7820,8 +7820,9 @@ public partial class ExplorerView : UserControl
         var remaining =
             visibleCases.Count(
                 testCase =>
-                    testCase.Status ==
-                    StatusNone);
+                    testCase.Status is
+                        StatusNone or
+                        StatusInProgress);
 
         SetText(
             _successCountTextBlock,
@@ -8866,8 +8867,9 @@ public partial class ExplorerView : UserControl
             _summaryRemainingCountTextBlock,
             cases.Count(
                     testCase =>
-                        testCase.Status ==
-                        StatusNone)
+                        testCase.Status is
+                            StatusNone or
+                            StatusInProgress)
                 .ToString());
 
         var nextTypeKey =
